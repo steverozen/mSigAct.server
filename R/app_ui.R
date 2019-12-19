@@ -22,7 +22,7 @@ app_ui <- function() {
                fluidRow(
                  column(3, actionButton(inputId = "submit", label = "Submit")),
                  column(3, textOutput(outputId = "download.status"),
-                        actionButton(inputId = "download", label = "Download zip file")),
+                        actionButton(inputId = "download", label = "Download zip file"))
                  )
                )
       ),
