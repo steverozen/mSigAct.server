@@ -4,34 +4,39 @@ app_server <- function(input, output,session) {
   # List the first level callModules here
 
   files <- renderText({input$file$datapath})
-  ref.genome <- reactive({input$ref.genome})
+  vcf.type <- isolate(input$vcf.type)
+  ref.genome <- isolate(input$ref.genome)
+  if (ref.genome == "hg19") {
+    trans.ranges <- trans.ranges.GRCh37
+  } else if (ref.genome == "hg38") {
+    trans.ranges <- trans.ranges.GRCh38
+  } else if (ref.genome == "mm10") {
+    trans.ranges <- trans.ranges.GRCm38
+  }
+  region <- isolate(input$region)
   
-  
-  trans.ranges <- reactive(
-    if (input$ref.genome == "hg19") {
-      trans.ranges.GRCh37
-    }
-  )
-    
-  if (FALSE) {
-    if (input$ref.genome == "hg19") {
-      trans.ranges <- trans.ranges.GRCh37
-    } else if (renderPrint({input$ref.genome == "hg38"})) {
-      trans.ranges <- trans.ranges.GRCh38
-    } else if (renderPrint({input$ref.genome == "mm10"})) {
-      trans.ranges <- trans.ranges.GRCm38
-    }
+  names.of.VCFs <- isolate(input$names.of.VCFs)
+  if (names.of.VCFs == "") {
+    names.of.VCFs <- NULL
   }
   
-  
-  if (input$vcf.type == "strelka.sbs") {
-    observeEvent(input$submit, 
-                 StrelkaSBSVCFFilesToZipFile(files, ref.genome, trans.ranges,
-                                             input$region, input$names.of.VCFs,
-                                             input$output.file, input$zipfile.name))
-  }
+  output.file <- isolate(input$output.file)
+  zipfile.name <- isolate(input$zipfile.name)
   
   #browser()
-  output$value <- renderText({input$ref.genome == "hg19"})
+ 
+  cats <-
+    observeEvent(input$file, 
+                 StrelkaSBSVCFFilesToZipFile(input$file$datapath, 
+                                             ref.genome, 
+                                             trans.ranges,
+                                             region, names.of.VCFs,
+                                             output.file,
+                                             zipfile.name))
+  
+  
+  browser()
+  output$value <- files
+  
   
 }
