@@ -16,17 +16,23 @@ app_ui <- function() {
       add_common_parameters(),
       fluidRow(
         column(4, add_tumor_col_names()),
-        column(4, fileInput(inputId = "file", 
-                            label = h5(strong("Upload VCFs of same type")), 
-                            multiple = TRUE),
+        column(4, 
+               h5(strong("Please select a folder which contains the VCF files")),
+               shinyDirButton(id = "directory", label = "Folder select", 
+                              title = "Please select a folder which contains the VCF files"),
+               textOutput("dir"),
                fluidRow(
-                 column(3, actionButton(inputId = "submit", label = "Submit")),
-                 column(3, textOutput(outputId = "download.status"),
-                        actionButton(inputId = "download", label = "Download zip file"))
+                 br(),
+                 br(),
+                 column(5, 
+                        actionButton(inputId = "submit", label = "Update and Submit"),
+                        textOutput("download.status")),
+                 column(4, 
+                        downloadButton(outputId = "download.zipfile", 
+                                       label = "Download Zip file"))
                  )
                )
       ),
-      verbatimTextOutput("value")
     )
   )
 }
@@ -59,9 +65,11 @@ add_region <- function(){
 #' @import shiny
 add_tumor_col_names <- function() {
   textInput(inputId = "tumor.col.names", 
-            label = p(strong(h5("Names of columns containing", 
+            label = p(strong(h5("Names of columns in Mutect VCFs containing", 
                               "tumor sample information")),
-                      h5("(Only applicable to Mutect VCFs)")),
+                      h5("(e.g. colname1, colname2, colname3 ... ", 
+                         "If value is NA(default), the program will use the ", 
+                         "10th column in all the VCFs to calculate VAFs)")),
             value = "NA")
 }
 
@@ -70,13 +78,14 @@ add_common_parameters <- function(){
   fluidRow(
     column(4, textInput(inputId = "names.of.VCFs", 
                         label = p(strong(h5("Names of VCFs")),
-                                  h5("(You may leave it blank)")))),
+                                  h5("(e.g. name1, name2, name3 ...You may leave", 
+                                     "it blank to use the default values.)")))),
     column(4, textInput(inputId = "output.file",
                         label = p(strong(h5("Base name of the files")),
-                                  h5("(You may leave it blank)")))),
+                                  h5("(e.g. name1, or you may leave it blank)")))),
     column(4, textInput(inputId = "zipfile.name",
                         label = p(strong(h5("Name of the zip file")),
-                                  h5("(You may use the default value)")),
+                                  h5("(e.g. name1, or you may use the default value)")),
                         value = "output"))
   )
 }
