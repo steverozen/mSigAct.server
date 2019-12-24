@@ -1,13 +1,16 @@
 #' @import shiny
 #' @import shinyFiles
+#' @import shinythemes
 app_ui <- function() {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # List the first level UI elements here 
     fluidPage(
-      titlePanel(paste0("In-depth Characterization and Analysis ", 
-                        "of Mutational Signatures ('ICAMS')")),
+      theme = shinytheme("cerulean"),
+      titlePanel(p("Shiny interface to the end-to-end functionality of the ", 
+                   a("ICAMS", href = "https://github.com/steverozen/ICAMS"),
+                   " package")),
       hr(),
       fluidRow(
         column(4, add_type_of_vcf()),
@@ -82,7 +85,7 @@ add_common_parameters <- function(){
                                   h5("(e.g. name1, name2, name3 ...You may leave", 
                                      "it blank to use the default values.)")))),
     column(4, textInput(inputId = "output.file",
-                        label = p(strong(h5("Base name of the files")),
+                        label = p(strong(h5("Base name of the CSV and PDF files")),
                                   h5("(e.g. name1, or you may leave it blank)")))),
     column(4, textInput(inputId = "zipfile.name",
                         label = p(strong(h5("Name of the zip file")),
