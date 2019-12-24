@@ -12,7 +12,8 @@ Imports:
     shiny,
     golem,
     shinyFiles,
-    ICAMS
+    ICAMS,
+    shinythemes
 Remotes: steverozen/ICAMS
 RoxygenNote: 7.0.2
 Suggests: 
