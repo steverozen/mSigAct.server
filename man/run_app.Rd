@@ -6,6 +6,9 @@
 \usage{
 run_app(...)
 }
+\arguments{
+\item{...}{Further arguments to be passed to the function.}
+}
 \description{
 Run the Shiny Application
 }

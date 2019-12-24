@@ -1,5 +1,6 @@
 #' Run the Shiny Application
-#'
+#' @param ... Further arguments to be passed to the function.
+#' 
 #' @export
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
