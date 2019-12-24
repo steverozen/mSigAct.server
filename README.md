@@ -11,3 +11,15 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 Shiny interface to the end-to-end functionality of the
 [ICAMS](https://github.com/steverozen/ICAMS) package.
+
+## Installation
+
+Install the development version of ICAMS.shiny from
+[GitHub](https://github.com/) with the R command line:
+
+``` r
+install.packages("devtools")
+devtools::install_github("steverozen/ICAMS.shiny")
+library(ICAMS.shiny)
+run_app()
+```
