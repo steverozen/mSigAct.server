@@ -1,5 +1,6 @@
 #' @import ICAMS
 #' @import shiny
+#' @import shinyFiles
 app_server <- function(input, output,session) {
   # List the first level callModules here
   
@@ -15,11 +16,11 @@ app_server <- function(input, output,session) {
                         dir <- parseDirPath(volumes, input$directory)
                         trans.ranges <- reactive({
                           if (input$ref.genome == "hg19") {
-                            return(trans.ranges.GRCh37)
+                            return(ICAMS::trans.ranges.GRCh37)
                           } else if (input$ref.genome == "hg38") {
-                            return(trans.ranges.GRCh38)
+                            return(ICAMS::trans.ranges.GRCh38)
                           } else if (input$ref.genome == "mm10") {
-                            return(trans.ranges.GRCm38)
+                            return(ICAMS::trans.ranges.GRCm38)
                           }
                         })
                         
