@@ -13,7 +13,8 @@ Imports:
     golem,
     shinyFiles,
     ICAMS,
-    shinythemes
+    shinythemes,
+    htmltools
 Remotes: steverozen/ICAMS
 RoxygenNote: 7.0.2
 Suggests: 
