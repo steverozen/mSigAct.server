@@ -12,7 +12,6 @@ app_server <- function(input, output,session) {
     output$download.zipfile <- 
       downloadHandler(filename = paste0(input$zipfile.name, ".zip"),
                       content = function(file) {
-                        zipfile <- paste0(file, input$zipfile.name, ".zip")
                         dir <- parseDirPath(volumes, input$directory)
                         trans.ranges <- reactive({
                           if (input$ref.genome == "hg19") {
@@ -33,10 +32,9 @@ app_server <- function(input, output,session) {
                             return(trimws(vector))
                           }
                         })
-                        
                         if (input$vcf.type == "strelka.sbs") {
                           StrelkaSBSVCFFilesToZipFile(dir,
-                                                      zipfile,
+                                                      file,
                                                       input$ref.genome, 
                                                       trans.ranges(),
                                                       input$region, 
@@ -44,7 +42,7 @@ app_server <- function(input, output,session) {
                                                       input$output.file)
                         } else if (input$vcf.type == "strelka.id") {
                           StrelkaIDVCFFilesToZipFile(dir,
-                                                     zipfile,
+                                                     file,
                                                      input$ref.genome,
                                                      input$region,
                                                      names.of.VCFs(),
@@ -60,7 +58,7 @@ app_server <- function(input, output,session) {
                             }
                           })
                           MutectVCFFilesToZipFile(dir,
-                                                  zipfile,
+                                                  file,
                                                   input$ref.genome,
                                                   trans.ranges(),
                                                   input$region,
