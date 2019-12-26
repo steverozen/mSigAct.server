@@ -12,7 +12,7 @@ app_server <- function(input, output,session) {
     output$download.zipfile <- 
       downloadHandler(filename = paste0(input$zipfile.name, ".zip"),
                       content = function(file) {
-                        
+                        zipfile <- paste0(file, input$zipfile.name, ".zip")
                         dir <- parseDirPath(volumes, input$directory)
                         trans.ranges <- reactive({
                           if (input$ref.genome == "hg19") {
@@ -36,21 +36,19 @@ app_server <- function(input, output,session) {
                         
                         if (input$vcf.type == "strelka.sbs") {
                           StrelkaSBSVCFFilesToZipFile(dir,
-                                                      file,
+                                                      zipfile,
                                                       input$ref.genome, 
                                                       trans.ranges(),
                                                       input$region, 
                                                       names.of.VCFs(),
-                                                      input$output.file,
-                                                      input$zipfile.name)
+                                                      input$output.file)
                         } else if (input$vcf.type == "strelka.id") {
                           StrelkaIDVCFFilesToZipFile(dir,
-                                                     file,
+                                                     zipfile,
                                                      input$ref.genome,
                                                      input$region,
                                                      names.of.VCFs(),
-                                                     input$output.file,
-                                                     input$zipfile.name)
+                                                     input$output.file)
                         } else if (input$vcf.type == "mutect") {
                           tumor.col.names <- reactive({
                             if (input$tumor.col.names == "NA") {
@@ -62,14 +60,13 @@ app_server <- function(input, output,session) {
                             }
                           })
                           MutectVCFFilesToZipFile(dir,
-                                                  file,
+                                                  zipfile,
                                                   input$ref.genome,
                                                   trans.ranges(),
                                                   input$region,
                                                   names.of.VCFs(),
                                                   tumor.col.names(),
-                                                  input$output.file,
-                                                  input$zipfile.name)
+                                                  input$output.file)
                         }
                       })
     output$download.status <- eventReactive(input$submit, "Ready to download")
