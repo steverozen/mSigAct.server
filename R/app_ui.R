@@ -8,9 +8,10 @@ app_ui <- function() {
     # List the first level UI elements here 
     fluidPage(
       theme = shinytheme("cerulean"),
-      titlePanel(p("Shiny interface to the end-to-end functionality of the ", 
-                   a("ICAMS", href = "https://github.com/steverozen/ICAMS"),
-                   " package")),
+      titlePanel(p(a("ICAMS", href = "https://github.com/steverozen/ICAMS"),
+                   ": In-depth Characterization and Analysis of ", 
+                   "Mutational Signatures")),
+                   
       hr(),
       fluidRow(
         column(4, add_type_of_vcf()),
@@ -26,8 +27,7 @@ app_ui <- function() {
                               title = "Please select a folder which contains the VCF files"),
                textOutput("dir"),
                fluidRow(
-                 br(),
-                 br(),
+                 rep_br(2),
                  column(5, 
                         actionButton(inputId = "submit", label = "Update and Submit"),
                         textOutput("download.status")),
@@ -37,6 +37,10 @@ app_ui <- function() {
                  )
                )
       ),
+      rep_br(8),
+      fluidRow(h5("For complete documentation of ICAMS, please refer to "),
+               a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
+                 "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
     )
   )
 }
@@ -93,8 +97,6 @@ add_common_parameters <- function(){
                         value = "output"))
   )
 }
-
-
 
 #' @import shiny
 golem_add_external_resources <- function(){
