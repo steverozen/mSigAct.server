@@ -32,7 +32,7 @@ app_server <- function(input, output,session) {
                             return(trimws(vector))
                           }
                         })
-                        if (input$vcf.type == "strelka.sbs") {
+                        if (input$vcftype == "strelka.sbs") {
                           StrelkaSBSVCFFilesToZipFile(dir,
                                                       file,
                                                       input$ref.genome, 
@@ -40,14 +40,14 @@ app_server <- function(input, output,session) {
                                                       input$region, 
                                                       names.of.VCFs(),
                                                       input$output.file)
-                        } else if (input$vcf.type == "strelka.id") {
+                        } else if (input$vcftype == "strelka.id") {
                           StrelkaIDVCFFilesToZipFile(dir,
                                                      file,
                                                      input$ref.genome,
                                                      input$region,
                                                      names.of.VCFs(),
                                                      input$output.file)
-                        } else if (input$vcf.type == "mutect") {
+                        } else if (input$vcftype == "mutect") {
                           tumor.col.names <- reactive({
                             if (input$tumor.col.names == "NA") {
                               return (NA)
