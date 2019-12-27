@@ -17,10 +17,12 @@ app_ui <- function() {
         column(3, add_type_of_vcf()),
         column(3, add_reference_genome()),
         column(3, add_region()),
+        column(3, conditionalPanel(
+          condition = "input.vcftype == 'mutect'",
+          add_tumor_col_names()))
       ),
       add_common_parameters(),
       fluidRow(
-        column(4, add_tumor_col_names()),
         column(4, 
                h5(strong("Please select a folder which contains the VCF files")),
                shinyDirButton(id = "directory", label = "Folder select", 
@@ -47,7 +49,7 @@ app_ui <- function() {
 
 #' @import shiny
 add_type_of_vcf <- function() {
-  radioButtons(inputId = "vcf.type", label = h5(strong("Type of VCF")), 
+  radioButtons(inputId = "vcftype", label = h5(strong("Type of VCF")), 
                choiceNames = list(p(a(href = "https://github.com/Illumina/strelka", "Strelka"),
                                     " single base substitutions (SBS)"),
                                   p(a(href = "https://github.com/Illumina/strelka", "Strelka"),
@@ -60,9 +62,9 @@ add_type_of_vcf <- function() {
 #' @import shiny
 add_reference_genome <- function(){
   radioButtons(inputId = "ref.genome", label = h5(strong("Reference genome")), 
-               choices = c("Human GRCh37/hg19" = "hg19",
-                           "Human GRCh38/hg38" = "hg38",
-                           "Mouse GRCm38/mm10" = "mm10"),
+               choiceNames = list(p("Human GRCh37/hg19"), p("Human GRCh38/hg38"),
+                                  p("Mouse GRCm38/mm10")),
+               choiceValues = list("hg19", "hg38", "mm10"),
                selected = "hg19")
 }
 
@@ -87,16 +89,17 @@ add_tumor_col_names <- function() {
 #' @import shiny
 add_common_parameters <- function(){
   fluidRow(
-    column(4, textInput(inputId = "names.of.VCFs", 
-                        label = p(strong(h5("Sample Name")),
+    column(3, textInput(inputId = "names.of.VCFs", 
+                        label = p(strong(h5("Sample name")),
                                   h5("(e.g. name1, name2, name3 ...You may leave", 
                                      "it blank to use the names of the VCF files.)")))),
-    column(4, textInput(inputId = "output.file",
+    column(3, textInput(inputId = "output.file",
                         label = p(strong(h5("Base name of the CSV and PDF files to create")),
                                   h5("(e.g. name1, or you may leave it blank)")))),
-    column(4, textInput(inputId = "zipfile.name",
+    column(3, textInput(inputId = "zipfile.name",
                         label = p(strong(h5("Name of zip file to create")),
-                                  h5("(e.g. name1, or you may use the default value)")),
+                                  h5("(e.g. name1, or you may use the default value", 
+                                     " ICAMS.output)")),
                         value = "ICAMS.output"))
   )
 }
