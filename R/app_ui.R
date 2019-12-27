@@ -11,7 +11,7 @@ app_ui <- function() {
       titlePanel(p(a("ICAMS", href = "https://github.com/steverozen/ICAMS"),
                    ": In-depth Characterization and Analysis of ", 
                    "Mutational Signatures")),
-                   
+      
       hr(),
       fluidRow(
         column(3, add_type_of_vcf()),
@@ -22,27 +22,24 @@ app_ui <- function() {
           add_tumor_col_names()))
       ),
       add_common_parameters(),
+      h5(strong("Please select a folder which contains the VCF files")),
       fluidRow(
-        column(4, 
-               h5(strong("Please select a folder which contains the VCF files")),
+        column(1,
                shinyDirButton(id = "directory", label = "Folder select", 
                               title = "Please select a folder which contains the VCF files"),
-               textOutput("dir"),
-               fluidRow(
-                 rep_br(2),
-                 column(5, 
-                        actionButton(inputId = "submit", label = "Update and Submit"),
-                        textOutput("download.status")),
-                 column(4, 
-                        downloadButton(outputId = "download.zipfile", 
-                                       label = "Download Zip file"))
-                 )
-               )
+               textOutput("dir")),
+        column(3,
+               actionButton(inputId = "submit", label = "Update argument and submit"),
+               textOutput("download.status"))
       ),
-      rep_br(8),
-      fluidRow(h5("For complete documentation of ICAMS, please refer to "),
-               a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
-                 "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
+      rep_br(2),
+      downloadButton(outputId = "download.zipfile", label = "Download Zip file"),
+      rep_br(2),
+      hr(),
+      print(p("For complete documentation of ICAMS, please refer to ",
+              a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
+                "https://cran.rstudio.com/web/packages/ICAMS/index.html")))
+     
     )
   )
 }
