@@ -8,7 +8,11 @@ app_server <- function(input, output,session) {
   shinyDirChoose(input, "directory", roots = volumes, session = session)
   output$dir <- renderText(parseDirPath(volumes, input$directory))
   
-  observeEvent(input$submit, {
+  output$showbutton <- eventReactive(input$submit, "yes")
+  outputOptions(output, "showbutton", suspendWhenHidden = FALSE) 
+  
+  observeEvent(
+    input$submit,
     output$download.zipfile <- 
       downloadHandler(filename = paste0(input$zipfile.name, ".zip"),
                       content = function(file) {
@@ -33,30 +37,35 @@ app_server <- function(input, output,session) {
                           }
                         })
                         if (input$vcftype == "strelka.sbs") {
-                          StrelkaSBSVCFFilesToZipFile(dir,
-                                                      file,
-                                                      input$ref.genome, 
-                                                      trans.ranges(),
-                                                      input$region, 
-                                                      names.of.VCFs(),
-                                                      input$output.file)
+                          output$notification <- renderText(
+                            StrelkaSBSVCFFilesToZipFile(dir,
+                                                        file,
+                                                        input$ref.genome, 
+                                                        trans.ranges(),
+                                                        input$region, 
+                                                        names.of.VCFs(),
+                                                        input$output.file)
+                          )
                         } else if (input$vcftype == "strelka.id") {
+                          output$notification <- renderText(
                           StrelkaIDVCFFilesToZipFile(dir,
                                                      file,
                                                      input$ref.genome,
                                                      input$region,
                                                      names.of.VCFs(),
                                                      input$output.file)
+                          )
                         } else if (input$vcftype == "mutect") {
                           tumor.col.names <- reactive({
                             if (input$tumor.col.names == "NA") {
                               return (NA)
                             } else {
                               vector1 <- unlist(strsplit(input$tumor.col.names, 
-                                                        ",", fixed = TRUE))
+                                                         ",", fixed = TRUE))
                               return(trimws(vector1))
                             }
                           })
+                          output$notification <- renderText(
                           MutectVCFFilesToZipFile(dir,
                                                   file,
                                                   input$ref.genome,
@@ -65,10 +74,10 @@ app_server <- function(input, output,session) {
                                                   names.of.VCFs(),
                                                   tumor.col.names(),
                                                   input$output.file)
+                          )
                         }
                       })
-    output$download.status <- eventReactive(input$submit, "Ready to download")
-  }
-      )
+  )
+  
 
 }

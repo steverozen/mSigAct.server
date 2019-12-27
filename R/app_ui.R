@@ -29,16 +29,19 @@ app_ui <- function() {
                               title = "Please select a folder which contains the VCF files"),
                textOutput("dir")),
         column(3,
-               actionButton(inputId = "submit", label = "Update argument and submit"),
-               textOutput("download.status"))
+               actionButton(inputId = "submit", label = "Update argument and submit"))
       ),
       rep_br(2),
-      downloadButton(outputId = "download.zipfile", label = "Download Zip file"),
+      conditionalPanel(
+        condition = "output.showbutton == 'yes'",
+        downloadButton(outputId = "download.zipfile", label = "Download Zip file")
+      ),
+      textOutput("notification"),
       rep_br(2),
       hr(),
-      print(p("For complete documentation of ICAMS, please refer to ",
-              a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
-                "https://cran.rstudio.com/web/packages/ICAMS/index.html")))
+      p("For complete documentation of ICAMS, please refer to ",
+        a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
+          "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
      
     )
   )
