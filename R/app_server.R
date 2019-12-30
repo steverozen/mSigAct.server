@@ -37,24 +37,26 @@ app_server <- function(input, output,session) {
                           }
                         })
                         if (input$vcftype == "strelka.sbs") {
-                          output$notification <- renderText(
-                            StrelkaSBSVCFFilesToZipFile(dir,
-                                                        file,
-                                                        input$ref.genome, 
-                                                        trans.ranges(),
-                                                        input$region, 
-                                                        names.of.VCFs(),
-                                                        input$output.file)
-                          )
+                          res <- 
+                            CatchToList(StrelkaSBSVCFFilesToZipFile(dir,
+                                                                    file,
+                                                                    input$ref.genome, 
+                                                                    trans.ranges(),
+                                                                    input$region, 
+                                                                    names.of.VCFs(),
+                                                                    input$output.file))
+                          AddMessage(output, res)
                         } else if (input$vcftype == "strelka.id") {
-                          output$notification <- renderText(
-                          StrelkaIDVCFFilesToZipFile(dir,
-                                                     file,
-                                                     input$ref.genome,
-                                                     input$region,
-                                                     names.of.VCFs(),
-                                                     input$output.file)
+                          
+                          res <- CatchToList(
+                            StrelkaIDVCFFilesToZipFile(dir,
+                                                       file,
+                                                       input$ref.genome,
+                                                       input$region,
+                                                       names.of.VCFs(),
+                                                       input$output.file)
                           )
+                          AddMessage(output, res)
                         } else if (input$vcftype == "mutect") {
                           tumor.col.names <- reactive({
                             if (input$tumor.col.names == "NA") {
@@ -65,19 +67,57 @@ app_server <- function(input, output,session) {
                               return(trimws(vector1))
                             }
                           })
-                          output$notification <- renderText(
-                          MutectVCFFilesToZipFile(dir,
-                                                  file,
-                                                  input$ref.genome,
-                                                  trans.ranges(),
-                                                  input$region,
-                                                  names.of.VCFs(),
-                                                  tumor.col.names(),
-                                                  input$output.file)
+                          res <- CatchToList(
+                            MutectVCFFilesToZipFile(dir,
+                                                    file,
+                                                    input$ref.genome,
+                                                    trans.ranges(),
+                                                    input$region,
+                                                    names.of.VCFs(),
+                                                    tumor.col.names(),
+                                                    input$output.file)
                           )
+                          AddMessage(output, res)
                         }
                       })
   )
-  
+}
 
+#' @keywords internal
+CatchToList <- function(expr) {
+  warning <- error <- message <- NULL
+  res <- withCallingHandlers(
+    tryCatch(expr, error = function(e) {
+      error <<- conditionMessage(e)
+      NULL
+    }), warning = function(w) {
+      warning <<- append(warning, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }, message = function(m) {
+      message <<- append(message, conditionMessage(m))
+    })
+  rm(res)
+  list(error = error, warning = warning, message = message)
+}
+
+#' @keywords internal
+AddMessage <- function(output, res) {
+  if (is.null(res$error)) {
+    output$error <- NULL
+  } else {
+    output$error <- renderText(paste0("Error: ", res$error)) 
+  }
+  
+  if (is.null(res$warning)) {
+    output$warning <- NULL
+  } else {
+    output$warning <- renderText(paste0("Warning: ", res$warning))
+  }
+  
+  if (is.null(res$message)) {
+    output$message <- NULL
+  } else {
+    output$message <- renderText(res$message)
+  }
+  
 }
