@@ -47,15 +47,7 @@ app_server <- function(input, output,session) {
                           )
                           AddMessage(output, res)
                         } else if (input$vcftype == "mutect") {
-                          tumor.col.names <- reactive({
-                            if (input$tumor.col.names == "NA") {
-                              return (NA)
-                            } else {
-                              vector1 <- unlist(strsplit(input$tumor.col.names, 
-                                                         ",", fixed = TRUE))
-                              return(trimws(vector1))
-                            }
-                          })
+                          tumor.col.names <- reactive(GetTumorColNames(input$tumor.col.names))
                           res <- CatchToList(
                             MutectVCFFilesToZipFile(dir,
                                                     file,
@@ -71,6 +63,18 @@ app_server <- function(input, output,session) {
                       })
   )
 }
+
+#' @keywords internal
+GetTumorColNames <- function(tumor.col.names) {
+  if (tumor.col.names == "NA") {
+    return (NA)
+  } else {
+    vector1 <- unlist(strsplit(tumor.col.names, 
+                               ",", fixed = TRUE))
+    return(trimws(vector1))
+  }
+}
+
 
 #' @keywords internal
 GetNamesOfVCFs <- function(names.of.VCFs) {
