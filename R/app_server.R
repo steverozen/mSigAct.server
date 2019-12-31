@@ -20,6 +20,8 @@ app_server <- function(input, output,session) {
                           ProcessStrelkaSBSVCFs(input, output, file, volumes)
                         } else if (input$vcftype == "strelka.id") {
                           ProcessStrelkaIDVCFs(input, output, file, volumes)
+                        } else if (input$vcftype == "mutect") {
+                          ProcessMutectVCFs(input, output, file, volumes)
                         }
                       })
   )
@@ -55,6 +57,26 @@ ProcessStrelkaIDVCFs <- function(input, output, file, volumes) {
   )
   AddMessage(output, res)
 }
+
+#' @keywords internal
+ProcessMutectVCFs <- function(input, output, file, volumes) {
+  dir <- parseDirPath(volumes, input$directory)
+  trans.ranges <- reactive(GetTransRanges(input$ref.genome))
+  names.of.VCFs <- reactive(GetNamesOfVCFs(input$names.of.VCFs))
+  tumor.col.names <- reactive(GetTumorColNames(input$tumor.col.names))
+  res <- CatchToList(
+    MutectVCFFilesToZipFile(dir,
+                            file,
+                            input$ref.genome,
+                            trans.ranges(),
+                            input$region,
+                            names.of.VCFs(),
+                            tumor.col.names(),
+                            input$output.file)
+  )
+  AddMessage(output, res)
+}
+
 
 #' @keywords internal
 GetTumorColNames <- function(tumor.col.names) {
