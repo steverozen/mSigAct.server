@@ -27,19 +27,36 @@ app_server <- function(input, output,session) {
   )
 }
 
+
+
 #' @keywords internal
 ProcessStrelkaSBSVCFs <- function(input, output, file, volumes) {
   dir <- parseDirPath(volumes, input$directory)
   trans.ranges <- reactive(GetTransRanges(input$ref.genome))
   names.of.VCFs <- reactive(GetNamesOfVCFs(input$names.of.VCFs))
+  
+  # Create a Progress object
+  progress <- shiny::Progress$new()
+  progress$set(message = "Progress", value = 0)
+  # Close the progress when this reactive exits (even if there's an error)
+  on.exit(progress$close())
+  
+  # Create a callback function to update progress. Each time this is called, it
+  # will increase the progress by that value and update the detail.
+  updateProgress <- function(value = NULL, detail = NULL) {
+    value1 <- value + progress$getValue()
+    progress$set(value = value1, detail = detail)
+  }
+  
   res <- 
-    CatchToList(StrelkaSBSVCFFilesToZipFile(dir,
-                                            file,
-                                            input$ref.genome, 
-                                            trans.ranges(),
-                                            input$region, 
-                                            names.of.VCFs(),
-                                            input$output.file))
+    CatchToList(ICAMS:::.StrelkaSBSVCFFilesToZipFile(dir,
+                                                     file,
+                                                     input$ref.genome, 
+                                                     trans.ranges(),
+                                                     input$region, 
+                                                     names.of.VCFs(),
+                                                     input$output.file,
+                                                     updateProgress))
   AddMessage(output, res)
 }
 
