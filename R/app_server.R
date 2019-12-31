@@ -48,15 +48,15 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, volumes) {
     progress$set(value = value1, detail = detail)
   }
   
-  res <- 
-    CatchToList(ICAMS:::.StrelkaSBSVCFFilesToZipFile(dir,
-                                                     file,
-                                                     input$ref.genome, 
-                                                     trans.ranges(),
-                                                     input$region, 
-                                                     names.of.VCFs(),
-                                                     input$output.file,
-                                                     updateProgress))
+  res <- CatchToList(
+    ICAMS:::.StrelkaSBSVCFFilesToZipFile(dir,
+                                         file,
+                                         input$ref.genome, 
+                                         trans.ranges(),
+                                         input$region, 
+                                         names.of.VCFs(),
+                                         input$output.file,
+                                         updateProgress))
   AddMessage(output, res)
 }
 
@@ -64,13 +64,28 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, volumes) {
 ProcessStrelkaIDVCFs <- function(input, output, file, volumes) {
   dir <- parseDirPath(volumes, input$directory)
   names.of.VCFs <- reactive(GetNamesOfVCFs(input$names.of.VCFs))
+  
+  # Create a Progress object
+  progress <- shiny::Progress$new(min = 0, max = 0.4)
+  progress$set(message = "Progress", value = 0)
+  # Close the progress when this reactive exits (even if there's an error)
+  on.exit(progress$close())
+  
+  # Create a callback function to update progress. Each time this is called, it
+  # will increase the progress by that value and update the detail.
+  updateProgress <- function(value = NULL, detail = NULL) {
+    value1 <- value + progress$getValue()
+    progress$set(value = value1, detail = detail)
+  }
+  
   res <- CatchToList(
-    StrelkaIDVCFFilesToZipFile(dir,
-                               file,
-                               input$ref.genome,
-                               input$region,
-                               names.of.VCFs(),
-                               input$output.file)
+    ICAMS:::.StrelkaIDVCFFilesToZipFile(dir,
+                                        file,
+                                        input$ref.genome,
+                                        input$region,
+                                        names.of.VCFs(),
+                                        input$output.file,
+                                        updateProgress)
   )
   AddMessage(output, res)
 }
