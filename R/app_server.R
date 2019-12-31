@@ -17,15 +17,7 @@ app_server <- function(input, output,session) {
       downloadHandler(filename = paste0(input$zipfile.name, ".zip"),
                       content = function(file) {
                         dir <- parseDirPath(volumes, input$directory)
-                        trans.ranges <- reactive({
-                          if (input$ref.genome == "hg19") {
-                            return(ICAMS::trans.ranges.GRCh37)
-                          } else if (input$ref.genome == "hg38") {
-                            return(ICAMS::trans.ranges.GRCh38)
-                          } else if (input$ref.genome == "mm10") {
-                            return(ICAMS::trans.ranges.GRCm38)
-                          }
-                        })
+                        trans.ranges <- reactive(GetTransRanges(input$ref.genome))
                         
                         names.of.VCFs <- reactive({
                           if (input$names.of.VCFs == "") {
@@ -37,15 +29,20 @@ app_server <- function(input, output,session) {
                           }
                         })
                         if (input$vcftype == "strelka.sbs") {
-                          res <- 
-                            CatchToList(StrelkaSBSVCFFilesToZipFile(dir,
-                                                                    file,
-                                                                    input$ref.genome, 
-                                                                    trans.ranges(),
-                                                                    input$region, 
-                                                                    names.of.VCFs(),
-                                                                    input$output.file))
-                          AddMessage(output, res)
+                          withProgress(message = 'Making plot', value = 0, {
+                            res <- 
+                              CatchToList(StrelkaSBSVCFFilesToZipFile(dir,
+                                                                      file,
+                                                                      input$ref.genome, 
+                                                                      trans.ranges(),
+                                                                      input$region, 
+                                                                      names.of.VCFs(),
+                                                                      input$output.file))
+                            AddMessage(output, res)
+                            incProgress(amount = 1.0, detail = paste("Finishing"))
+                          }
+                            )
+                          
                         } else if (input$vcftype == "strelka.id") {
                           
                           res <- CatchToList(
@@ -82,6 +79,18 @@ app_server <- function(input, output,session) {
                       })
   )
 }
+
+#' @keywords internal
+GetTransRanges <- function(ref.genome) {
+  if (ref.genome == "hg19") {
+    return(ICAMS::trans.ranges.GRCh37)
+  } else if (ref.genome == "hg38") {
+    return(ICAMS::trans.ranges.GRCh38)
+  } else if (ref.genome == "mm10") {
+    return(ICAMS::trans.ranges.GRCm38)
+  }
+}
+
 
 #' @keywords internal
 CatchToList <- function(expr) {
