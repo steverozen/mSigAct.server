@@ -16,52 +16,27 @@ app_server <- function(input, output,session) {
     output$download.zipfile <- 
       downloadHandler(filename = paste0(input$zipfile.name, ".zip"),
                       content = function(file) {
-                        dir <- parseDirPath(volumes, input$directory)
-                        trans.ranges <- reactive(GetTransRanges(input$ref.genome))
-                        
-                        names.of.VCFs <- reactive(GetNamesOfVCFs(input$names.of.VCFs))
                         if (input$vcftype == "strelka.sbs") {
-                          withProgress(message = 'Making plot', value = 0, {
-                            res <- 
-                              CatchToList(StrelkaSBSVCFFilesToZipFile(dir,
-                                                                      file,
-                                                                      input$ref.genome, 
-                                                                      trans.ranges(),
-                                                                      input$region, 
-                                                                      names.of.VCFs(),
-                                                                      input$output.file))
-                            AddMessage(output, res)
-                            incProgress(amount = 1.0, detail = paste("Finishing"))
-                          }
-                            )
-                          
-                        } else if (input$vcftype == "strelka.id") {
-                          
-                          res <- CatchToList(
-                            StrelkaIDVCFFilesToZipFile(dir,
-                                                       file,
-                                                       input$ref.genome,
-                                                       input$region,
-                                                       names.of.VCFs(),
-                                                       input$output.file)
-                          )
-                          AddMessage(output, res)
-                        } else if (input$vcftype == "mutect") {
-                          tumor.col.names <- reactive(GetTumorColNames(input$tumor.col.names))
-                          res <- CatchToList(
-                            MutectVCFFilesToZipFile(dir,
-                                                    file,
-                                                    input$ref.genome,
-                                                    trans.ranges(),
-                                                    input$region,
-                                                    names.of.VCFs(),
-                                                    tumor.col.names(),
-                                                    input$output.file)
-                          )
-                          AddMessage(output, res)
+                          ProcessStrelkaSBSVCFs(input, output, file, volumes)
                         }
                       })
   )
+}
+
+#' @keywords internal
+ProcessStrelkaSBSVCFs <- function(input, output, file, volumes) {
+  dir <- parseDirPath(volumes, input$directory)
+  trans.ranges <- reactive(GetTransRanges(input$ref.genome))
+  names.of.VCFs <- reactive(GetNamesOfVCFs(input$names.of.VCFs))
+  res <- 
+    CatchToList(StrelkaSBSVCFFilesToZipFile(dir,
+                                            file,
+                                            input$ref.genome, 
+                                            trans.ranges(),
+                                            input$region, 
+                                            names.of.VCFs(),
+                                            input$output.file))
+  AddMessage(output, res)
 }
 
 #' @keywords internal
