@@ -19,15 +19,7 @@ app_server <- function(input, output,session) {
                         dir <- parseDirPath(volumes, input$directory)
                         trans.ranges <- reactive(GetTransRanges(input$ref.genome))
                         
-                        names.of.VCFs <- reactive({
-                          if (input$names.of.VCFs == "") {
-                            return(NULL)
-                          } else {
-                            vector <- unlist(strsplit(input$names.of.VCFs, 
-                                                      ",", fixed = TRUE))
-                            return(trimws(vector))
-                          }
-                        })
+                        names.of.VCFs <- reactive(GetNamesOfVCFs(input$names.of.VCFs))
                         if (input$vcftype == "strelka.sbs") {
                           withProgress(message = 'Making plot', value = 0, {
                             res <- 
@@ -79,6 +71,18 @@ app_server <- function(input, output,session) {
                       })
   )
 }
+
+#' @keywords internal
+GetNamesOfVCFs <- function(names.of.VCFs) {
+  if (names.of.VCFs == "") {
+    return(NULL)
+  } else {
+    vector <- unlist(strsplit(names.of.VCFs, 
+                              ",", fixed = TRUE))
+    return(trimws(vector))
+  }
+}
+
 
 #' @keywords internal
 GetTransRanges <- function(ref.genome) {
