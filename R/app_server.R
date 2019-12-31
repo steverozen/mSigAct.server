@@ -18,6 +18,8 @@ app_server <- function(input, output,session) {
                       content = function(file) {
                         if (input$vcftype == "strelka.sbs") {
                           ProcessStrelkaSBSVCFs(input, output, file, volumes)
+                        } else if (input$vcftype == "strelka.id") {
+                          ProcessStrelkaIDVCFs(input, output, file, volumes)
                         }
                       })
   )
@@ -36,6 +38,21 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, volumes) {
                                             input$region, 
                                             names.of.VCFs(),
                                             input$output.file))
+  AddMessage(output, res)
+}
+
+#' @keywords internal
+ProcessStrelkaIDVCFs <- function(input, output, file, volumes) {
+  dir <- parseDirPath(volumes, input$directory)
+  names.of.VCFs <- reactive(GetNamesOfVCFs(input$names.of.VCFs))
+  res <- CatchToList(
+    StrelkaIDVCFFilesToZipFile(dir,
+                               file,
+                               input$ref.genome,
+                               input$region,
+                               names.of.VCFs(),
+                               input$output.file)
+  )
   AddMessage(output, res)
 }
 
