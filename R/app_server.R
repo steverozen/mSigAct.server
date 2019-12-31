@@ -96,15 +96,30 @@ ProcessMutectVCFs <- function(input, output, file, volumes) {
   trans.ranges <- reactive(GetTransRanges(input$ref.genome))
   names.of.VCFs <- reactive(GetNamesOfVCFs(input$names.of.VCFs))
   tumor.col.names <- reactive(GetTumorColNames(input$tumor.col.names))
+  
+  # Create a Progress object
+  progress <- shiny::Progress$new()
+  progress$set(message = "Progress", value = 0)
+  # Close the progress when this reactive exits (even if there's an error)
+  on.exit(progress$close())
+  
+  # Create a callback function to update progress. Each time this is called, it
+  # will increase the progress by that value and update the detail.
+  updateProgress <- function(value = NULL, detail = NULL) {
+    value1 <- value + progress$getValue()
+    progress$set(value = value1, detail = detail)
+  }
+  
   res <- CatchToList(
-    MutectVCFFilesToZipFile(dir,
-                            file,
-                            input$ref.genome,
-                            trans.ranges(),
-                            input$region,
-                            names.of.VCFs(),
-                            tumor.col.names(),
-                            input$output.file)
+    ICAMS:::.MutectVCFFilesToZipFile(dir,
+                                     file,
+                                     input$ref.genome,
+                                     trans.ranges(),
+                                     input$region,
+                                     names.of.VCFs(),
+                                     tumor.col.names(),
+                                     input$output.file,
+                                     updateProgress)
   )
   AddMessage(output, res)
 }
