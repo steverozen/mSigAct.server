@@ -36,9 +36,6 @@ app_ui <- function() {
         condition = "output.showbutton == 'yes'",
         downloadButton(outputId = "download.zipfile", label = "Download Zip file")
       ),
-      span(textOutput("error"), style = "color:red"),
-      span(textOutput("warning"), style = "color:red"),
-      textOutput("message"),
       rep_br(2),
       hr(),
       p("For complete documentation of ICAMS, please refer to ",

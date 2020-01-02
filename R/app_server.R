@@ -57,7 +57,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, volumes) {
                                          names.of.VCFs(),
                                          input$output.file,
                                          updateProgress))
-  AddMessage(output, res)
+  AddMessage(res)
 }
 
 #' @keywords internal
@@ -87,7 +87,8 @@ ProcessStrelkaIDVCFs <- function(input, output, file, volumes) {
                                         input$output.file,
                                         updateProgress)
   )
-  AddMessage(output, res)
+
+  AddMessage(res)
 }
 
 #' @keywords internal
@@ -121,9 +122,8 @@ ProcessMutectVCFs <- function(input, output, file, volumes) {
                                      input$output.file,
                                      updateProgress)
   )
-  AddMessage(output, res)
+  AddMessage(res)
 }
-
 
 #' @keywords internal
 GetTumorColNames <- function(tumor.col.names) {
@@ -179,23 +179,19 @@ CatchToList <- function(expr) {
 }
 
 #' @keywords internal
-AddMessage <- function(output, res) {
-  if (is.null(res$error)) {
-    output$error <- NULL
-  } else {
-    output$error <- renderText(paste0("Error: ", res$error)) 
-  }
+AddMessage <- function(res) {
+  if (!is.null(res$error)) {
+    showNotification(ui = "Error:", action = res$error, duration = NULL,
+                     type = "error")
+  } 
   
-  if (is.null(res$warning)) {
-    output$warning <- NULL
-  } else {
-    output$warning <- renderText(paste0("Warning: ", res$warning))
-  }
+  if (!is.null(res$warning)) {
+    showNotification(ui = "Warning:", action = res$warning, duration = NULL,
+                     type = "warning")
+  } 
   
-  if (is.null(res$message)) {
-    output$message <- NULL
-  } else {
-    output$message <- renderText(res$message)
-  }
-  
+  if (!is.null(res$message)) {
+    showNotification(ui = "Message:", action = res$message, duration = NULL,
+                     type = "message")
+  } 
 }
