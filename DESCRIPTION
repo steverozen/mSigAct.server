@@ -14,7 +14,8 @@ Imports:
     shinyFiles,
     ICAMS,
     shinythemes,
-    htmltools
+    htmltools,
+    pkgload
 Remotes: steverozen/ICAMS
 RoxygenNote: 7.0.2
 Suggests: 

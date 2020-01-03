@@ -89,9 +89,9 @@ add_tumor_col_names <- function() {
 add_common_parameters <- function(){
   fluidRow(
     column(3, textInput(inputId = "names.of.VCFs", 
-                        label = p(strong(h5("Sample name")),
-                                  h5("(e.g. name1, name2, name3 ...You may leave", 
-                                     "it blank to use the names of the VCF files.)")))),
+                        label = p(strong(h5("Sample names")),
+                                  h5("(e.g. name1, name2, name3 ...If ", 
+                                     "blank, then use the names of the VCF files.)")))),
     column(3, textInput(inputId = "output.file",
                         label = p(strong(h5("Base name of the CSV and PDF files to create")),
                                   h5("(e.g. name1, or you may leave it blank)")))),

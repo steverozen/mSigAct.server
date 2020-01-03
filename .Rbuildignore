@@ -6,3 +6,4 @@ dev_history.R
 $run_dev.*
 ^\.travis\.yml$
 ^README\.Rmd$
+^app\.R$

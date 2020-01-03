@@ -49,7 +49,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, volumes) {
   }
   
   res <- CatchToList(
-    ICAMS:::.StrelkaSBSVCFFilesToZipFile(dir,
+    ICAMS::StrelkaSBSVCFFilesToZipFile(dir,
                                          file,
                                          input$ref.genome, 
                                          trans.ranges(),
@@ -79,7 +79,7 @@ ProcessStrelkaIDVCFs <- function(input, output, file, volumes) {
   }
   
   res <- CatchToList(
-    ICAMS:::.StrelkaIDVCFFilesToZipFile(dir,
+    ICAMS::StrelkaIDVCFFilesToZipFile(dir,
                                         file,
                                         input$ref.genome,
                                         input$region,
@@ -112,7 +112,7 @@ ProcessMutectVCFs <- function(input, output, file, volumes) {
   }
   
   res <- CatchToList(
-    ICAMS:::.MutectVCFFilesToZipFile(dir,
+    ICAMS::MutectVCFFilesToZipFile(dir,
                                      file,
                                      input$ref.genome,
                                      trans.ranges(),

@@ -31,6 +31,6 @@ Install the development version of ICAMS.shiny from [GitHub](https://github.com/
 install.packages("devtools")
 devtools::install_github("steverozen/ICAMS.shiny")
 library(ICAMS.shiny)
-ICAMS.shinyApp()
+run_app()
 ```
 
