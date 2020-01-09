@@ -374,7 +374,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   }
   
   # Catch the errors, warnings and messages and store them in a list when
-  # generating a zip archive from Mutect VCFs
+  # generating a zip archive from Strelka SBS VCFs
   res <- CatchToList(
     GenerateZipFileFromStrelkaSBSVCFs(files = vcfs.info$datapath,
                                       zipfile = file,
@@ -438,3 +438,68 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
   unlink(file.names)
 }
 
+#' This function is a wrapper function processing Strelka ID VCF files to
+#' generate a zip archive.
+#' 
+#' @inheritParams ProcessMutectVCFs
+#'   
+#' @return A list of updated notification ids for error, warning and message
+#'   after running this function.
+#'
+#' @keywords internal
+ProcessStrelkaIDVCFs <- function(input, output, file, ids) {
+  # vcfs.info is a data frame that contains one row for each uploaded file, 
+  # and four columns "name", "size", "type" and "datapath". 
+  # "name": The filename provided by the web browser.
+  # "size": The size of the uploaded data, in bytes. 
+  # "type": The MIME type reported by the browser.
+  # "datapath": The path to a temp file that contains the data that was uploaded.
+  vcfs.info <- input$vcf.files
+  
+  # Get the sample names specified by user
+  vcf.names <- GetNamesOfVCFs(input$names.of.VCFs)
+  
+  if (is.null(vcf.names)) {
+    # If user didn't specify sample names, then use VCF names
+    # as the sample names
+    names.of.VCFs <- 
+      # Get VCF file names without extension
+      tools::file_path_sans_ext(vcfs.info$name) 
+  } else {
+    names.of.VCFs <- vcf.names
+  }
+  
+  # Get the base name of the CSV and PDF files to create specified by user
+  base.filename <- input$base.filename
+  
+  # Create a Progress object
+  progress <- shiny::Progress$new()
+  progress$set(message = "Progress", value = 0)
+  # Close the progress when this reactive exits (even if there's an error)
+  on.exit(progress$close())
+  
+  # Create a callback function to update progress. Each time this is called, it
+  # will increase the progress by that value and update the detail
+  updateProgress <- function(value = NULL, detail = NULL) {
+    value1 <- value + progress$getValue()
+    progress$set(value = value1, detail = detail)
+  }
+  
+  # Catch the errors, warnings and messages and store them in a list when
+  # generating a zip archive from Strelka ID VCFs
+  res <- CatchToList(
+    GenerateZipFileFromStrelkaIDVCFs(files = vcfs.info$datapath,
+                                     zipfile = file,
+                                     ref.genome = input$ref.genome, 
+                                     region = input$region, 
+                                     names.of.VCFs = names.of.VCFs, 
+                                     base.filename = base.filename,
+                                     updateProgress = updateProgress)
+  )
+  
+  # Get the new notification ids
+  new.ids <- AddNotifications(res)
+  
+  # Update the notification ids
+  return(UpdateNotificationIDs(ids, new.ids))
+}
