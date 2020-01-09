@@ -25,13 +25,11 @@ app_server <- function(input, output,session) {
                             # and messages
                             ids <<- 
                               ProcessStrelkaSBSVCFs(input, output, file, ids)
+                          } else if (input$vcftype == "strelka.id") {
+                            ids <<- ProcessStrelkaIDVCFs(input, output, file, ids)
                           } else if (input$vcftype == "mutect") {
-                            # Generate a zip archive from Mutect VCFs and update
-                            # the notification ids for errors, warnings and
-                            # messages
                             ids <<- ProcessMutectVCFs(input, output, file, ids)
                           }
-                          
                         })
         
     }
