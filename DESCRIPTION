@@ -1,6 +1,6 @@
 Package: ICAMS.shiny
 Title: An Amazing Shiny App
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Author: Author
 Maintainer: Author <your@email.com>
 Description: What the package does (one paragraph).
@@ -15,7 +15,8 @@ Imports:
     ICAMS,
     shinythemes,
     htmltools,
-    pkgload
+    pkgload,
+    zip
 Remotes: steverozen/ICAMS
 RoxygenNote: 7.0.2
 Suggests: 
