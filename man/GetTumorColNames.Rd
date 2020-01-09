@@ -13,7 +13,7 @@ contain the tumor sample information in Mutect VCFs (different names
 separated by comma) specified by user on the browser.}
 }
 \value{
-A character vetor containing the name of column which contains the
+A character vector containing the name of column which contains the
   tumor sample information in Mutect VCFs.
 }
 \description{

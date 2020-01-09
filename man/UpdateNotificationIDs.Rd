@@ -7,7 +7,7 @@
 UpdateNotificationIDs(old.ids, new.ids)
 }
 \arguments{
-\item{old.ids}{A list of notificaion ids to be updated.}
+\item{old.ids}{A list of notification ids to be updated.}
 
 \item{new.ids}{A list of new notification ids.}
 }

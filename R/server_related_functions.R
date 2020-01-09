@@ -5,7 +5,7 @@
 #'   contain the tumor sample information in Mutect VCFs (different names
 #'   separated by comma) specified by user on the browser.
 #'   
-#' @return A character vetor containing the name of column which contains the
+#' @return A character vector containing the name of column which contains the
 #'   tumor sample information in Mutect VCFs.
 #'   
 #' @keywords internal
@@ -27,7 +27,7 @@ GetTumorColNames <- function(tumor.col.names) {
 #'   representing different VCF files (different names separated by comma)
 #'   specified by user on the browser.
 #'   
-#' @return A character vetor containing the sample names representing different
+#' @return A character vector containing the sample names representing different
 #'   VCF files.
 #'   
 #' @keywords internal
@@ -102,7 +102,7 @@ AddNotifications <- function(res) {
 
 #' Update the existing list of notification ids.
 #'
-#' @param old.ids A list of notificaion ids to be updated.
+#' @param old.ids A list of notification ids to be updated.
 #' 
 #' @param new.ids A list of new notification ids.
 #' 

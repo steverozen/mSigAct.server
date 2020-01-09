@@ -13,7 +13,7 @@ representing different VCF files (different names separated by comma)
 specified by user on the browser.}
 }
 \value{
-A character vetor containing the sample names representing different
+A character vector containing the sample names representing different
   VCF files.
 }
 \description{
