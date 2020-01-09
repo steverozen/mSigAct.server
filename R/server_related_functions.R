@@ -392,3 +392,49 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   # Update the notification ids
   return(UpdateNotificationIDs(ids, new.ids))
 }
+
+#' This function generates a zip archive from Strelka ID VCF files.
+#' 
+#' @inheritParams ICAMS::MutectVCFFilesToZipFile
+#' 
+#' @param files Character vector of file paths to the Strelka ID VCF files.
+#' 
+#' @import ICAMS
+#' 
+#' @import zip
+#' 
+#' @keywords internal
+GenerateZipFileFromStrelkaIDVCFs <- function(files,
+                                             zipfile,
+                                             ref.genome, 
+                                             region = "unknown", 
+                                             names.of.VCFs = NULL, 
+                                             base.filename = "",
+                                             updateProgress = NULL){
+  
+  list <- StrelkaIDVCFFilesToCatalog(files,
+                                     ref.genome,
+                                     region,
+                                     names.of.VCFs,
+                                     updateProgress)
+  
+  output.file <- ifelse(base.filename == "",
+                        paste0(tempdir(), .Platform$file.sep),
+                        file.path(tempdir(), paste0(base.filename, ".")))
+  
+  WriteCatalog(list$catalog, file = paste0(output.file, "catID.csv"))
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "wrote catalogs to CSV files")
+  }
+  
+  PlotCatalogToPdf(list$catalog, file = paste0(output.file, "catID.pdf"))
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
+  }
+  
+  file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf"), 
+                           full.names = TRUE)
+  zip::zipr(zipfile = zipfile, files = file.names)
+  unlink(file.names)
+}
+
