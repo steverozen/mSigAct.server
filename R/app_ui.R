@@ -66,9 +66,7 @@ app_ui <- function() {
       # action button to update argument and submit for the first time
       conditionalPanel(
         condition = "output.clicksubmit",
-        downloadButton(outputId = "download", label = "Download")),
-      
-      verbatimTextOutput(outputId = "id"),
+        downloadButton(outputId = "download", label = "Download results")),
       
       # Add two line breaks
       rep_br(2),
