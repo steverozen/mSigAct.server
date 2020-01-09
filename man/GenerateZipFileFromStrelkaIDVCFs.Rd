@@ -7,6 +7,8 @@
 GenerateZipFileFromStrelkaIDVCFs(
   files,
   zipfile,
+  vcf.names,
+  zipfile.name,
   ref.genome,
   region = "unknown",
   names.of.VCFs = NULL,

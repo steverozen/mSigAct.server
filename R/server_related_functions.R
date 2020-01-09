@@ -127,11 +127,42 @@ RemoveAllNotifications <- function(ids) {
   sapply(ids$message, FUN = removeNotification)
 }
 
+#' Create a README file describing the zip archive generated from VCF files
+#'
+#' @inheritParams GenerateZipFileFromMutectVCFs
+#' 
+#' @keywords internal
+CreateReadMeFile <- function(vcf.names, zipfile.name, ref.genome, region) {
+  
+  README <- file(description = file.path(tempdir(), "READEME.txt"), open = "w")
+  writeLines(paste0("README.txt file for ", paste0(zipfile.name, ".zip"), 
+                    " created on ", Sys.time()), README)
+  writeLines("", README)
+  writeLines("###Input parameters###", README)
+  writeLines(paste0("File names:       ", paste(vcf.names, collapse = "; ")), 
+             README)
+  if (ref.genome == "hg19") {
+    ref.genome <- "BSgenome.Hsapiens.1000genomes.hs37d5"
+  } else if (ref.genome == "hg38") {
+    ref.genome <- "BSgenome.Hsapiens.UCSC.hg38"
+  } else if (ref.genome == "mm10") {
+    ref.genome <- "BSgenome.Mmusculus.UCSC.mm10"
+  }
+  
+  writeLines(paste0("Reference genome: ", ref.genome), README)
+  writeLines(paste0("Region:           ", region), README)
+  close(README)
+}
+
 #' This function generates a zip archive from Mutect VCF files.
 #' 
 #' @inheritParams ICAMS::MutectVCFFilesToZipFile
 #' 
 #' @param files Character vector of file paths to the Mutect VCF files.
+#' 
+#' @param vcf.names Names of VCF files uploaded by the user.
+#' 
+#' @param zipfile.name Name of zip archive specified by the user.
 #' 
 #' @import ICAMS
 #' 
@@ -140,6 +171,8 @@ RemoveAllNotifications <- function(ids) {
 #' @keywords internal
 GenerateZipFileFromMutectVCFs <- function(files,
                                           zipfile,
+                                          vcf.names,
+                                          zipfile.name,
                                           ref.genome, 
                                           trans.ranges = NULL, 
                                           region = "unknown", 
@@ -180,7 +213,10 @@ GenerateZipFileFromMutectVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
   }
-  file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf"), 
+  
+  CreateReadMeFile(vcf.names, zipfile.name, ref.genome, region)
+  
+  file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
                            full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
@@ -253,6 +289,8 @@ ProcessMutectVCFs <- function(input, output, file, ids) {
   res <- CatchToList(
     GenerateZipFileFromMutectVCFs(files = vcfs.info$datapath,
                                   zipfile = file,
+                                  vcf.names = vcfs.info$name,
+                                  zipfile.name = input$zipfile.name,
                                   ref.genome = input$ref.genome, 
                                   trans.ranges = NULL, 
                                   region = input$region, 
@@ -282,6 +320,8 @@ ProcessMutectVCFs <- function(input, output, file, ids) {
 #' @keywords internal
 GenerateZipFileFromStrelkaSBSVCFs <- function(files,
                                               zipfile,
+                                              vcf.names,
+                                              zipfile.name,
                                               ref.genome, 
                                               trans.ranges = NULL, 
                                               region = "unknown", 
@@ -320,8 +360,12 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
   }
-  file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf"), 
-                           full.names = TRUE)
+  
+  CreateReadMeFile(vcf.names, zipfile.name, ref.genome, region)
+  
+  file.names <- 
+    list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
+               full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
 }
@@ -378,6 +422,8 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   res <- CatchToList(
     GenerateZipFileFromStrelkaSBSVCFs(files = vcfs.info$datapath,
                                       zipfile = file,
+                                      vcf.names = vcfs.info$name,
+                                      zipfile.name = input$zipfile.name,
                                       ref.genome = input$ref.genome, 
                                       trans.ranges = NULL, 
                                       region = input$region, 
@@ -406,6 +452,8 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 #' @keywords internal
 GenerateZipFileFromStrelkaIDVCFs <- function(files,
                                              zipfile,
+                                             vcf.names,
+                                             zipfile.name,
                                              ref.genome, 
                                              region = "unknown", 
                                              names.of.VCFs = NULL, 
@@ -432,8 +480,11 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
     updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
   }
   
-  file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf"), 
-                           full.names = TRUE)
+  CreateReadMeFile(vcf.names, zipfile.name, ref.genome, region)
+  
+  file.names <- 
+    list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
+               full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
 }
@@ -490,6 +541,8 @@ ProcessStrelkaIDVCFs <- function(input, output, file, ids) {
   res <- CatchToList(
     GenerateZipFileFromStrelkaIDVCFs(files = vcfs.info$datapath,
                                      zipfile = file,
+                                     vcf.names = vcfs.info$name,
+                                     zipfile.name = input$zipfile.name,
                                      ref.genome = input$ref.genome, 
                                      region = input$region, 
                                      names.of.VCFs = names.of.VCFs, 

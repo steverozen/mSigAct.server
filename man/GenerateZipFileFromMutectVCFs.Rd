@@ -7,6 +7,8 @@
 GenerateZipFileFromMutectVCFs(
   files,
   zipfile,
+  vcf.names,
+  zipfile.name,
   ref.genome,
   trans.ranges = NULL,
   region = "unknown",
@@ -20,6 +22,10 @@ GenerateZipFileFromMutectVCFs(
 \item{files}{Character vector of file paths to the Mutect VCF files.}
 
 \item{zipfile}{Pathname of the zip file to be created.}
+
+\item{vcf.names}{Names of VCF files uploaded by the user.}
+
+\item{zipfile.name}{Name of zip archive specified by the user.}
 
 \item{ref.genome}{A \code{ref.genome} argument as described in
 \code{\link[ICAMS]{ICAMS}}.}
