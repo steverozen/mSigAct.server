@@ -189,6 +189,10 @@ GenerateZipFileFromMutectVCFs <- function(files,
                                       tumor.col.names,
                                       updateProgress)
   
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
+  }
+  
   output.file <- ifelse(base.filename == "",
                         paste0(tempdir(), .Platform$file.sep),
                         file.path(tempdir(), paste0(base.filename, ".")))
@@ -197,8 +201,9 @@ GenerateZipFileFromMutectVCFs <- function(files,
     WriteCatalog(catalogs[[name]],
                  file = paste0(output.file, name, ".csv"))
   }
+  
   if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "wrote catalogs to CSV files")
+    updateProgress(value = 0.1, detail = "plotting catalogs to PDF files")
   }
   
   for (name in names(catalogs)) {
@@ -211,7 +216,7 @@ GenerateZipFileFromMutectVCFs <- function(files,
     }
   }
   if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
+    updateProgress(value = 0.1, detail = "generating zip archive")
   }
   
   CreateReadMeFile(vcf.names, zipfile.name, ref.genome, region)
