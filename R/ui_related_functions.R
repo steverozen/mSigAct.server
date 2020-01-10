@@ -53,7 +53,7 @@ add_region <- function(){
 add_sample_names <- function() {
   textInput(inputId = "names.of.VCFs", 
             label = p(strong(h5("Sample names")),
-                      h5("(e.g. name1, name2, name3 ...If blank, ", 
+                      h5("(e.g. name1, name2, name3...If blank, ", 
                          "then use the names of the VCF files.)")))
 }
 

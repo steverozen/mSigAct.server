@@ -46,15 +46,21 @@ app_ui <- function() {
         
         # Add text input for user to specify the base filename
         # of the CSV and PDF files generated
-        column(4, add_base_filename()),
-        
-        # Add text input for user to specify the zip file name
-        column(4, add_zipfile_name())
+        column(4, add_base_filename())
       ),
       
-      # Add a file upload control for user to upload multiple VCF files
-      fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
-                multiple = TRUE),
+      # Add the next row of control widgets
+      fluidRow(
+        # Add text input for user to specify the zip file name
+        column(4, add_zipfile_name()),
+        
+        # Add a file upload control for user to upload multiple VCF files
+        column(4, fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
+                            multiple = TRUE))
+      ),
+      
+      # Add one line break
+      br(),
       
       # Add an action button for user to update argument and submit
       actionButton(inputId = "submit", label = "Update argument and submit"),
