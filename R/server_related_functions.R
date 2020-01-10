@@ -81,21 +81,27 @@ AddNotifications <- function(res) {
              "message" = character(0))
   
   if (!is.null(res$error)) {
-    id.error <- showNotification(ui = "Error:", action = res$error, 
-                                 duration = NULL, type = "error")
-    id$error <- id.error
+    for (i in 1:length(res$error)) {
+      id.error <- showNotification(ui = "Error:", action = res$error[i], 
+                                   duration = NULL, type = "error")
+      id$error <- id.error
+    }
   } 
   
   if (!is.null(res$warning)) {
-    id.warning <- showNotification(ui = "Warning:", action = res$warning, 
-                                   duration = NULL, type = "warning")
-    id$warning <- id.warning
+    for (i in 1:length(res$warning)) {
+      id.warning <- showNotification(ui = "Warning:", action = res$warning[i], 
+                                     duration = NULL, type = "warning")
+      id$warning <- c(id$warning, id.warning)
+    }
   } 
   
   if (!is.null(res$message)) {
-    id.message <- showNotification(ui = "Message:", action = res$message, 
-                                   duration = NULL, type = "message")
-    id$message <- id.message
+    for (i in 1:length(res$message)) {
+      id.message <- showNotification(ui = "Message:", action = res$message[i], 
+                                     duration = NULL, type = "message")
+      id$message <- id.message
+    }
   }
   return(id)
 }
