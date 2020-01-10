@@ -137,16 +137,67 @@ RemoveAllNotifications <- function(ids) {
 #'
 #' @inheritParams GenerateZipFileFromMutectVCFs
 #' 
+#' @importFrom  stringi stri_pad
+#' 
+#' @importFrom tools md5sum
+#' 
 #' @keywords internal
-CreateReadMeFile <- function(vcf.names, zipfile.name, ref.genome, region) {
+AddRunInformation <- 
+  function(files, vcf.names, zipfile.name, vcftype, ref.genome, region) {
   
-  README <- file(description = file.path(tempdir(), "READEME.txt"), open = "w")
-  writeLines(paste0("README.txt file for ", paste0(zipfile.name, ".zip"), 
-                    " created on ", Sys.time()), README)
-  writeLines("", README)
-  writeLines("###Input parameters###", README)
-  writeLines(paste0("File names:       ", paste(vcf.names, collapse = "; ")), 
-             README)
+  run.info <- 
+    file(description = file.path(tempdir(), "run-information.txt"), open = "w")
+  
+  # Add the header information
+  writeLines(paste0("------------------------------------------------------",
+                    "------------------------------------------------------"),
+                    run.info)
+  writeLines(paste0("run-information.txt file for ", 
+                    paste0(zipfile.name, ".zip"), 
+                    " created on ", Sys.time()), run.info)
+  writeLines(paste0("------------------------------------------------------",
+                    "------------------------------------------------------"),
+             run.info)
+  
+  # Add section on purpose of ICAMS software
+  writeLines("", run.info)
+  writeLines("### Purpose of the software ###", run.info)
+  writeLines(c("Analysis and visualization of experimentally elucidated mutational",
+               "signatures – the kind of analysis and visualization in Boot et al.,",
+               "'In-depth characterization of the cisplatin mutational signature in",
+               "human cell lines and in esophageal and liver tumors', ", 
+               "Genome Research 2018, https://doi.org/10.1101/gr.230219.117.",
+               "'ICAMS' stands for In-depth Characterization and Analysis of",
+               "Mutational Signatures. 'ICAMS' has functions to read in variant",
+               "call files (VCFs) and to collate the corresponding catalogs of",
+               "mutational spectra and to analyze and plot catalogs of mutational",
+               "spectra and signatures. Handles both “counts-based” and ", 
+               "“density-based” catalogs of mutational spectra or signatures."), 
+             run.info)
+  writeLines("", run.info)
+  writeLines(c("For complete documentation of ICAMS, please refer to ",
+               "https://cran.rstudio.com/web/packages/ICAMS/index.html"), run.info)
+  writeLines("", run.info)
+  writeLines(c("To use the shiny interface of ICAMS, please refer to ",
+               "https://jnh01.shinyapps.io/icams/"), run.info)
+  
+  # Add ICAMS and R version used
+  writeLines("", run.info)
+  writeLines("### Version of the software ###", run.info)
+  writeLines(paste0("ICAMS version: ", packageVersion("ICAMS")), run.info)
+  writeLines(paste0("R version:     ", getRversion()), run.info)
+  
+  # Add input parameters specified by the user
+  writeLines("", run.info)
+  writeLines("### Input parameters ###", run.info)
+  if (vcftype == "strelka.sbs") {
+    vcftype <- "Strelka SBS VCF"
+  } else if (vcftype == "strelka.id") {
+    vcftype <- "Strelka ID VCF"
+  } else if (vcftype == "mutect") {
+    vcftype <- "Mutect VCF"
+  }
+  
   if (ref.genome == "hg19") {
     ref.genome <- "BSgenome.Hsapiens.1000genomes.hs37d5"
   } else if (ref.genome == "hg38") {
@@ -154,10 +205,24 @@ CreateReadMeFile <- function(vcf.names, zipfile.name, ref.genome, region) {
   } else if (ref.genome == "mm10") {
     ref.genome <- "BSgenome.Mmusculus.UCSC.mm10"
   }
+  writeLines(paste0("Type of VCF:      ", vcftype), run.info)
+  writeLines(paste0("Reference genome: ", ref.genome), run.info)
+  writeLines(paste0("Region:           ", region), run.info)
   
-  writeLines(paste0("Reference genome: ", ref.genome), README)
-  writeLines(paste0("Region:           ", region), README)
-  close(README)
+  # Add input files information
+  writeLines("", run.info)
+  writeLines("### Input files ###", run.info)
+  max.num.of.char <- max(nchar(vcf.names))
+  writeLines(paste0(stringi::stri_pad("Name", width = max.num.of.char,
+                                      side = "right"), "  ", "MD5"), run.info)
+  num.of.file <- length(files)
+  for (i in 1:num.of.file) {
+    writeLines(paste0(stringi::stri_pad(vcf.names[i], 
+                                        width = max.num.of.char,
+                                 side = "right"), "  ", 
+                      tools::md5sum(files[i])), run.info)
+  }
+  close(run.info)
 }
 
 #' This function generates a zip archive from Mutect VCF files.
@@ -225,7 +290,8 @@ GenerateZipFileFromMutectVCFs <- function(files,
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
   
-  CreateReadMeFile(vcf.names, zipfile.name, ref.genome, region)
+  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "mutect", 
+                    ref.genome, region)
   
   file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
                            full.names = TRUE)
@@ -372,7 +438,8 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
     updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
   }
   
-  CreateReadMeFile(vcf.names, zipfile.name, ref.genome, region)
+  AddRunInformation(vcf.names, zipfile.name, vcftype = "strelka.sbs",
+                    ref.genome, region)
   
   file.names <- 
     list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
@@ -491,7 +558,8 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
     updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
   }
   
-  CreateReadMeFile(vcf.names, zipfile.name, ref.genome, region)
+  AddRunInformation(vcf.names, zipfile.name, vcftype = "strelka.id",
+                    ref.genome, region)
   
   file.names <- 
     list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
