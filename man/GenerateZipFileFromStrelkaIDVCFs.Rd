@@ -38,9 +38,6 @@ used as the names of the VCF files.}
 produced; multiple files will be generated, each ending in
 \eqn{x}\code{.csv} or \eqn{x}\code{.pdf}, where \eqn{x} indicates the type
 of catalog.}
-
-\item{updateProgress}{Optional. Currently only used in ICAMS.shiny package to
-update the progress indicator.}
 }
 \description{
 This function generates a zip archive from Strelka ID VCF files.
