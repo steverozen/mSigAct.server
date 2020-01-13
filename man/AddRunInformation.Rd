@@ -2,9 +2,18 @@
 % Please edit documentation in R/server_related_functions.R
 \name{AddRunInformation}
 \alias{AddRunInformation}
-\title{Create a README file describing the zip archive generated from VCF files}
+\title{Create a run information text file from generating zip archive from VCF
+files.}
 \usage{
-AddRunInformation(files, vcf.names, zipfile.name, vcftype, ref.genome, region)
+AddRunInformation(
+  files,
+  vcf.names,
+  zipfile.name,
+  vcftype,
+  ref.genome,
+  region,
+  nrow.vcf
+)
 }
 \arguments{
 \item{files}{Character vector of file paths to the Mutect VCF files.}
@@ -18,8 +27,12 @@ AddRunInformation(files, vcf.names, zipfile.name, vcftype, ref.genome, region)
 
 \item{region}{A character string designating a genomic region;
 see \code{\link[ICAMS]{as.catalog}} and \code{\link[ICAMS]{ICAMS}}.}
+
+\item{nrow.vcf}{A list which contains information indicating number of data
+lines in the VCFs (excluding  meta-information lines and header line).}
 }
 \description{
-Create a README file describing the zip archive generated from VCF files
+Create a run information text file from generating zip archive from VCF
+files.
 }
 \keyword{internal}

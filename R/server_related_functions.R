@@ -133,9 +133,13 @@ RemoveAllNotifications <- function(ids) {
   sapply(ids$message, FUN = removeNotification)
 }
 
-#' Create a README file describing the zip archive generated from VCF files
-#'
+#' Create a run information text file from generating zip archive from VCF
+#' files.
+#' 
 #' @inheritParams GenerateZipFileFromMutectVCFs
+#' 
+#' @param nrow.vcf A list which contains information indicating number of data
+#'   lines in the VCFs (excluding  meta-information lines and header line).
 #' 
 #' @importFrom  stringi stri_pad
 #' 
@@ -143,25 +147,23 @@ RemoveAllNotifications <- function(ids) {
 #' 
 #' @keywords internal
 AddRunInformation <- 
-  function(files, vcf.names, zipfile.name, vcftype, ref.genome, region) {
+  function(files, vcf.names, zipfile.name, vcftype, ref.genome, 
+           region, nrow.vcf) {
   
   run.info <- 
     file(description = file.path(tempdir(), "run-information.txt"), open = "w")
   
   # Add the header information
-  writeLines(paste0("------------------------------------------------------",
-                    "------------------------------------------------------"),
-                    run.info)
-  writeLines(paste0("run-information.txt file for ", 
-                    paste0(zipfile.name, ".zip"), 
-                    " created on ", Sys.time()), run.info)
-  writeLines(paste0("------------------------------------------------------",
-                    "------------------------------------------------------"),
-             run.info)
+  header <- paste0("run-information.txt file for ", paste0(zipfile.name, ".zip"), 
+                   " created on ", Sys.time())
+  char.length <- nchar(header)
+  writeLines(paste(rep("-", char.length), collapse = ""), run.info)
+  writeLines(header, run.info)
+  writeLines(paste(rep("-", char.length), collapse = ""), run.info)
   
   # Add section on purpose of ICAMS software
   writeLines("", run.info)
-  writeLines("### Purpose of the software ###", run.info)
+  writeLines("### About ICAMS ###", run.info)
   writeLines(c("Analysis and visualization of experimentally elucidated mutational",
                "signatures – the kind of analysis and visualization in Boot et al.,",
                "'In-depth characterization of the cisplatin mutational signature in",
@@ -178,7 +180,7 @@ AddRunInformation <-
   writeLines(c("For complete documentation of ICAMS, please refer to ",
                "https://cran.rstudio.com/web/packages/ICAMS/index.html"), run.info)
   writeLines("", run.info)
-  writeLines(c("To use the shiny interface of ICAMS, please refer to ",
+  writeLines(c("Shiny interface of ICAMS is available at ",
                "https://jnh01.shinyapps.io/icams/"), run.info)
   
   # Add ICAMS and R version used
@@ -199,11 +201,11 @@ AddRunInformation <-
   }
   
   if (ref.genome == "hg19") {
-    ref.genome <- "BSgenome.Hsapiens.1000genomes.hs37d5"
+    ref.genome <- "Human GRCh37/hg19"
   } else if (ref.genome == "hg38") {
-    ref.genome <- "BSgenome.Hsapiens.UCSC.hg38"
+    ref.genome <- "Human GRCh38/hg38"
   } else if (ref.genome == "mm10") {
-    ref.genome <- "BSgenome.Mmusculus.UCSC.mm10"
+    ref.genome <- "Mouse GRCm38/mm10"
   }
   writeLines(paste0("Type of VCF:      ", vcftype), run.info)
   writeLines(paste0("Reference genome: ", ref.genome), run.info)
@@ -213,13 +215,21 @@ AddRunInformation <-
   writeLines("", run.info)
   writeLines("### Input files ###", run.info)
   max.num.of.char <- max(nchar(vcf.names))
+  # Add a description of the information listed for input files
   writeLines(paste0(stringi::stri_pad("Name", width = max.num.of.char,
-                                      side = "right"), "  ", "MD5"), run.info)
+                                      side = "right"), "  ", 
+                    "Number of data lines", "  ",
+                    "MD5"), run.info)
+  
   num.of.file <- length(files)
+  
+  nrow <- sapply(nrow.vcf, FUN = "[[", 1)
   for (i in 1:num.of.file) {
     writeLines(paste0(stringi::stri_pad(vcf.names[i], 
                                         width = max.num.of.char,
-                                 side = "right"), "  ", 
+                                 side = "right"), "  ",
+                      stringi::stri_pad(nrow[i], width = 20,
+                                        side = "right"), "  ",
                       tools::md5sum(files[i])), run.info)
   }
   close(run.info)
@@ -255,6 +265,7 @@ GenerateZipFileFromMutectVCFs <- function(files,
     updateProgress(value = 0.1, detail = "reading and splitting VCFs")
   }
   list <- ReadAndSplitMutectVCFs(files, names.of.VCFs, tumor.col.names)
+  nrow.vcf <- list$nrow.vcf
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
@@ -307,7 +318,7 @@ GenerateZipFileFromMutectVCFs <- function(files,
   }
   
   AddRunInformation(files, vcf.names, zipfile.name, vcftype = "mutect", 
-                    ref.genome, region)
+                    ref.genome, region, nrow.vcf)
   
   file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
                            full.names = TRUE)
