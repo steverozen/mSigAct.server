@@ -251,14 +251,30 @@ GenerateZipFileFromMutectVCFs <- function(files,
                                           tumor.col.names = NA,
                                           base.filename = "",
                                           updateProgress = NULL){
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "reading and splitting VCFs")
+  }
+  list <- ReadAndSplitMutectVCFs(files, names.of.VCFs, tumor.col.names)
   
-  catalogs <- MutectVCFFilesToCatalog(files,
-                                      ref.genome,
-                                      trans.ranges,
-                                      region,
-                                      names.of.VCFs,
-                                      tumor.col.names,
-                                      updateProgress)
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "generating SBS catalogs")
+  }
+  SBS.catalogs <- VCFsToSBSCatalogs(list$split.vcfs$SBS, ref.genome, 
+                                    trans.ranges, region)
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.3, detail = "generating DBS catalogs")
+  }
+  DBS.catalogs <- VCFsToDBSCatalogs(list$split.vcfs$DBS, ref.genome, 
+                                    trans.ranges, region)
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.2, detail = "generating ID catalogs")
+  }
+  ID.catalog <- VCFsToIDCatalogs(list$split.vcfs$ID, ref.genome, 
+                                 region)[[1]]
+  
+  catalogs <- c(SBS.catalogs, DBS.catalogs, list(catID = ID.catalog))
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
