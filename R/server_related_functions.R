@@ -138,7 +138,7 @@ RemoveAllNotifications <- function(ids) {
 #' 
 #' @inheritParams GenerateZipFileFromMutectVCFs
 #' 
-#' @param nrow.vcf A list which contains information indicating number of data
+#' @param nrow.data A list which contains information indicating number of data
 #'   lines in the VCFs (excluding  meta-information lines and header line).
 #' 
 #' @importFrom  stringi stri_pad
@@ -148,7 +148,7 @@ RemoveAllNotifications <- function(ids) {
 #' @keywords internal
 AddRunInformation <- 
   function(files, vcf.names, zipfile.name, vcftype, ref.genome, 
-           region, nrow.vcf) {
+           region, nrow.data) {
   
   run.info <- 
     file(description = file.path(tempdir(), "run-information.txt"), open = "w")
@@ -223,7 +223,7 @@ AddRunInformation <-
   
   num.of.file <- length(files)
   
-  nrow <- sapply(nrow.vcf, FUN = "[[", 1)
+  nrow <- sapply(nrow.data, FUN = "[[", 1)
   for (i in 1:num.of.file) {
     writeLines(paste0(stringi::stri_pad(vcf.names[i], 
                                         width = max.num.of.char,
@@ -265,7 +265,7 @@ GenerateZipFileFromMutectVCFs <- function(files,
     updateProgress(value = 0.1, detail = "reading and splitting VCFs")
   }
   list <- ReadAndSplitMutectVCFs(files, names.of.VCFs, tumor.col.names)
-  nrow.vcf <- list$nrow.vcf
+  nrow.data <- list$nrow.data
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
@@ -318,7 +318,7 @@ GenerateZipFileFromMutectVCFs <- function(files,
   }
   
   AddRunInformation(files, vcf.names, zipfile.name, vcftype = "mutect", 
-                    ref.genome, region, nrow.vcf)
+                    ref.genome, region, nrow.data)
   
   file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
                            full.names = TRUE)
@@ -432,6 +432,11 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
                                               names.of.VCFs = NULL, 
                                               base.filename = "",
                                               updateProgress = NULL){
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "reading and splitting VCFs")
+  }
+  list <- ReadAndSplitStrelkaSBSVCFs(files, names.of.VCFs)
+  nrow.data <- list$nrow.data
   
   catalogs <- StrelkaSBSVCFFilesToCatalog(files,
                                           ref.genome,
