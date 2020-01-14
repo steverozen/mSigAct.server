@@ -438,25 +438,35 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
   list <- ReadAndSplitStrelkaSBSVCFs(files, names.of.VCFs)
   nrow.data <- list$nrow.data
   
-  catalogs <- StrelkaSBSVCFFilesToCatalog(files,
-                                          ref.genome,
-                                          trans.ranges,
-                                          region,
-                                          names.of.VCFs,
-                                          updateProgress)
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "generating SBS catalogs")
+  }
+  SBS.catalogs <- VCFsToSBSCatalogs(list$split.vcfs$SBS.vcfs, ref.genome, 
+                                    trans.ranges, region)
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.3, detail = "generating DBS catalogs")
+  }
+  DBS.catalogs <- VCFsToDBSCatalogs(list$split.vcfs$DBS.vcfs, ref.genome, 
+                                    trans.ranges, region)
+  
+  catalogs <- c(SBS.catalogs, DBS.catalogs)
   
   output.file <- ifelse(base.filename == "",
                         paste0(tempdir(), .Platform$file.sep),
                         file.path(tempdir(), paste0(base.filename, ".")))
   
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.3, detail = "writing catalogs to CSV files")
+  }
   for (name in names(catalogs)) {
     WriteCatalog(catalogs[[name]],
                  file = paste0(output.file, name, ".csv"))
   }
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "wrote catalogs to CSV files")
-  }
   
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "plotting catalogs to PDF files")
+  }
   for (name in names(catalogs)) {
     PlotCatalogToPdf(catalogs[[name]],
                      file = paste0(output.file, name, ".pdf"))
@@ -466,12 +476,12 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
                        plot.SBS12 = TRUE)
     }
   }
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
-  }
   
-  AddRunInformation(vcf.names, zipfile.name, vcftype = "strelka.sbs",
-                    ref.genome, region)
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "generating zip archive")
+  }
+  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "strelka.sbs",
+                    ref.genome, region, nrow.data)
   
   file.names <- 
     list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
@@ -569,29 +579,37 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
                                              names.of.VCFs = NULL, 
                                              base.filename = "",
                                              updateProgress = NULL){
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "reading VCFs")
+  }
+  list0 <- ReadStrelkaIDVCFs(files, names.of.VCFs)
+  list.of.vcfs <- lapply(list0, FUN = "[[", 1)
+  nrow.data <- lapply(list0, FUN = "[[", 2)
   
-  list <- StrelkaIDVCFFilesToCatalog(files,
-                                     ref.genome,
-                                     region,
-                                     names.of.VCFs,
-                                     updateProgress)
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "generating ID catalog")
+  }
+  list <- VCFsToIDCatalogs(list.of.vcfs, ref.genome, region)
   
   output.file <- ifelse(base.filename == "",
                         paste0(tempdir(), .Platform$file.sep),
                         file.path(tempdir(), paste0(base.filename, ".")))
   
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.4, detail = "writing catalog to CSV file")
+  }
   WriteCatalog(list$catalog, file = paste0(output.file, "catID.csv"))
+
   if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "wrote catalogs to CSV files")
+    updateProgress(value = 0.1, detail = "plotting catalog to PDF file")
   }
-  
   PlotCatalogToPdf(list$catalog, file = paste0(output.file, "catID.pdf"))
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "plotted catalogs to PDF files")
-  }
   
-  AddRunInformation(vcf.names, zipfile.name, vcftype = "strelka.id",
-                    ref.genome, region)
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "generating zip archive")
+  }
+  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "strelka.id",
+                    ref.genome, region, nrow.data)
   
   file.names <- 
     list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
@@ -635,7 +653,7 @@ ProcessStrelkaIDVCFs <- function(input, output, file, ids) {
   base.filename <- input$base.filename
   
   # Create a Progress object
-  progress <- shiny::Progress$new()
+  progress <- shiny::Progress$new(min = 0, max = 0.8)
   progress$set(message = "Progress", value = 0)
   # Close the progress when this reactive exits (even if there's an error)
   on.exit(progress$close())
