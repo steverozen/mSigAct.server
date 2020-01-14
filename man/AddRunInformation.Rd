@@ -12,7 +12,7 @@ AddRunInformation(
   vcftype,
   ref.genome,
   region,
-  nrow.vcf
+  nrow.data
 )
 }
 \arguments{
@@ -28,7 +28,7 @@ AddRunInformation(
 \item{region}{A character string designating a genomic region;
 see \code{\link[ICAMS]{as.catalog}} and \code{\link[ICAMS]{ICAMS}}.}
 
-\item{nrow.vcf}{A list which contains information indicating number of data
+\item{nrow.data}{A list which contains information indicating number of data
 lines in the VCFs (excluding  meta-information lines and header line).}
 }
 \description{
