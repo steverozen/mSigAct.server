@@ -16,6 +16,14 @@ app_ui <- function() {
       # Add a horizontal line
       hr(),
       
+      # Add a short description of the shiny interface of ICAMS
+      p("The shiny interface of ICAMS allows users to upload multiple variant 
+         call files (VCFs) and generates a zip archive available to download 
+         which contains different mutation catalogs and PDF plots. The uploaded
+         VCFs must be of the ", strong("same"), " VCF type, reference genome and 
+         region."),
+         
+      
       # Add the first row of control widgets
       fixedRow(
         # Add radio buttons for user to specify the type of VCF files
