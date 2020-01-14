@@ -5,7 +5,7 @@ app_ui <- function() {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # List the first level UI elements here 
-    fluidPage(
+    fixedPage(
       # Specify the theme used for UI
       theme = shinytheme("cerulean"),
       
@@ -17,45 +17,45 @@ app_ui <- function() {
       hr(),
       
       # Add the first row of control widgets
-      fluidRow(
+      fixedRow(
         # Add radio buttons for user to specify the type of VCF files
-        column(4, add_vcf_type()),
+        column(6, add_vcf_type()),
         
         # Add a conditional panel for user to specify the column names in 
         # Mutect VCFs which contain the tumor sample information (if needed)
-        column(4, conditionalPanel(
+        column(6, conditionalPanel(
           condition = "input.vcftype == 'mutect'",
           add_tumor_col_names()))
       ),
       
       # Add the next row of control widgets
-      fluidRow(
+      fixedRow(
         # Add radio buttons for user to specify the reference genome
-        column(4, add_reference_genome()),
+        column(6, add_reference_genome()),
         
         # Add radio buttons for user to specify the genomic region
         # from where the VCFs were generated
-        column(4, add_region())
+        column(6, add_region())
       ),
       
       # Add the next row of control widgets
-      fluidRow(
+      fixedRow(
         # Add text input for user to specify the sample names
         # representing different VCF files
-        column(4, add_sample_names()),
+        column(6, add_sample_names()),
         
         # Add text input for user to specify the base filename
         # of the CSV and PDF files generated
-        column(4, add_base_filename())
+        column(6, add_base_filename())
       ),
       
       # Add the next row of control widgets
-      fluidRow(
+      fixedRow(
         # Add text input for user to specify the zip file name
-        column(4, add_zipfile_name()),
+        column(6, add_zipfile_name()),
         
         # Add a file upload control for user to upload multiple VCF files
-        column(4, fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
+        column(6, fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
                             multiple = TRUE))
       ),
       
