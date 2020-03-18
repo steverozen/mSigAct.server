@@ -17,12 +17,23 @@ app_ui <- function() {
       hr(),
       
       # Add a short description of the shiny interface of ICAMS
-      p("The shiny interface of ICAMS allows users to upload multiple variant 
-         call files (VCFs) and generates a zip archive available to download 
-         which contains different mutation catalogs and PDF plots. The uploaded
-         VCFs must be of the ", strong("same"), " VCF type, reference genome and 
-         region."),
+      p("The ", a(href = "https://shiny.rstudio.com/", "Shiny"), 
+        "interface of ",
+        a(href = "https://cran.r-project.org/web/packages/ICAMS/index.html", "ICAMS"), 
+        " allows users to upload multiple ", 
+        a(href = "https://tinyurl.com/rdzwnxd", "VCF"), 
+        " (Variant Call Format) files and generates a zip archive which ",
+        "contains different mutation catalogs and PDF plots. ", 
+        "The uploaded VCFs must ", strong("all"), " be of the ", 
+        strong("same"), " VCF type, reference genome and region."),
          
+      # Add a link to the COSMIC website about mutational signatures
+      p("For an overview of mutational signatures, please refer to the ",
+        a(href = "https://cancer.sanger.ac.uk/cosmic/signatures", "COSMIC"),
+        " (Catalogue Of Somatic Mutations In Cancer) website,"),
+      
+      # Add a horizontal line
+      hr(),
       
       # Add the first row of control widgets
       fixedRow(
