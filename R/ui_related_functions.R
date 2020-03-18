@@ -70,9 +70,7 @@ add_base_filename <- function() {
 #' @keywords internal
 add_zipfile_name <- function() {
   textInput(inputId = "zipfile.name",
-            label = p(strong(h5("Name of zip file to create")),
-                      h5("(e.g. name1, or you may use the default value", 
-                         " ICAMS.output)")),
+            label = p(strong(h5("Name of zip file to create"))),
             value = "ICAMS.output")
 }
 
