@@ -11,6 +11,12 @@ app_server <- function(input, output,session) {
   ids <- list("error" = character(0), "warning" = character(0), 
              "message" = character(0))
   
+  # Download VCF files to test when user clicks the buttom
+  output$downloadtestVCFs <- downloadHandler(filename = "test-VCFs.zip", 
+                                             content = function(file) {
+                                               PrepareTestVCFs(file)
+                                             })
+  
   # Only when user clicks the submit button, then all the reactive values
   # used as parameters in generating the zip archive will be updated
   observeEvent(
@@ -35,8 +41,9 @@ app_server <- function(input, output,session) {
     }
   )
   
+  # When user clicks the submit buttom, all the previous notifications(error,
+  # warning or message) will be removed
   observeEvent(input$submit, {
-    #browser()
     RemoveAllNotifications(ids)
   })
 }

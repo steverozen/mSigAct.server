@@ -145,6 +145,8 @@ RemoveAllNotifications <- function(ids) {
 #' 
 #' @importFrom tools md5sum
 #' 
+#' @importFrom utils packageVersion
+#' 
 #' @keywords internal
 AddRunInformation <- 
   function(files, vcf.names, zipfile.name, vcftype, ref.genome, 
@@ -165,7 +167,7 @@ AddRunInformation <-
   writeLines("", run.info)
   writeLines("### About ICAMS ###", run.info)
   writeLines(c("Analysis and visualization of experimentally elucidated mutational",
-               "signatures – the kind of analysis and visualization in Boot et al.,",
+               "signatures - the kind of analysis and visualization in Boot et al.,",
                "'In-depth characterization of the cisplatin mutational signature in",
                "human cell lines and in esophageal and liver tumors', ", 
                "Genome Research 2018, https://doi.org/10.1101/gr.230219.117.",
@@ -173,8 +175,8 @@ AddRunInformation <-
                "Mutational Signatures. 'ICAMS' has functions to read in variant",
                "call files (VCFs) and to collate the corresponding catalogs of",
                "mutational spectra and to analyze and plot catalogs of mutational",
-               "spectra and signatures. Handles both “counts-based” and ", 
-               "“density-based” catalogs of mutational spectra or signatures."), 
+               'spectra and signatures. Handles both "counts-based" and ', 
+               '"density-based" catalogs of mutational spectra or signatures.'), 
              run.info)
   writeLines("", run.info)
   writeLines(c("For complete documentation of ICAMS, please refer to ",
@@ -248,6 +250,8 @@ AddRunInformation <-
 #' @import ICAMS
 #' 
 #' @import zip
+#' 
+#' @importFrom utils glob2rx
 #' 
 #' @keywords internal
 GenerateZipFileFromMutectVCFs <- function(files,
@@ -421,6 +425,8 @@ ProcessMutectVCFs <- function(input, output, file, ids) {
 #' 
 #' @import zip
 #' 
+#' @importFrom utils glob2rx
+#' 
 #' @keywords internal
 GenerateZipFileFromStrelkaSBSVCFs <- function(files,
                                               zipfile,
@@ -569,6 +575,8 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 #' 
 #' @import zip
 #' 
+#' @importFrom utils glob2rx
+#' 
 #' @keywords internal
 GenerateZipFileFromStrelkaIDVCFs <- function(files,
                                              zipfile,
@@ -684,4 +692,19 @@ ProcessStrelkaIDVCFs <- function(input, output, file, ids) {
   
   # Update the notification ids
   return(UpdateNotificationIDs(ids, new.ids))
+}
+
+#' Prepare test VCFs for user to test
+#' 
+#' @param file Path of the file to be written.
+#' 
+#' @import ICAMS
+#' 
+#' @import zip
+#' 
+#' @keywords internal
+PrepareTestVCFs <- function(file) {
+  dir <- system.file("extdata/Strelka-SBS-vcf", package = "ICAMS")
+  files <- list.files(dir, full.names = TRUE)
+  zip::zipr(files, zipfile = file)
 }
