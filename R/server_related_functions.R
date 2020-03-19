@@ -133,13 +133,15 @@ RemoveAllNotifications <- function(ids) {
   sapply(ids$message, FUN = removeNotification)
 }
 
+
+#' @keywords internal
+CalculateNumberOfSpace <- getFromNamespace("CalculateNumberOfSpace", "ICAMS")
+
+#' @keywords internal
+AssignNumberOfAsterisks <- getFromNamespace("AssignNumberOfAsterisks", "ICAMS")
+
 #' Create a run information text file from generating zip archive from VCF
 #' files.
-#' 
-#' @inheritParams GenerateZipFileFromMutectVCFs
-#' 
-#' @param nrow.data A list which contains information indicating number of data
-#'   lines in the VCFs (excluding  meta-information lines and header line).
 #' 
 #' @importFrom  stringi stri_pad
 #' 
@@ -150,92 +152,194 @@ RemoveAllNotifications <- function(ids) {
 #' @keywords internal
 AddRunInformation <- 
   function(files, vcf.names, zipfile.name, vcftype, ref.genome, 
-           region, nrow.data) {
-  
-  run.info <- 
-    file(description = file.path(tempdir(), "run-information.txt"), open = "w")
-  
-  # Add the header information
-  header <- paste0("run-information.txt file for ", paste0(zipfile.name, ".zip"), 
-                   " created on ", Sys.time())
-  char.length <- nchar(header)
-  writeLines(paste(rep("-", char.length), collapse = ""), run.info)
-  writeLines(header, run.info)
-  writeLines(paste(rep("-", char.length), collapse = ""), run.info)
-  
-  # Add section on purpose of ICAMS software
-  writeLines("", run.info)
-  writeLines("### About ICAMS ###", run.info)
-  writeLines(c("Analysis and visualization of experimentally elucidated mutational",
-               "signatures - the kind of analysis and visualization in Boot et al.,",
-               "'In-depth characterization of the cisplatin mutational signature in",
-               "human cell lines and in esophageal and liver tumors', ", 
-               "Genome Research 2018, https://doi.org/10.1101/gr.230219.117.",
-               "'ICAMS' stands for In-depth Characterization and Analysis of",
-               "Mutational Signatures. 'ICAMS' has functions to read in variant",
-               "call files (VCFs) and to collate the corresponding catalogs of",
-               "mutational spectra and to analyze and plot catalogs of mutational",
-               'spectra and signatures. Handles both "counts-based" and ', 
-               '"density-based" catalogs of mutational spectra or signatures.'), 
-             run.info)
-  writeLines("", run.info)
-  writeLines(c("For complete documentation of ICAMS, please refer to ",
-               "https://cran.rstudio.com/web/packages/ICAMS/index.html"), run.info)
-  writeLines("", run.info)
-  writeLines(c("Shiny interface of ICAMS is available at ",
-               "https://jnh01.shinyapps.io/icams/"), run.info)
-  
-  # Add ICAMS and R version used
-  writeLines("", run.info)
-  writeLines("### Version of the software ###", run.info)
-  writeLines(paste0("ICAMS version: ", packageVersion("ICAMS")), run.info)
-  writeLines(paste0("R version:     ", getRversion()), run.info)
-  
-  # Add input parameters specified by the user
-  writeLines("", run.info)
-  writeLines("### Input parameters ###", run.info)
-  if (vcftype == "strelka.sbs") {
-    vcftype <- "Strelka SBS VCF"
-  } else if (vcftype == "strelka.id") {
-    vcftype <- "Strelka ID VCF"
-  } else if (vcftype == "mutect") {
-    vcftype <- "Mutect VCF"
-  }
-  
-  if (ref.genome == "hg19") {
-    ref.genome <- "Human GRCh37/hg19"
-  } else if (ref.genome == "hg38") {
-    ref.genome <- "Human GRCh38/hg38"
-  } else if (ref.genome == "mm10") {
-    ref.genome <- "Mouse GRCm38/mm10"
-  }
-  writeLines(paste0("Type of VCF:      ", vcftype), run.info)
-  writeLines(paste0("Reference genome: ", ref.genome), run.info)
-  writeLines(paste0("Region:           ", region), run.info)
-  
-  # Add input files information
-  writeLines("", run.info)
-  writeLines("### Input files ###", run.info)
-  max.num.of.char <- max(nchar(vcf.names))
-  # Add a description of the information listed for input files
-  writeLines(paste0(stringi::stri_pad("Name", width = max.num.of.char,
-                                      side = "right"), "  ", 
-                    "Number of data lines", "  ",
-                    "MD5"), run.info)
-  
-  num.of.file <- length(files)
-  
-  nrow <- sapply(nrow.data, FUN = "[[", 1)
-  for (i in 1:num.of.file) {
-    writeLines(paste0(stringi::stri_pad(vcf.names[i], 
-                                        width = max.num.of.char,
+           region, mutation.loads, strand.bias.statistics) {
+    
+    run.info <- 
+      file(description = file.path(tempdir(), "run-information.txt"), open = "w")
+    
+    # Add the header information
+    header <- paste0("run-information.txt file for ", zipfile.name, 
+                     " created on ", Sys.time())
+    char.length <- nchar(header)
+    writeLines(paste(rep("-", char.length), collapse = ""), run.info)
+    writeLines(header, run.info)
+    writeLines(paste(rep("-", char.length), collapse = ""), run.info)
+    
+    # Add section on purpose of ICAMS software
+    writeLines("", run.info)
+    writeLines("--- About ICAMS ---", run.info)
+    writeLines(c("Analysis and visualization of experimentally elucidated mutational",
+                 "signatures - the kind of analysis and visualization in Boot et al.,",
+                 "'In-depth characterization of the cisplatin mutational signature in",
+                 "human cell lines and in esophageal and liver tumors', ", 
+                 "Genome Research 2018, https://doi.org/10.1101/gr.230219.117.",
+                 "'ICAMS' stands for In-depth Characterization and Analysis of",
+                 "Mutational Signatures. 'ICAMS' has functions to read in variant",
+                 "call files (VCFs) and to collate the corresponding catalogs of",
+                 "mutational spectra and to analyze and plot catalogs of mutational",
+                 'spectra and signatures. Handles both "counts-based" and ', 
+                 '"density-based" catalogs of mutational spectra or signatures.'), 
+               run.info)
+    writeLines("", run.info)
+    writeLines(c("For complete documentation of ICAMS, please refer to ",
+                 "https://cran.rstudio.com/web/packages/ICAMS/index.html"), run.info)
+    writeLines("", run.info)
+    writeLines(c("Shiny interface of ICAMS is available at ",
+                 "https://jnh01.shinyapps.io/icams/"), run.info)
+    
+    # Add ICAMS and R version used
+    writeLines("", run.info)
+    writeLines("--- Version of the software ---", run.info)
+    writeLines(paste0("ICAMS version: ", packageVersion("ICAMS")), run.info)
+    writeLines(paste0("R version:     ", getRversion()), run.info)
+    
+    # Add input parameters specified by the user
+    writeLines("", run.info)
+    writeLines("--- Input parameters ---", run.info)
+    if (vcftype == "strelka.sbs") {
+      vcftype <- "Strelka SBS VCF"
+    } else if (vcftype == "strelka.id") {
+      vcftype <- "Strelka ID VCF"
+    } else if (vcftype == "mutect") {
+      vcftype <- "Mutect VCF"
+    }
+    
+    if (ref.genome == "hg19") {
+      ref.genome <- "Human GRCh37/hg19"
+    } else if (ref.genome == "hg38") {
+      ref.genome <- "Human GRCh38/hg38"
+    } else if (ref.genome == "mm10") {
+      ref.genome <- "Mouse GRCm38/mm10"
+    }
+    writeLines(paste0("Type of VCF:      ", vcftype), run.info)
+    writeLines(paste0("Reference genome: ", ref.genome), run.info)
+    writeLines(paste0("Region:           ", region), run.info)
+    
+    # Add input files information
+    writeLines("", run.info)
+    writeLines("--- Input files ---", run.info)
+    max.num.of.char <- max(nchar(vcf.names))
+    # Add a description of the information listed for input files
+    writeLines(paste0(stri_pad("Name", width = max.num.of.char,
+                               side = "right"), "  ", 
+                      "# of data lines", "  ",
+                      stri_pad("MD5", width = 32,
+                               side = "right"), "  ",
+                      "# of SBS", "  ",
+                      "# of DBS", "  ",
+                      "# of ID", "  ",
+                      "# of excluded variants*", "  "),
+               run.info)
+    
+    num.of.file <- length(files)
+    
+    for (i in 1:num.of.file) {
+      writeLines(paste0(stri_pad(vcf.names[i], 
+                                 width = max.num.of.char,
                                  side = "right"), "  ",
-                      stringi::stri_pad(nrow[i], width = 20,
-                                        side = "right"), "  ",
-                      tools::md5sum(files[i])), run.info)
+                        stri_pad(mutation.loads$total.variants[i], 
+                                 width = 15, side = "right"), "  ",
+                        tools::md5sum(files[i]), "  ",
+                        stri_pad(mutation.loads$SBS[i], width = 8,
+                                 side = "right"), "  ",
+                        stri_pad(mutation.loads$DBS[i], width = 8,
+                                 side = "right"), "  ",
+                        stri_pad(mutation.loads$ID[i], width = 7,
+                                 side = "right"), "  ",
+                        stri_pad(mutation.loads$excluded.variants[i], 
+                                 width = 22, side = "right")), 
+                 run.info)
+      
+    }
+    # Add a disclaimer about excluded variants in the analysis
+    writeLines("", run.info)
+    writeLines(paste0("* Triplet and above base substitutions, ", 
+                      "complex indels, and variants with multiple alternative ",
+                      "alleles are excluded from the analysis."), run.info)
+    
+    # Add strand bias statistics for SBS12 plot
+    if (!is.null(strand.bias.statistics)) {
+      writeLines("", run.info)
+      writeLines("--- Transcription strand bias statistics ---", run.info)
+      list0 <- strand.bias.statistics
+      num.of.sample <- length(names(list0))
+      space.mat <- CalculateNumberOfSpace(list0)
+      
+      for (i in 1:num.of.sample) {
+        transcribed.counts <- list0[[i]][, "transcribed"]
+        untranscribed.counts <- list0[[i]][, "untranscribed"]
+        q.values <- list0[[i]][, "q.values"]
+        q.values.symbol <- lapply(q.values, FUN = AssignNumberOfAsterisks)
+        q.values.sci <- formatC(q.values, format = "e", digits = 2)
+        
+        transcribed.info <- character(0)
+        untranscribed.info <- character(0)
+        header1 <- header2 <- character(0)
+        mutation.class <- rownames(list0[[1]])
+        
+        for (j in 1:6) {
+          header1 <- paste0(header1, stri_pad(mutation.class[j], 
+                                              width = space.mat[j, "space.total"], 
+                                              side = "both"), "|")
+          
+          header2 <- 
+            paste0(header2, " ", 
+                   stri_pad("counts", 
+                            width = space.mat[j, "space.counts"], 
+                            side = "right"), " ",
+                   stri_pad("Q-value", 
+                            width = space.mat[j, "space.q.value"], 
+                            side = "right"), " ", "|")
+          
+          transcribed.info <- 
+            paste0(transcribed.info, " ",
+                   stri_pad(transcribed.counts[j], 
+                            width = space.mat[j, "space.counts"], 
+                            side = "right"), " ", 
+                   stri_pad(q.values.sci[j], 
+                            width = space.mat[j, "space.q.value"], 
+                            side = "right"), " ", "|")
+          
+          untranscribed.info <- 
+            paste0(untranscribed.info, " ",
+                   stri_pad(untranscribed.counts[j], 
+                            width = space.mat[j, "space.counts"], 
+                            side = "right"), " ", 
+                   stri_pad(ifelse(is.null(q.values.symbol[[j]]), 
+                                   "", q.values.symbol[[j]]), 
+                            width = space.mat[j, "space.q.value"], 
+                            side = "right"), " ", "|")
+        }
+        
+        # Add description lines of the information listed for strand bias statistics
+        writeLines(paste0(stri_pad("", width = 13), " |", header1), run.info)
+        writeLines(paste0(stri_pad("Strand", width = 13, side = "right"), " |",
+                          header2, "Sample name"), run.info)
+        
+        # Write the transcription strand bias statistics
+        writeLines(paste0(stri_pad("transcribed", width = 13, side = "right"),
+                          " |", transcribed.info, names(list0)[i]), run.info)
+        writeLines(paste0(stri_pad("untranscribed", width = 13, side = "right"),
+                          " |", untranscribed.info, names(list0)[i]), run.info)
+        
+        writeLines("", run.info)
+      }
+      
+      # Add a description about the symbol denoting p-value
+      writeLines(
+        paste0("Legend: *Q<0.05, **Q<0.01, ***Q<0.001 (Benjamini-Hochberg ",
+               "false discovery rates based on two-tailed binomial tests)"), run.info)
+      
+      # Add a note about direction of strand bias
+      writeLines(paste0("Direction of strand bias: Fewer mutations on ",
+                        "transcribed strand indicates that DNA damage occurred on ",
+                        "pyrimidines,"), run.info) 
+      writeLines(paste0("                          Fewer mutations on ", 
+                        "untranscribed strand indicates that DNA damage occurred on ", 
+                        "purines."), run.info)
+    }
+    close(run.info)
   }
-  close(run.info)
-}
 
 #' This function generates a zip archive from Mutect VCF files.
 #' 
@@ -425,8 +529,6 @@ ProcessMutectVCFs <- function(input, output, file, ids) {
 #' 
 #' @import zip
 #' 
-#' @importFrom utils glob2rx
-#' 
 #' @keywords internal
 GenerateZipFileFromStrelkaSBSVCFs <- function(files,
                                               zipfile,
@@ -441,19 +543,22 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "reading and splitting VCFs")
   }
-  list <- ReadAndSplitStrelkaSBSVCFs(files, names.of.VCFs)
-  nrow.data <- list$nrow.data
+  split.vcfs <- ReadAndSplitStrelkaSBSVCFs(files, names.of.VCFs)
+  GetMutationLoadsFromStrelkaSBSVCFs <- 
+    getFromNamespace("GetMutationLoadsFromStrelkaSBSVCFs", "ICAMS")
+  mutation.loads <- GetMutationLoadsFromStrelkaSBSVCFs(split.vcfs)
+  strand.bias.statistics<- NULL
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
   }
-  SBS.catalogs <- VCFsToSBSCatalogs(list$split.vcfs$SBS.vcfs, ref.genome, 
+  SBS.catalogs <- VCFsToSBSCatalogs(split.vcfs$SBS.vcfs, ref.genome, 
                                     trans.ranges, region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.3, detail = "generating DBS catalogs")
   }
-  DBS.catalogs <- VCFsToDBSCatalogs(list$split.vcfs$DBS.vcfs, ref.genome, 
+  DBS.catalogs <- VCFsToDBSCatalogs(split.vcfs$DBS.vcfs, ref.genome, 
                                     trans.ranges, region)
   
   catalogs <- c(SBS.catalogs, DBS.catalogs)
@@ -477,9 +582,11 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
     PlotCatalogToPdf(catalogs[[name]],
                      file = paste0(output.file, name, ".pdf"))
     if (name == "catSBS192") {
-      PlotCatalogToPdf(catalogs[[name]],
-                       file = paste0(output.file, "SBS12.pdf"),
-                       plot.SBS12 = TRUE)
+      list <- PlotCatalogToPdf(catalogs[[name]],
+                               file = paste0(output.file, "SBS12.pdf"),
+                               plot.SBS12 = TRUE)
+      strand.bias.statistics<- c(strand.bias.statistics, 
+                                 list$strand.bias.statistics)
     }
   }
   
@@ -487,10 +594,10 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
   AddRunInformation(files, vcf.names, zipfile.name, vcftype = "strelka.sbs",
-                    ref.genome, region, nrow.data)
+                    ref.genome, region, mutation.loads, strand.bias.statistics)
   
   file.names <- 
-    list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
+    list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$", 
                full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
@@ -707,4 +814,21 @@ PrepareTestVCFs <- function(file) {
   dir <- system.file("extdata/Strelka-SBS-vcf", package = "ICAMS")
   files <- list.files(dir, full.names = TRUE)
   zip::zipr(files, zipfile = file)
+}
+
+#' @keywords internal
+GenerateZipFileFromBuiltInData <- function(output, file, ids) {
+  input <- reactiveValues()
+  dir <- system.file("extdata/Strelka-SBS-vcf", package = "ICAMS")
+  datapath <- list.files(dir, full.names = TRUE)
+  name <- tools::file_path_sans_ext(basename(datapath))
+  names.of.VCFs <- "HepG2.s2, HepG2"
+  input$vcf.files <- 
+    data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)
+  input$names.of.VCFs <- names.of.VCFs
+  input$base.filename <- "HepG2"
+  input$zipfile.name <- "ICAMS-test.zip"
+  input$ref.genome <- "hg19"
+  input$region <- "genome"
+  ProcessStrelkaSBSVCFs(input, output, file, ids)
 }

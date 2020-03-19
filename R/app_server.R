@@ -2,10 +2,12 @@
 app_server <- function(input, output,session) {
   # List the first level callModules here
   
-  # Create an output value that can be used as a condition argument
+  # Create output values that can be used as condition argument
   # in the function conditionalPanel() in app_ui.R
   output$clicksubmit <- reactive({input$submit})
+  output$usebuiltindata <- reactive({input$builtindata})
   outputOptions(output, "clicksubmit", suspendWhenHidden = FALSE) 
+  outputOptions(output, "usebuiltindata", suspendWhenHidden = FALSE) 
   
   # Create an empty list which can be used to store notification ids later
   ids <- list("error" = character(0), "warning" = character(0), 
@@ -16,6 +18,19 @@ app_server <- function(input, output,session) {
                                              content = function(file) {
                                                PrepareTestVCFs(file)
                                              })
+  
+  # Generate the zip archive if user chooses to use built-in data
+  observeEvent(
+    input$builtindata,
+    {
+      output$download <- 
+        downloadHandler(filename = "ICAMS-test.zip",
+                        content = function(file) {
+                          #browser()
+                          ids <<- 
+                            GenerateZipFileFromBuiltInData(output, file, ids)
+                        })
+    })
   
   # Only when user clicks the submit button, then all the reactive values
   # used as parameters in generating the zip archive will be updated

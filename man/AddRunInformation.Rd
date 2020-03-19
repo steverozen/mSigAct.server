@@ -12,24 +12,9 @@ AddRunInformation(
   vcftype,
   ref.genome,
   region,
-  nrow.data
+  mutation.loads,
+  strand.bias.statistics
 )
-}
-\arguments{
-\item{files}{Character vector of file paths to the Mutect VCF files.}
-
-\item{vcf.names}{Names of VCF files uploaded by the user.}
-
-\item{zipfile.name}{Name of zip archive specified by the user.}
-
-\item{ref.genome}{A \code{ref.genome} argument as described in
-\code{\link[ICAMS]{ICAMS}}.}
-
-\item{region}{A character string designating a genomic region;
-see \code{\link[ICAMS]{as.catalog}} and \code{\link[ICAMS]{ICAMS}}.}
-
-\item{nrow.data}{A list which contains information indicating number of data
-lines in the VCFs (excluding  meta-information lines and header line).}
 }
 \description{
 Create a run information text file from generating zip archive from VCF
