@@ -75,23 +75,37 @@ app_ui <- function() {
         
         # Add a file upload control for user to upload multiple VCF files
         column(6, fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
-                            multiple = TRUE))
-      ),
+                            multiple = TRUE))),
       
       # Add one line break
       br(),
       
-      # Add an action button for user to update argument and submit
-      actionButton(inputId = "submit", label = "Update argument and submit"),
+      # Add the next row of control widgets
+      fixedRow(
+        # Add an action button for user to update argument and submit
+        column(6, actionButton(inputId = "submit", 
+                               label = "Update argument and submit")),
+        
+        # Add a downlaod button for user to download VCF files to test
+        column(6, downloadButton(outputId = "downloadtestVCFs", 
+                              label = "Download VCF files to test"))),
       
-      # Add two line breaks
-      rep_br(2),
+      # Add one line break
+      br(),
       
-      # Add a download button appearing as soon as when user clicks the 
-      # action button to update argument and submit for the first time
-      conditionalPanel(
-        condition = "output.clicksubmit",
-        downloadButton(outputId = "download", label = "Download results")),
+      # Add the next row of control widgets
+      fixedRow(
+        # Add a download button appearing as soon as when user clicks the 
+        # action button to update argument and submit for the first time
+        column(6,
+               conditionalPanel(
+                 condition = "output.clicksubmit",
+                 downloadButton(outputId = "download", label = "Download results"))),
+        
+        # Add an action button for user to use the built-in data
+        column(6,
+               actionButton(inputId = "use.builtin.data", 
+                            label = "Use the built-in data"))),
       
       # Add two line breaks
       rep_br(2),
