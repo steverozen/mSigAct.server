@@ -31,7 +31,7 @@ GenerateZipFileFromMutectVCFs(
 \code{\link[ICAMS]{ICAMS}}.}
 
 \item{trans.ranges}{Optional. If \code{ref.genome} specifies one of the
-\code{\link{BSgenome}} object 
+\code{\link[BSgenome]{BSgenome}} object 
 \enumerate{
   \item \code{\link[BSgenome.Hsapiens.1000genomes.hs37d5]{BSgenome.Hsapiens.1000genomes.hs37d5}}
   \item \code{\link[BSgenome.Hsapiens.UCSC.hg38]{BSgenome.Hsapiens.UCSC.hg38}}
@@ -48,22 +48,25 @@ see \code{\link[ICAMS]{as.catalog}} and \code{\link[ICAMS]{ICAMS}}.}
 
 \item{names.of.VCFs}{Optional. Character vector of names of the VCF files.
 The order of names in \code{names.of.VCFs} should match the order of VCFs
-listed in \code{dir}. If \code{NULL}(default), this function will remove
+listed in \code{files}. If \code{NULL}(default), this function will remove
 all of the path up to and including the last path separator (if any) in
-\code{dir} and file paths without extensions (and the leading dot) will be
+\code{files} and file paths without extensions (and the leading dot) will be
 used as the names of the VCF files.}
-
-\item{tumor.col.names}{Optional. Character vector of column names in VCFs which contain
-the tumor sample information. The order of names in \code{tumor.col.names}
-should match the order of VCFs listed in \code{dir}. If
-\code{tumor.col.names} is equal to \code{NA}(default), this function will
-use the 10th column in all the VCFs to calculate VAFs.
-See \code{\link[ICAMS]{GetMutectVAF}} for more details.}
 
 \item{base.filename}{Optional. The base name of the CSV and PDF files to be
 produced; multiple files will be generated, each ending in
 \eqn{x}\code{.csv} or \eqn{x}\code{.pdf}, where \eqn{x} indicates the type
 of catalog.}
+
+\item{updateProgress}{A callback function to update the progress indicator on
+the user interface.}
+
+\item{tumor.col.name}{Optional. Character vector of column names in VCFs which contain
+the tumor sample information. The order of names in \code{tumor.col.names}
+should match the order of VCFs listed in \code{files}. If
+\code{tumor.col.names} is equal to \code{NA}(default), this function will
+use the 10th column in all the VCFs to calculate VAFs.
+See \code{\link[ICAMS]{GetMutectVAF}} for more details.}
 }
 \description{
 This function generates a zip archive from Mutect VCF files.

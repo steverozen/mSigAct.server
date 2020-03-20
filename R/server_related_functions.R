@@ -343,14 +343,56 @@ AddRunInformation <-
 
 #' This function generates a zip archive from Mutect VCF files.
 #' 
-#' @inheritParams ICAMS::MutectVCFFilesToZipFile
 #' 
 #' @param files Character vector of file paths to the Mutect VCF files.
+#' 
+#' @param zipfile Pathname of the zip file to be created.    
 #' 
 #' @param vcf.names Names of VCF files uploaded by the user.
 #' 
 #' @param zipfile.name Name of zip archive specified by the user.
 #' 
+#' @param ref.genome A \code{ref.genome} argument as described in
+#'   \code{\link[ICAMS]{ICAMS}}. 
+#' 
+#' @param trans.ranges Optional. If \code{ref.genome} specifies one of the
+#'   \code{\link[BSgenome]{BSgenome}} object 
+#'   \enumerate{
+#'     \item \code{\link[BSgenome.Hsapiens.1000genomes.hs37d5]{BSgenome.Hsapiens.1000genomes.hs37d5}}
+#'     \item \code{\link[BSgenome.Hsapiens.UCSC.hg38]{BSgenome.Hsapiens.UCSC.hg38}}
+#'     \item \code{\link[BSgenome.Mmusculus.UCSC.mm10]{BSgenome.Mmusculus.UCSC.mm10}}
+#'   }
+#'   then the function will infer \code{trans.ranges} automatically. Otherwise,
+#'   user will need to provide the necessary \code{trans.ranges}. Please refer to
+#'   \code{\link[ICAMS]{TranscriptRanges}} for more details.
+#'   If \code{is.null(trans.ranges)} do not add transcript range
+#'   information.
+#' 
+#' @param region A character string designating a genomic region;
+#'  see \code{\link[ICAMS]{as.catalog}} and \code{\link[ICAMS]{ICAMS}}.
+#' 
+#' @param names.of.VCFs Optional. Character vector of names of the VCF files.
+#'   The order of names in \code{names.of.VCFs} should match the order of VCFs
+#'   listed in \code{files}. If \code{NULL}(default), this function will remove
+#'   all of the path up to and including the last path separator (if any) in
+#'   \code{files} and file paths without extensions (and the leading dot) will be
+#'   used as the names of the VCF files.
+#' 
+#' @param tumor.col.name Optional. Character vector of column names in VCFs which contain
+#'   the tumor sample information. The order of names in \code{tumor.col.names}
+#'   should match the order of VCFs listed in \code{files}. If
+#'   \code{tumor.col.names} is equal to \code{NA}(default), this function will
+#'   use the 10th column in all the VCFs to calculate VAFs.
+#'   See \code{\link[ICAMS]{GetMutectVAF}} for more details.
+#' 
+#' @param base.filename Optional. The base name of the CSV and PDF files to be
+#'   produced; multiple files will be generated, each ending in
+#'   \eqn{x}\code{.csv} or \eqn{x}\code{.pdf}, where \eqn{x} indicates the type
+#'   of catalog.
+#'
+#' @param updateProgress A callback function to update the progress indicator on
+#'   the user interface.
+#'   
 #' @import ICAMS
 #' 
 #' @import zip
@@ -526,7 +568,7 @@ ProcessMutectVCFs <- function(input, output, file, ids) {
 
 #' This function generates a zip archive from Strelka SBS VCF files.
 #' 
-#' @inheritParams ICAMS::MutectVCFFilesToZipFile
+#' @inheritParams GenerateZipFileFromMutectVCFs 
 #' 
 #' @param files Character vector of file paths to the Strelka SBS VCF files.
 #' 
@@ -681,7 +723,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 
 #' This function generates a zip archive from Strelka ID VCF files.
 #' 
-#' @inheritParams ICAMS::MutectVCFFilesToZipFile
+#' @inheritParams GenerateZipFileFromMutectVCFs 
 #' 
 #' @param files Character vector of file paths to the Strelka ID VCF files.
 #' 
