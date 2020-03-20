@@ -8,8 +8,7 @@ add_vcf_type <- function() {
                       p(a(href = "https://github.com/Illumina/strelka", 
                           "Strelka"), " Indel (ID)"),
                       a(href = "https://github.com/broadgsa/gatk", "Mutect")),
-               choiceValues = list("strelka.sbs", "strelka.id", "mutect"),
-               selected = "strelka.sbs")
+               choiceValues = list("strelka.sbs", "strelka.id", "mutect"))
 }
 
 #' @import shiny
@@ -34,8 +33,7 @@ add_reference_genome <- function(){
                       "Human GRCh38/hg38",
                       "Mouse GRCm38/mm10"),
                choiceValues = 
-                 list("hg19", "hg38", "mm10"),
-               selected = "hg19")
+                 list("hg19", "hg38", "mm10"))
 }
 
 #' @import shiny
@@ -44,8 +42,7 @@ add_region <- function(){
   radioButtons(inputId = "region", 
                label = h5(strong("Genomic region")), 
                choices = 
-                 c("unknown", "genome", "exome", "transcript"), 
-               selected = "unknown")
+                 c("unknown", "genome", "exome", "transcript"))
 }
 
 #' @import shiny
@@ -80,13 +77,3 @@ upload_vcf_files <- function() {
   fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
             multiple = TRUE)
 }
-
-
-
-
-
-
-
-
-
-
