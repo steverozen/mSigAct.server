@@ -1,7 +1,7 @@
 #' @import shiny
 #' @keywords internal
 add_vcf_type <- function() {
-  radioButtons(inputId = "vcftype", label = h5(strong("Type of VCF")), 
+  radioButtons(inputId = "vcftype", label = h5(strong("Type of VCF files")), 
                choiceNames = 
                  list(p(a(href = "https://github.com/Illumina/strelka", 
                           "Strelka"), " single base substitutions (SBS)"),

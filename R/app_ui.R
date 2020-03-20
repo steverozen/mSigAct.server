@@ -74,7 +74,7 @@ app_ui <- function() {
         column(6, add_zipfile_name()),
         
         # Add a file upload control for user to upload multiple VCF files
-        column(6, fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
+        column(6, fileInput(inputId = "vcf.files", label = "Choose VCF files", 
                             multiple = TRUE))),
       
       # Add one line break
@@ -97,14 +97,15 @@ app_ui <- function() {
       fixedRow(
         # Add a download button appearing as soon as when user clicks the 
         # action button to update argument and submit for the first time
+        # or when user clicks to use the built-in data
         column(6,
                conditionalPanel(
-                 condition = "output.clicksubmit",
+                 condition = "output.clicksubmit || output.usebuiltindata",
                  downloadButton(outputId = "download", label = "Download results"))),
         
         # Add an action button for user to use the built-in data
         column(6,
-               actionButton(inputId = "use.builtin.data", 
+               actionButton(inputId = "builtindata", 
                             label = "Use the built-in data"))),
       
       # Add two line breaks
