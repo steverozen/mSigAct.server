@@ -355,7 +355,7 @@ AddRunInformation <-
 #' 
 #' @import zip
 #' 
-#' @importFrom utils glob2rx
+#' @importFrom utils getFromNamespace
 #' 
 #' @keywords internal
 GenerateZipFileFromMutectVCFs <- function(files,
@@ -372,25 +372,28 @@ GenerateZipFileFromMutectVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "reading and splitting VCFs")
   }
-  list <- ReadAndSplitMutectVCFs(files, names.of.VCFs, tumor.col.names)
-  nrow.data <- list$nrow.data
+  split.vcfs <- ReadAndSplitMutectVCFs(files, names.of.VCFs, tumor.col.names)
+  GetMutationLoadsFromMutectVCFs <- 
+    getFromNamespace("GetMutationLoadsFromMutectVCFs", "ICAMS")
+  mutation.loads <- GetMutationLoadsFromMutectVCFs(split.vcfs)
+  strand.bias.statistics<- NULL
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
   }
-  SBS.catalogs <- VCFsToSBSCatalogs(list$split.vcfs$SBS, ref.genome, 
+  SBS.catalogs <- VCFsToSBSCatalogs(split.vcfs$SBS, ref.genome, 
                                     trans.ranges, region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.3, detail = "generating DBS catalogs")
   }
-  DBS.catalogs <- VCFsToDBSCatalogs(list$split.vcfs$DBS, ref.genome, 
+  DBS.catalogs <- VCFsToDBSCatalogs(split.vcfs$DBS, ref.genome, 
                                     trans.ranges, region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.2, detail = "generating ID catalogs")
   }
-  ID.catalog <- VCFsToIDCatalogs(list$split.vcfs$ID, ref.genome, 
+  ID.catalog <- VCFsToIDCatalogs(split.vcfs$ID, ref.genome, 
                                  region)[[1]]
   
   catalogs <- c(SBS.catalogs, DBS.catalogs, list(catID = ID.catalog))
@@ -416,9 +419,11 @@ GenerateZipFileFromMutectVCFs <- function(files,
     PlotCatalogToPdf(catalogs[[name]],
                      file = paste0(output.file, name, ".pdf"))
     if (name == "catSBS192") {
-      PlotCatalogToPdf(catalogs[[name]],
-                       file = paste0(output.file, "SBS12.pdf"),
-                       plot.SBS12 = TRUE)
+      list <- PlotCatalogToPdf(catalogs[[name]],
+                               file = paste0(output.file, "SBS12.pdf"),
+                               plot.SBS12 = TRUE)
+      strand.bias.statistics <- 
+        c(strand.bias.statistics, list$strand.bias.statistics)
     }
   }
   if (is.function(updateProgress)) {
@@ -426,9 +431,9 @@ GenerateZipFileFromMutectVCFs <- function(files,
   }
   
   AddRunInformation(files, vcf.names, zipfile.name, vcftype = "mutect", 
-                    ref.genome, region, nrow.data)
+                    ref.genome, region, mutation.loads, strand.bias.statistics)
   
-  file.names <- list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
+  file.names <- list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$", 
                            full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
@@ -528,6 +533,8 @@ ProcessMutectVCFs <- function(input, output, file, ids) {
 #' @import ICAMS
 #' 
 #' @import zip
+#' 
+#' @importFrom utils getFromNamespace
 #' 
 #' @keywords internal
 GenerateZipFileFromStrelkaSBSVCFs <- function(files,
@@ -682,7 +689,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 #' 
 #' @import zip
 #' 
-#' @importFrom utils glob2rx
+#' @importFrom utils getFromNamespace
 #' 
 #' @keywords internal
 GenerateZipFileFromStrelkaIDVCFs <- function(files,
