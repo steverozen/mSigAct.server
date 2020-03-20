@@ -23,14 +23,19 @@ app_ui <- function() {
         " allows users to upload multiple ", 
         a(href = "https://tinyurl.com/rdzwnxd", "VCF"), 
         " (Variant Call Format) files and returns a zip archive which ",
-        "contains mutation catalogs and PDF plots. ", 
-        "The uploaded VCFs must ", strong("all"), " be of the ", 
-        strong("same"), " VCF type, reference genome and region."),
+        "contains mutation catalogs and PDF plots. ",
+        "Only VCF files from ",
+        a(href = "https://github.com/Illumina/strelka", "Strelka"), " or ",
+        a(href = "https://github.com/broadgsa/gatk", "Mutect"), 
+        " variant caller are supported.",
+        "The uploaded VCFs must ", strong("all"), " come from the ", 
+        strong("same"), " variant caller, reference genome and region."),
          
       # Add a link to the COSMIC website about mutational signatures
-      p("For an overview of mutational signatures, please refer to the ",
-        a(href = "https://cancer.sanger.ac.uk/cosmic/signatures", "COSMIC"),
-        " (Catalogue Of Somatic Mutations In Cancer) website."),
+      p("For background information of mutational signatures, please refer ", 
+        "to this paper: ",
+        a(href = "https://doi.org/10.1038/s41586-020-1943-3", 
+          "The repertoire of mutational signatures in human cancer")),
       
       # Add an overview picture about the Shiny interface
       #imageOutput(outputId = "overview.image"),
