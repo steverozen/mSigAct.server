@@ -22,16 +22,20 @@ app_ui <- function() {
         a(href = "https://cran.r-project.org/web/packages/ICAMS/index.html", "ICAMS"), 
         " allows users to upload multiple ", 
         a(href = "https://tinyurl.com/rdzwnxd", "VCF"), 
-        " (Variant Call Format) files and generates a zip archive which ",
-        "contains different mutation catalogs and PDF plots. ", 
+        " (Variant Call Format) files and returns a zip archive which ",
+        "contains mutation catalogs and PDF plots. ", 
         "The uploaded VCFs must ", strong("all"), " be of the ", 
         strong("same"), " VCF type, reference genome and region."),
          
       # Add a link to the COSMIC website about mutational signatures
       p("For an overview of mutational signatures, please refer to the ",
         a(href = "https://cancer.sanger.ac.uk/cosmic/signatures", "COSMIC"),
-        " (Catalogue Of Somatic Mutations In Cancer) website,"),
+        " (Catalogue Of Somatic Mutations In Cancer) website."),
       
+      # Add an overview picture about the Shiny interface
+      #imageOutput(outputId = "overview.image"),
+      img(src = "www/ICAMS.shiny-overview.PNG", width = "800", height = "471"),
+    
       # Add a horizontal line
       hr(),
       
