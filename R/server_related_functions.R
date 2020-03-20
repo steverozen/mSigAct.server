@@ -697,9 +697,11 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "reading VCFs")
   }
-  list0 <- ReadStrelkaIDVCFs(files, names.of.VCFs)
-  list.of.vcfs <- lapply(list0, FUN = "[[", 1)
-  nrow.data <- lapply(list0, FUN = "[[", 2)
+  list.of.vcfs <- ReadStrelkaIDVCFs(files, names.of.VCFs)
+  GetMutationLoadsFromStrelkaIDVCFs <-
+    getFromNamespace("GetMutationLoadsFromStrelkaIDVCFs", "ICAMS")
+  mutation.loads <- GetMutationLoadsFromStrelkaIDVCFs(list.of.vcfs)
+  strand.bias.statistics<- NULL
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating ID catalog")
@@ -724,11 +726,10 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
   AddRunInformation(files, vcf.names, zipfile.name, vcftype = "strelka.id",
-                    ref.genome, region, nrow.data)
+                    ref.genome, region, mutation.loads, strand.bias.statistics)
   
-  file.names <- 
-    list.files(path = tempdir(), pattern = glob2rx("*.csv|pdf|txt"), 
-               full.names = TRUE)
+  file.names <- list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$", 
+                           full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
 }
