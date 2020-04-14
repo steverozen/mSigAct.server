@@ -13,10 +13,10 @@ app_server <- function(input, output,session) {
   ids <- list("error" = character(0), "warning" = character(0), 
              "message" = character(0))
   
-  # Download VCF files to test when user clicks the buttom
-  output$downloadtestVCFs <- downloadHandler(filename = "test-VCFs.zip", 
+  # Download sample VCFs when user clicks the buttom
+  output$downloadsampleVCFs <- downloadHandler(filename = "sample-VCFs.zip", 
                                              content = function(file) {
-                                               PrepareTestVCFs(file)
+                                               PrepareSampleVCFs(file)
                                              })
   
   # Generate the zip archive if user chooses to use built-in data

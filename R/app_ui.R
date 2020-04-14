@@ -96,8 +96,8 @@ app_ui <- function() {
                                label = "Update argument and submit")),
         
         # Add a downlaod button for user to download VCF files to test
-        column(6, downloadButton(outputId = "downloadtestVCFs", 
-                              label = "Download VCF files to test"))),
+        column(6, downloadButton(outputId = "downloadsampleVCFs", 
+                              label = "Download the sample VCFs"))),
       
       # Add one line break
       br(),

@@ -860,8 +860,8 @@ ProcessStrelkaIDVCFs <- function(input, output, file, ids) {
 #' @import zip
 #' 
 #' @keywords internal
-PrepareTestVCFs <- function(file) {
-  dir <- system.file("extdata/Strelka-SBS-vcf", package = "ICAMS")
+PrepareSampleVCFs <- function(file) {
+  dir <- system.file("extdata/sample-VCFs", package = "ICAMS")
   files <- list.files(dir, full.names = TRUE)
   zip::zipr(files, zipfile = file)
 }
