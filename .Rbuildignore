@@ -7,3 +7,4 @@ $run_dev.*
 ^\.travis\.yml$
 ^README\.Rmd$
 ^app\.R$
+^rsconnect$
