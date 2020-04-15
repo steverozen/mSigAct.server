@@ -6,7 +6,7 @@
 # imports BSgenome.Hsapiens.UCSC.hg38,
 # imports BSgenome.Mmusculus.UCSC.mm10
 
-pkgload::load_all()
+pkgload::load_all(export_all = FALSE,helpers = FALSE,attach_testthat = FALSE)
 options( "golem.app.prod" = TRUE)
 # Increase the file uploads limit to 125 GB
 options(shiny.maxRequestSize = 125*1024^3)
