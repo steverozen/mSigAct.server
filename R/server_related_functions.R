@@ -867,18 +867,34 @@ PrepareSampleVCFs <- function(file) {
 }
 
 #' @keywords internal
-GenerateZipFileFromBuiltInData <- function(output, file, ids) {
+RunICAMSOnSampleStrelkaSBSVCFs <- function(output, file, ids) {
   input <- reactiveValues()
   dir <- system.file("extdata/Strelka-SBS-vcf", package = "ICAMS")
   datapath <- list.files(dir, full.names = TRUE)
   name <- tools::file_path_sans_ext(basename(datapath))
-  names.of.VCFs <- "HepG2.s2, HepG2"
   input$vcf.files <- 
     data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)
-  input$names.of.VCFs <- names.of.VCFs
+  input$names.of.VCFs <- paste(name, collapse = ", ")
   input$base.filename <- "HepG2"
-  input$zipfile.name <- "ICAMS-test.zip"
+  input$zipfile.name <- "ICAMS-test-run-Strelka-SBS-VCFs.zip"
   input$ref.genome <- "hg19"
   input$region <- "genome"
   ProcessStrelkaSBSVCFs(input, output, file, ids)
+}
+
+#' @keywords internal
+RunICAMSOnSampleMutectVCFs <- function(output, file, ids) {
+  input <- reactiveValues()
+  dir <- system.file("extdata/Mutect-vcf", package = "ICAMS")
+  datapath <- list.files(dir, full.names = TRUE)
+  name <- tools::file_path_sans_ext(basename(datapath))
+  input$vcf.files <- 
+    data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)
+  input$names.of.VCFs <- paste(name, collapse = ", ")
+  input$tumor.col.names <- "NA"
+  input$base.filename <- "HepG2"
+  input$zipfile.name <- "ICAMS-test-run-Mutect-VCFs.zip"
+  input$ref.genome <- "hg19"
+  input$region <- "genome"
+  ProcessMutectVCFs(input, output, file, ids)
 }
