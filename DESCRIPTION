@@ -14,11 +14,10 @@ Imports:
     ICAMS,
     pkgload,
     shiny,
-    shinythemes,
     stringi,
-    zip,
+    zip
 Remotes: steverozen/ICAMS
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: 
     testthat (>= 2.1.0),
     shinytest
