@@ -3,7 +3,6 @@
 export(run_app)
 import(ICAMS)
 import(shiny)
-import(shinythemes)
 import(zip)
 importFrom(golem,with_golem_options)
 importFrom(htmltools,HTML)
