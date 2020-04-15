@@ -159,7 +159,7 @@ AddRunInformation <-
     
     # Add the header information
     header <- paste0("run-information.txt file for ", zipfile.name, 
-                     " created on ", Sys.time())
+                     ".zip created on ", Sys.time())
     char.length <- nchar(header)
     writeLines(paste(rep("-", char.length), collapse = ""), run.info)
     writeLines(header, run.info)
@@ -185,7 +185,7 @@ AddRunInformation <-
                  "https://cran.rstudio.com/web/packages/ICAMS/index.html"), run.info)
     writeLines("", run.info)
     writeLines(c("Shiny interface of ICAMS is available at ",
-                 "https://jnh01.shinyapps.io/icams/"), run.info)
+                 "https://jnh01.shinyapps.io/ICAMS/"), run.info)
     
     # Add ICAMS and R version used
     writeLines("", run.info)
@@ -876,7 +876,7 @@ RunICAMSOnSampleStrelkaSBSVCFs <- function(output, file, ids) {
     data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)
   input$names.of.VCFs <- paste(name, collapse = ", ")
   input$base.filename <- "HepG2"
-  input$zipfile.name <- "ICAMS-test-run-Strelka-SBS-VCFs.zip"
+  input$zipfile.name <- "ICAMS-test-run-Strelka-SBS-VCFs"
   input$ref.genome <- "hg19"
   input$region <- "genome"
   ProcessStrelkaSBSVCFs(input, output, file, ids)
@@ -893,7 +893,7 @@ RunICAMSOnSampleMutectVCFs <- function(output, file, ids) {
   input$names.of.VCFs <- paste(name, collapse = ", ")
   input$tumor.col.names <- "NA"
   input$base.filename <- "HepG2"
-  input$zipfile.name <- "ICAMS-test-run-Mutect-VCFs.zip"
+  input$zipfile.name <- "ICAMS-test-run-Mutect-VCFs"
   input$ref.genome <- "hg19"
   input$region <- "genome"
   ProcessMutectVCFs(input, output, file, ids)
