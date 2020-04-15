@@ -1,17 +1,13 @@
 #' @import shiny
-#' @import shinythemes
 app_ui <- function() {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # List the first level UI elements here 
     fixedPage(
-      # Specify the theme used for UI
-      theme = shinytheme("cerulean"),
-      
       # Add a title on top the page
       titlePanel(p("ICAMS: In-depth Characterization and Analysis of ",
-                 "Mutational Signatures")),
+                 "Mutational Signatures", style = "color: #337ab7")),
       
       # Add a horizontal line
       hr(),
@@ -35,11 +31,11 @@ app_ui <- function() {
       p("For background information of mutational signatures, please refer ", 
         "to this paper: ",
         a(href = "https://doi.org/10.1038/s41586-020-1943-3", 
-          "The repertoire of mutational signatures in human cancer")),
+          "The repertoire of mutational signatures in human cancer"), "."),
       
       # Add an overview picture about the Shiny interface
       #imageOutput(outputId = "overview.image"),
-      img(src = "www/ICAMS.shiny-overview.PNG", width = "800", height = "471"),
+      img(src = "www/ICAMS.shiny-overview-v2.jpg", width = "800", height = "471"),
     
       # Add a horizontal line
       hr(),
@@ -83,42 +79,56 @@ app_ui <- function() {
         column(6, add_zipfile_name()),
         
         # Add a file upload control for user to upload multiple VCF files
-        column(6, fileInput(inputId = "vcf.files", label = "Choose VCF files", 
-                            multiple = TRUE))),
+        column(6, upload_vcf_files())),
+      
+      
+      # Add the next row of control widgets
+      fixedRow(column(6,
+                      MyDownloadButton(outputId = "download",
+                                       label = "Submit",
+                                       style="color: #fff; 
+                                       background-color: #337ab7; 
+                                       border-color: #2e6da4"),
+                      offset = 6)),
       
       # Add one line break
       br(),
       
-      # Add the next row of control widgets
-      fixedRow(
-        # Add an action button for user to update argument and submit
-        column(6, actionButton(inputId = "submit", 
-                               label = "Update argument and submit")),
-        
-        # Add a downlaod button for user to download VCF files to test
-        column(6, downloadButton(outputId = "downloadsampleVCFs", 
-                              label = "Download the sample VCFs"))),
+      fixedRow(column(6,
+                      actionButton(inputId = "remove", 
+                                   label = "Remove notifications"),
+                      offset = 6)),
       
       # Add one line break
       br(),
       
-      # Add the next row of control widgets
-      fixedRow(
-        # Add a download button appearing as soon as when user clicks the 
-        # action button to update argument and submit for the first time
-        # or when user clicks to use the built-in data
-        column(6,
-               conditionalPanel(
-                 condition = "output.clicksubmit || output.usebuiltindata",
-                 downloadButton(outputId = "download", label = "Download results"))),
-        
-        # Add an action button for user to use the built-in data
-        column(6,
-               actionButton(inputId = "builtindata", 
-                            label = "Use the built-in data"))),
+      # Add a download button for user to download VCF files to test
+      fixedRow(column(6,
+                      downloadButton(outputId = "downloadsampleVCFs", 
+                                     label = "Download the sample VCFs"),
+                      offset = 6)),
       
-      # Add two line breaks
-      rep_br(2),
+      # Add one line break
+      br(),
+      
+      # Add a button for user to run ICAMS on sample Strelka SBS VCFs
+      fixedRow(column(6, 
+                      MyDownloadButton(outputId = "runstrelkasbsvcfs", 
+                                       label = 
+                                         paste0("Run ICAMS on two ", 
+                                                "1-sample Strelka SBS VCFs")),
+                      offset = 6)),
+      
+      # Add one line break
+      br(),
+      
+      # Add a button for user to run ICAMS on sample Mutect VCFs
+      fixedRow(column(6, 
+                      MyDownloadButton(outputId = "runmutectvcfs", 
+                                       label = 
+                                         paste0("Run ICAMS on two ", 
+                                                "1-sample Mutect VCFs")),
+                      offset = 6)),
       
       # Add a horizontal line
       hr(),
