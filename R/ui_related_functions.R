@@ -1,7 +1,9 @@
 #' @import shiny
 #' @keywords internal
 add_vcf_type <- function() {
-  radioButtons(inputId = "vcftype", label = h5(strong("Type of VCF files")), 
+  radioButtons(inputId = "vcftype", 
+               label = h5(strong("Type of VCF files"), 
+                          style = "color: #337ab7"),
                choiceNames = 
                  list(p(a(href = "https://github.com/Illumina/strelka", 
                           "Strelka"), " single base substitutions (SBS)"),
@@ -17,7 +19,8 @@ add_vcf_type <- function() {
 add_tumor_col_names <- function() {
   textInput(inputId = "tumor.col.names", 
             label = p(strong(h5("Names of columns in Mutect VCFs containing", 
-                                "tumor sample information")),
+                                "tumor sample information",
+                                style = "color: #337ab7")),
                       h5("(e.g. colname1, colname2, colname3 ... ", 
                          "If value is NA(default), the program will use the ", 
                          "10th column in all the VCFs to calculate VAFs)")),
@@ -28,7 +31,7 @@ add_tumor_col_names <- function() {
 #' @keywords internal
 add_reference_genome <- function(){
   radioButtons(inputId = "ref.genome", 
-               label = h5(strong("Reference genome")), 
+               label = h5(strong("Reference genome", style = "color: #337ab7")), 
                choiceNames = 
                  list("Human GRCh37/hg19", 
                       "Human GRCh38/hg38",
@@ -42,9 +45,9 @@ add_reference_genome <- function(){
 #' @keywords internal
 add_region <- function(){
   radioButtons(inputId = "region", 
-               label = h5(strong("Genomic region")), 
+               label = h5(strong("Genomic region"), style = "color: #337ab7"), 
                choices = 
-                 c("unknown", "genome", "exome", "transcript"),
+                 c("genome", "exome", "transcript", "unknown"),
                selected = character(0))
 }
 
@@ -52,7 +55,7 @@ add_region <- function(){
 #' @keywords internal
 add_sample_names <- function() {
   textInput(inputId = "names.of.VCFs", 
-            label = p(strong(h5("Sample names")),
+            label = p(strong(h5("Sample names"), style = "color: #337ab7"),
                       h5("(e.g. name1, name2, name3...If blank, ", 
                          "then use the names of the VCF files.)")))
 }
@@ -62,7 +65,8 @@ add_sample_names <- function() {
 add_base_filename <- function() {
   textInput(inputId = "base.filename",
             label = 
-              p(strong(h5("Base name of the CSV and PDF files to create")),
+              p(strong(h5("Base name of the CSV and PDF files to create", 
+                          style = "color: #337ab7")),
                 h5("(e.g. name1, or you may leave it blank)")))
 }
 
@@ -70,15 +74,17 @@ add_base_filename <- function() {
 #' @keywords internal
 add_zipfile_name <- function() {
   textInput(inputId = "zipfile.name",
-            label = p(strong(h5("Name of zip file to create"))),
+            label = p(strong(h5("Name of zip file to create", 
+                                style = "color: #337ab7"))),
             value = "ICAMS.output")
 }
 
 #' @import shiny
 #' @keywords internal
 upload_vcf_files <- function() {
-  fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
-            multiple = TRUE)
+  div(
+    fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
+              multiple = TRUE), style="color: #337ab7;")
 }
 
 #' @import shiny
