@@ -80,3 +80,15 @@ upload_vcf_files <- function() {
   fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
             multiple = TRUE)
 }
+
+#' @import shiny
+#' @keywords internal
+MyDownloadButton <- function (outputId, label = "Download", 
+                              class = NULL, ...) {
+  {
+    aTag <- tags$a(id = outputId, 
+                   class = paste("btn btn-default shiny-download-link", class), 
+                   href = "", target = "_blank", download = NA, 
+                   icon(NULL), label, ...)
+  }
+}
