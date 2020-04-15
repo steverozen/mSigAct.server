@@ -34,8 +34,7 @@ app_ui <- function() {
           "The repertoire of mutational signatures in human cancer"), "."),
       
       # Add an overview picture about the Shiny interface
-      #imageOutput(outputId = "overview.image"),
-      img(src = "www/ICAMS.shiny-overview-v2.jpg", width = "800", height = "471"),
+      img(src = "www/ICAMS.shiny-overview-v2.JPG", width = "800", height = "471"),
     
       # Add a horizontal line
       hr(),
