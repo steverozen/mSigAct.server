@@ -8,14 +8,11 @@ License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Language: en-US
-Imports: Biostrings,
-    BSgenome,
-    GenomeInfoDb,
-    GenomicRanges,
+biocViews:
+Imports: config,
     golem,
     htmltools,
     ICAMS,
-    IRanges,
     pkgload,
     shiny,
     stringi,
