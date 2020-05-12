@@ -6,8 +6,10 @@ app_ui <- function() {
     # List the first level UI elements here 
     fixedPage(
       # Add a title on top the page
-      titlePanel(p("ICAMS: In-depth Characterization and Analysis of ",
-                 "Mutational Signatures", style = "color: #337ab7")),
+      titlePanel(title = p("ICAMS: In-depth Characterization and Analysis of ",
+                           "Mutational Signatures", style = "color: #337ab7"),
+                 windowTitle = paste0("ICAMS: In-depth Characterization and ", 
+                                 "Analysis of Mutational Signatures")),
       
       # Add a horizontal line
       hr(),
