@@ -9,6 +9,8 @@
 status](https://travis-ci.com/steverozen/ICAMS.shiny.svg?branch=master)](https://travis-ci.com/steverozen/ICAMS.shiny)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![License: GPL
+v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 <!-- badges: end -->
 
