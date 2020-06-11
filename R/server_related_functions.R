@@ -158,8 +158,11 @@ AddRunInformation <-
       file(description = file.path(tempdir(), "run-information.txt"), open = "w")
     
     # Add the header information
+    time.info <- strftime(Sys.time(), usetz = TRUE) # Get time zone information
+    time.info1 <- 
+      gsub(pattern = "+", replacement = "UTC+", x = time.info, fixed = TRUE)
     header <- paste0("run-information.txt file for ", zipfile.name, 
-                     ".zip created on ", strftime(Sys.time(), usetz = TRUE))
+                     ".zip created on ", time.info1)
     char.length <- nchar(header)
     writeLines(paste(rep("-", char.length), collapse = ""), run.info)
     writeLines(header, run.info)
