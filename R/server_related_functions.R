@@ -159,7 +159,7 @@ AddRunInformation <-
     
     # Add the header information
     header <- paste0("run-information.txt file for ", zipfile.name, 
-                     ".zip created on ", Sys.time())
+                     ".zip created on ", strftime(Sys.time(), usetz = TRUE))
     char.length <- nchar(header)
     writeLines(paste(rep("-", char.length), collapse = ""), run.info)
     writeLines(header, run.info)
