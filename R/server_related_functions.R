@@ -443,6 +443,10 @@ GenerateZipFileFromMutectVCFs <- function(files,
   
   catalogs <- c(SBS.catalogs, DBS.catalogs, list(catID = ID.catalog))
   
+  # Transform the counts catalogs to density catalogs
+  catalogs.counts <- c(SBS.catalogs, DBS.catalogs)
+  catalogs.density <- TransCountsCatalogToDensity(catalogs.counts)
+  
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
   }
@@ -453,6 +457,12 @@ GenerateZipFileFromMutectVCFs <- function(files,
   
   for (name in names(catalogs)) {
     WriteCatalog(catalogs[[name]],
+                 file = paste0(output.file, name, ".counts.csv"))
+  }
+  
+  # Write the density catalogs to CSV files
+  for (name in names(catalogs.density)) {
+    WriteCatalog(catalogs.density[[name]],
                  file = paste0(output.file, name, ".csv"))
   }
   
@@ -462,15 +472,29 @@ GenerateZipFileFromMutectVCFs <- function(files,
   
   for (name in names(catalogs)) {
     PlotCatalogToPdf(catalogs[[name]],
-                     file = paste0(output.file, name, ".pdf"))
+                     file = paste0(output.file, name, ".counts.pdf"))
     if (name == "catSBS192") {
       list <- PlotCatalogToPdf(catalogs[[name]],
-                               file = paste0(output.file, "SBS12.pdf"),
+                               file = paste0(output.file, "SBS12.counts.pdf"),
                                plot.SBS12 = TRUE)
       strand.bias.statistics <- 
         c(strand.bias.statistics, list$strand.bias.statistics)
     }
   }
+  
+  # Plotting the density catalogs to PDFs
+  for (name in names(catalogs.density)) {
+    PlotCatalogToPdf(catalogs.density[[name]],
+                     file = paste0(output.file, name, ".pdf"))
+    if (name == "catSBS192.density") {
+      list <- PlotCatalogToPdf(catalogs.density[[name]],
+                               file = paste0(output.file, "SBS12.density.pdf"),
+                               plot.SBS12 = TRUE)
+      strand.bias.statistics <- 
+        c(strand.bias.statistics, list$strand.bias.statistics)
+    }
+  }
+  
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
@@ -900,4 +924,25 @@ RunICAMSOnSampleMutectVCFs <- function(output, file, ids) {
   input$ref.genome <- "hg19"
   input$region <- "genome"
   ProcessMutectVCFs(input, output, file, ids)
+}
+
+#' Transfrom a list of counts catalogs to a list of density catalogs
+#'
+#' @param list A list of counts catalogs.
+#'
+#' @return A list of density catalogs transformed from \code{list}.
+#' 
+#' @keywords internal
+TransCountsCatalogToDensity <- function(list) {
+  # Create an empty list for storing the density catalogs
+  list1 <- vector(mode = "list")
+  
+  for (name in names(list)) {
+    name1 <- paste0(name, ".density")
+    catalog <- list[[name]]
+    catalog.density <- 
+      TransformCatalog(catalog, target.catalog.type = "density")
+    list1[[name1]] <- catalog.density
+  }
+  return(list1)
 }
