@@ -639,6 +639,9 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
   
   catalogs <- c(SBS.catalogs, DBS.catalogs)
   
+  # Transform the counts catalogs to density catalogs
+  catalogs.density <- TransCountsCatalogToDensity(catalogs)
+  
   output.file <- ifelse(base.filename == "",
                         paste0(tempdir(), .Platform$file.sep),
                         file.path(tempdir(), paste0(base.filename, ".")))
@@ -648,6 +651,12 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
   }
   for (name in names(catalogs)) {
     WriteCatalog(catalogs[[name]],
+                 file = paste0(output.file, name, ".counts.csv"))
+  }
+  
+  # Write the density catalogs to CSV files
+  for (name in names(catalogs.density)) {
+    WriteCatalog(catalogs.density[[name]],
                  file = paste0(output.file, name, ".csv"))
   }
   
@@ -656,13 +665,26 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
   }
   for (name in names(catalogs)) {
     PlotCatalogToPdf(catalogs[[name]],
-                     file = paste0(output.file, name, ".pdf"))
+                     file = paste0(output.file, name, ".counts.pdf"))
     if (name == "catSBS192") {
       list <- PlotCatalogToPdf(catalogs[[name]],
-                               file = paste0(output.file, "SBS12.pdf"),
+                               file = paste0(output.file, "SBS12.counts.pdf"),
                                plot.SBS12 = TRUE)
       strand.bias.statistics<- c(strand.bias.statistics, 
                                  list$strand.bias.statistics)
+    }
+  }
+  
+  # Plotting the density catalogs to PDFs
+  for (name in names(catalogs.density)) {
+    PlotCatalogToPdf(catalogs.density[[name]],
+                     file = paste0(output.file, name, ".pdf"))
+    if (name == "catSBS192.density") {
+      list <- PlotCatalogToPdf(catalogs.density[[name]],
+                               file = paste0(output.file, "SBS12.density.pdf"),
+                               plot.SBS12 = TRUE)
+      strand.bias.statistics <- 
+        c(strand.bias.statistics, list$strand.bias.statistics)
     }
   }
   
