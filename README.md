@@ -16,14 +16,3 @@ v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/li
 
 Shiny interface to the end-to-end functionality of the
 [ICAMS](https://github.com/steverozen/ICAMS) package.
-
-## Installation
-
-Install the development version of ICAMS.shiny from
-[GitHub](https://github.com/) with the R command line:
-
-``` r
-install.packages("devtools")
-devtools::install_github("steverozen/ICAMS.shiny")
-ICAMS.shiny::run_app()
-```
