@@ -173,11 +173,14 @@ AddRunInformation <-
     writeLines("--- About ICAMS ---", run.info)
     writeLines(c("Analysis and visualization of experimentally elucidated mutational",
                  "signatures - the kind of analysis and visualization in Boot et al.,",
-                 "'In-depth characterization of the cisplatin mutational signature in",
-                 "human cell lines and in esophageal and liver tumors', ", 
-                 "Genome Research 2018, https://doi.org/10.1101/gr.230219.117.",
-                 "'ICAMS' stands for In-depth Characterization and Analysis of",
-                 "Mutational Signatures. 'ICAMS' has functions to read in variant",
+                 '"In-depth characterization of the cisplatin mutational signature in',
+                 'human cell lines and in esophageal and liver tumors", ',
+                 "Genome Research 2018, https://doi.org/10.1101/gr.230219.117 and ",
+                 '"Characterization of colibactin-associated mutational signature ',
+                 'in an Asian oral squamous cell carcinoma and in other mucosal tumor types",',
+                 'Genome Research 2020, https://doi.org/10.1101/gr.255620.119.',
+                 '"ICAMS" stands for In-depth Characterization and Analysis of',
+                 'Mutational Signatures. "ICAMS" has functions to read in variant',
                  "call files (VCFs) and to collate the corresponding catalogs of",
                  "mutational spectra and to analyze and plot catalogs of mutational",
                  'spectra and signatures. Handles both "counts-based" and ', 
@@ -231,7 +234,7 @@ AddRunInformation <-
                       "# of SBS", "  ",
                       "# of DBS", "  ",
                       "# of ID", "  ",
-                      "# of excluded variants*", "  "),
+                      "# of discarded variants", "  "),
                run.info)
     
     num.of.file <- length(files)
@@ -249,16 +252,19 @@ AddRunInformation <-
                                  side = "right"), "  ",
                         stri_pad(mutation.loads$ID[i], width = 7,
                                  side = "right"), "  ",
-                        stri_pad(mutation.loads$excluded.variants[i], 
+                        stri_pad(mutation.loads$discarded.variants[i], 
                                  width = 22, side = "right")), 
                  run.info)
       
     }
-    # Add a disclaimer about excluded variants in the analysis
-    writeLines("", run.info)
-    writeLines(paste0("* Triplet and above base substitutions, ", 
-                      "complex indels, and variants with multiple alternative ",
-                      "alleles are excluded from the analysis."), run.info)
+    
+    if (FALSE) {
+      # Add a disclaimer about discarded variants in the analysis
+      writeLines("", run.info)
+      writeLines(paste0("* Triplet and above base substitutions, ", 
+                        "complex indels, and variants with multiple alternative ",
+                        "alleles are excluded from the analysis."), run.info)
+    }
     
     # Add strand bias statistics for SBS12 plot
     if (!is.null(strand.bias.statistics)) {
