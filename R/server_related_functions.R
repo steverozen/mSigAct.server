@@ -938,8 +938,13 @@ ProcessStrelkaIDVCFs <- function(input, output, file, ids) {
 #' 
 #' @keywords internal
 PrepareSampleVCFs <- function(file) {
-  dir <- system.file("extdata/sample-VCFs", package = "ICAMS")
-  files <- list.files(dir, full.names = TRUE)
+  dir1 <- system.file("extdata/Strelka-SBS-vcf", package = "ICAMS")
+  files1 <- list.files(dir1, full.names = TRUE)
+  dir2 <- system.file("extdata/Strelka-ID-vcf", package = "ICAMS")
+  files2 <- list.files(dir2, full.names = TRUE)
+  dir3 <- system.file("extdata/Mutect-vcf", package = "ICAMS")
+  files3 <- list.files(dir3, full.names = TRUE)
+  files <- c(files1, files2, files3)
   zip::zipr(files, zipfile = file)
 }
 
