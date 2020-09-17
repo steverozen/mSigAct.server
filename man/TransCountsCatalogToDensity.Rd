@@ -2,7 +2,7 @@
 % Please edit documentation in R/server_related_functions.R
 \name{TransCountsCatalogToDensity}
 \alias{TransCountsCatalogToDensity}
-\title{Transfrom a list of counts catalogs to a list of density catalogs}
+\title{Transform a list of counts catalogs to a list of density catalogs}
 \usage{
 TransCountsCatalogToDensity(list)
 }
@@ -13,6 +13,6 @@ TransCountsCatalogToDensity(list)
 A list of density catalogs transformed from \code{list}.
 }
 \description{
-Transfrom a list of counts catalogs to a list of density catalogs
+Transform a list of counts catalogs to a list of density catalogs
 }
 \keyword{internal}

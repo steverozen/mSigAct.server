@@ -982,7 +982,7 @@ RunICAMSOnSampleMutectVCFs <- function(output, file, ids) {
   ProcessMutectVCFs(input, output, file, ids)
 }
 
-#' Transfrom a list of counts catalogs to a list of density catalogs
+#' Transform a list of counts catalogs to a list of density catalogs
 #'
 #' @param list A list of counts catalogs.
 #'
