@@ -418,34 +418,47 @@ GenerateZipFileFromMutectVCFs <- function(files,
     updateProgress(value = 0.1, detail = "reading and splitting VCFs")
   }
   split.vcfs <- ReadAndSplitMutectVCFs(files, names.of.VCFs, tumor.col.names)
-  GetMutationLoadsFromMutectVCFs <- 
-    getFromNamespace("GetMutationLoadsFromMutectVCFs", "ICAMS")
-  mutation.loads <- GetMutationLoadsFromMutectVCFs(split.vcfs)
-  strand.bias.statistics<- NULL
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
   }
-  SBS.catalogs <- VCFsToSBSCatalogs(split.vcfs$SBS, ref.genome, 
+  SBS.list <- VCFsToSBSCatalogs(split.vcfs$SBS, ref.genome, 
                                     trans.ranges, region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.3, detail = "generating DBS catalogs")
   }
-  DBS.catalogs <- VCFsToDBSCatalogs(split.vcfs$DBS, ref.genome, 
+  DBS.list <- VCFsToDBSCatalogs(split.vcfs$DBS, ref.genome, 
                                     trans.ranges, region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.2, detail = "generating ID catalogs")
   }
-  ID.catalog <- VCFsToIDCatalogs(split.vcfs$ID, ref.genome, 
-                                 region)[[1]]
+  ID.list <- VCFsToIDCatalogs(split.vcfs$ID, ref.genome, region)
+  CombineAndReturnCatalogsForMutectVCFs <- 
+    getFromNamespace("CombineAndReturnCatalogsForMutectVCFs", "ICAMS")
+  catalogs0 <- 
+    CombineAndReturnCatalogsForMutectVCFs(split.vcfs.list = split.vcfs, 
+                                          SBS.list = SBS.list, 
+                                          DBS.list = DBS.list,
+                                          ID.list = ID.list)
   
-  catalogs <- c(SBS.catalogs, DBS.catalogs, list(catID = ID.catalog))
+  GetMutationLoadsFromMutectVCFs <- 
+    getFromNamespace("GetMutationLoadsFromMutectVCFs", "ICAMS")
+  mutation.loads <- GetMutationLoadsFromMutectVCFs(catalogs0)
+  strand.bias.statistics<- NULL
+  
+  # Retrieve the catalog matrix from catalogs0
+  catalogs <- catalogs0
+  catalogs$discarded.variants <- catalogs$annotated.vcfs <- NULL
+  
+  
+  # Remove the ID counts catalog as it does not have abundance for
+  # it to be transformed to density catalog
+  catalogs$catID <- NULL
   
   # Transform the counts catalogs to density catalogs
-  catalogs.counts <- c(SBS.catalogs, DBS.catalogs)
-  catalogs.density <- TransCountsCatalogToDensity(catalogs.counts)
+  catalogs.density <- TransCountsCatalogToDensity(catalogs)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
