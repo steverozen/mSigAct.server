@@ -620,24 +620,33 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
     updateProgress(value = 0.1, detail = "reading and splitting VCFs")
   }
   split.vcfs <- ReadAndSplitStrelkaSBSVCFs(files, names.of.VCFs)
-  GetMutationLoadsFromStrelkaSBSVCFs <- 
-    getFromNamespace("GetMutationLoadsFromStrelkaSBSVCFs", "ICAMS")
-  mutation.loads <- GetMutationLoadsFromStrelkaSBSVCFs(split.vcfs)
-  strand.bias.statistics<- NULL
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
   }
-  SBS.catalogs <- VCFsToSBSCatalogs(split.vcfs$SBS.vcfs, ref.genome, 
+  SBS.list <- VCFsToSBSCatalogs(split.vcfs$SBS.vcfs, ref.genome, 
                                     trans.ranges, region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.3, detail = "generating DBS catalogs")
   }
-  DBS.catalogs <- VCFsToDBSCatalogs(split.vcfs$DBS.vcfs, ref.genome, 
+  DBS.list <- VCFsToDBSCatalogs(split.vcfs$DBS.vcfs, ref.genome, 
                                     trans.ranges, region)
   
-  catalogs <- c(SBS.catalogs, DBS.catalogs)
+  CombineAndReturnCatalogsForStrelkaSBSVCFs <- 
+    getFromNamespace("CombineAndReturnCatalogsForStrelkaSBSVCFs", "ICAMS")
+  catalogs0 <- 
+    CombineAndReturnCatalogsForStrelkaSBSVCFs(split.vcfs.list = split.vcfs, 
+                                              SBS.list = SBS.list, 
+                                              DBS.list = DBS.list)
+  GetMutationLoadsFromStrelkaSBSVCFs <- 
+    getFromNamespace("GetMutationLoadsFromStrelkaSBSVCFs", "ICAMS")
+  mutation.loads <- GetMutationLoadsFromStrelkaSBSVCFs(catalogs0)
+  strand.bias.statistics<- NULL
+  
+  # Retrieve the catalog matrix from catalogs0
+  catalogs <- catalogs0
+  catalogs$discarded.variants <- catalogs$annotated.vcfs <- NULL
   
   # Transform the counts catalogs to density catalogs
   catalogs.density <- TransCountsCatalogToDensity(catalogs)
