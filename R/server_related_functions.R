@@ -824,15 +824,16 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
     updateProgress(value = 0.1, detail = "reading VCFs")
   }
   list.of.vcfs <- ReadStrelkaIDVCFs(files, names.of.VCFs)
-  GetMutationLoadsFromStrelkaIDVCFs <-
-    getFromNamespace("GetMutationLoadsFromStrelkaIDVCFs", "ICAMS")
-  mutation.loads <- GetMutationLoadsFromStrelkaIDVCFs(list.of.vcfs)
-  strand.bias.statistics<- NULL
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating ID catalog")
   }
   list <- VCFsToIDCatalogs(list.of.vcfs, ref.genome, region)
+  
+  GetMutationLoadsFromStrelkaIDVCFs <-
+    getFromNamespace("GetMutationLoadsFromStrelkaIDVCFs", "ICAMS")
+  mutation.loads <- GetMutationLoadsFromStrelkaIDVCFs(list)
+  strand.bias.statistics<- NULL
   
   output.file <- ifelse(base.filename == "",
                         paste0(tempdir(), .Platform$file.sep),
