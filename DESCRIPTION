@@ -13,13 +13,19 @@ Imports: BSgenome.Hsapiens.1000genomes.hs37d5,
     BSgenome.Hsapiens.UCSC.hg38,
     BSgenome.Mmusculus.UCSC.mm10,
     config,
+    GenSA,
     golem,
     htmltools,
     ICAMS,
+    ICAMSxtra,
+    PCAWG7,
     pkgload,
+    quadprog,
     shiny,
     stringi,
     zip
+Remotes: github::steverozen/PCAWG7,
+    github::steverozen/ICAMSxtra
 RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 2.1.0),
