@@ -114,11 +114,7 @@ GetExposureUseSigMiner <-
                                           sig = sig.universe,
                                           n = num.of.replicates,
                                           method = "QP")
-    catalog <- catalog
     total.counts <- colSums(catalog)
-    sig.universe <- sig.universe
-    num.of.replicates <- num.of.replicates
-    conf.int <- conf.int
     exposure.mean <- apply(retval$expo, MARGIN = 1, FUN = mean)
     
     # Use function quantile to find the confidence interval of bootstrap sample values
@@ -134,7 +130,6 @@ GetExposureUseSigMiner <-
     idx <- data.table::between(0, lower = df[, 1], upper = df[, 2])
     
     num.of.redundant.sigs <- sum(idx)
-    browser()
     
     # Get rid of redundant sigs and do signature attribution again until we have 
     # no more redundant signatures
@@ -145,7 +140,7 @@ GetExposureUseSigMiner <-
       # Use sig.names to update the sig.universe and do signature attribution again
       sig.universe <- sig.universe[, sig.names]
       
-      sigfit.SBS96.ci <- sigminer::sig_fit_bootstrap(catalog = catalog,
+      retval <- sigminer::sig_fit_bootstrap(catalog = catalog,
                                                      sig = sig.universe,
                                                      n = num.of.replicates,
                                                      method = "QP")
@@ -163,8 +158,8 @@ GetExposureUseSigMiner <-
       num.of.redundant.sigs <- sum(idx)
     }
     
-    exposures.props <- cbind(exposure.mean, exposure.ci)
-    sigfit.exposures <- total.counts * exposures.props
+    # exposures.props <- cbind(exposure.mean, exposure.ci)
+    sigfit.exposures <- cbind(exposure.mean, exposure.ci)
     colnames(sigfit.exposures)[1] <- colnames(catalog)
     return(sigfit.exposures)
   }
