@@ -1,6 +1,12 @@
 catSBS96.1 <- PCAWG7::spectra$PCAWG$SBS96[, 1, drop = FALSE]
-my.exposure.SBS96 <- PCAWG7::exposure$PCAWG$SBS96[, 1, drop = FALSE]
 catSBS192.1 <- PCAWG7::spectra$PCAWG$SBS192[, 1, drop = FALSE]
+my.exposure.SBS96 <- PCAWG7::exposure$PCAWG$SBS96[, 1, drop = FALSE]
+
+catDBS78.1 <- PCAWG7::spectra$PCAWG$DBS78[, 1, drop = FALSE]
+my.exposure.DBS78 <- PCAWG7::exposure$PCAWG$DBS78[, 1, drop = FALSE]
+
+catID.1 <- PCAWG7::spectra$PCAWG$ID[, 1, drop = FALSE]
+my.exposure.ID <- PCAWG7::exposure$PCAWG$ID[, 1, drop = FALSE]
 
 my.sig.SBS96 <- 
   CancerTypeToSigSubset(ca.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
@@ -8,6 +14,14 @@ my.sig.SBS96 <-
 my.sig.SBS192 <-
   CancerTypeToSigSubset(ca.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
                         sig.type = "SBS192", region = "genome")
+my.sig.DBS78 <- 
+  CancerTypeToSigSubset(ca.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
+                        sig.type = "DBS78", region = "genome")
+
+my.sig.ID <- 
+  CancerTypeToSigSubset(ca.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
+                        sig.type = "ID", region = "genome")
+
 
 exposures.SBS96 <- GetExposureAndPlotToPdf(catalog = catSBS96.1, 
                                      file = file.path(tempdir(), "test.SBS96.pdf"),
@@ -15,39 +29,31 @@ exposures.SBS96 <- GetExposureAndPlotToPdf(catalog = catSBS96.1,
                                      num.of.replicates = 1000, 
                                      method = decomposeQP) 
 
+sigfit.exposures.SBS96 <- GetExposureUseSigMiner(catalog = catSBS96.1, 
+                                           sig.universe = my.sig.SBS96)
+
 exposures.SBS192 <- GetExposureAndPlotToPdf(catalog = catSBS192.1, 
                                             file = file.path(tempdir(), "test.SBS192.pdf"),
                                             sig.universe = my.sig.SBS192, 
                                             num.of.replicates = 1000, 
                                             method = decomposeQP) 
+sigfit.exposures.SBS192 <- GetExposureUseSigMiner(catalog = catSBS192.1, 
+                                                 sig.universe = my.sig.SBS192)
 
+exposures.DBS78 <- GetExposureAndPlotToPdf(catalog = catDBS78.1, 
+                                           file = file.path(tempdir(), "test.DBS78.pdf"),
+                                           sig.universe = my.sig.DBS78, 
+                                           num.of.replicates = 1000, 
+                                           method = decomposeQP) 
 
+sigfit.exposures.DBS78 <- GetExposureUseSigMiner(catalog = catDBS78.1, 
+                                                 sig.universe = my.sig.DBS78)
 
+exposures.ID <- GetExposureAndPlotToPdf(catalog = catID.1, 
+                                           file = file.path(tempdir(), "test.ID.pdf"),
+                                           sig.universe = my.sig.ID, 
+                                           num.of.replicates = 1000, 
+                                           method = decomposeQP) 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###
-sigfit.SBS96 <- sigminer::sig_fit(catalogue_matrix = catSBS96.1,
-                                  sig = my.sig.SBS96,
-                                  method = "QP")
-sigfit.SBS96.ci <- sigminer::sig_fit_bootstrap(catalog = catSBS96.1,
-                                               sig = my.sig.SBS96,
-                                               n = 1000,
-                                               method = "QP")
-
-sigfit.exposures <- GetExposureUseSigMiner(catalog = catSBS96.1, 
-                                           sig.universe = my.sig.SBS96,
-                                           num.of.replicates = 100,
-                                           conf.int = 0.95)
+sigfit.exposures.ID <- GetExposureUseSigMiner(catalog = catID.1, 
+                                                 sig.universe = my.sig.ID)
