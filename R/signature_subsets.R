@@ -23,6 +23,9 @@ CancerTypeToExposureStatData <-
       
       return(present.by.sig)
     }
+    if (sig.type == "SBS192") {
+      sig.type <- "SBS96"
+    }
     exposure <- PCAWG7::exposure[[tumor.cohort]][[sig.type]]
     tumor.type <- SampleIDToCancerType(colnames(exposure))
     split.exposure <- 
