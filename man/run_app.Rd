@@ -12,3 +12,4 @@ run_app(...)
 \description{
 Run the Shiny Application
 }
+\keyword{internal}

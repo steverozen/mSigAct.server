@@ -10,4 +10,4 @@ pkgload::load_all(export_all = FALSE,helpers = FALSE,attach_testthat = FALSE)
 options( "golem.app.prod" = TRUE)
 # Increase the file uploads limit to 125 GB
 options(shiny.maxRequestSize = 125*1024^3)
-ICAMS.shiny::run_app() # add parameters here (if any)
+ICAMS.shiny:::run_app() # add parameters here (if any)

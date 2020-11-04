@@ -1,18 +1,17 @@
-# The code below are taken from SignatureEstimation R package
+# The code below are adapted from SignatureEstimation R package
 # Original code source: https://www.ncbi.nlm.nih.gov/CBBresearch/Przytycka/software/signatureestimation/SignatureEstimation.tar.gz
 # Original paper: https://academic.oup.com/bioinformatics/article-pdf/34/2/330/25114255/btx604.pdf
+# Reference manual for SignatureEstimation R package:https://www.ncbi.nlm.nih.gov/CBBresearch/Przytycka/software/signatureestimation/SignatureEstimation.pdf
+
 
 #' decomposeQP Function
 #'
 #' This function allows to get the optimal solution by using dual method to solve the quadratic programming problem.
-#' @param m observed turmor profile vector for a single patient/sample, 96 by 1. m is normalized.
+#' @param m observed tumor profile vector for a single patient/sample, 96 by 1. m is normalized.
 #' @param P signature profile matrix, 96 by N(N = # signatures, COSMIC: N=30)
-#' @param control some control parameter that can be passed into the solve.QP function
+#' @param ... some control parameter that can be passed into the solve.QP function
 #' @keywords quadratic programming
 #' @export
-#' @examples
-#' decomposeQP(tumorBRCA[,1], signaturesCOSMIC)
-
 decomposeQP <- function(m, P, ...){
   # N: how many signatures are selected
   N = ncol(P)
@@ -41,14 +40,11 @@ decomposeQP <- function(m, P, ...){
 #' decomposeSA Function
 #'
 #' This function allows to get the optimal solution by using simulated annealing to solve the optimization problem.
-#' @param m observed turmor profile vector for a single patient/sample, 96 by 1. m is normalized.
+#' @param m observed tumor profile vector for a single patient/sample, 96 by 1. m is normalized.
 #' @param P signature profile matrix, 96 by N(N = # signatures, COSMIC: N=30)
 #' @param control some control parameter that can be passed into the GenSA function
 #' @keywords simulated annealing
 #' @export
-#' @examples
-#' decomposeSA(tumorBRCA[,1], signaturesCOSMIC)
-
 #Wrapper for GenSA function to run simulated annealing
 decomposeSA <- function(m, P, control = list()) {
   #objective function to be minimized
@@ -74,20 +70,12 @@ decomposeSA <- function(m, P, control = list()) {
 #' findSigExposures Function
 #' wrapper function
 #' This function allows to obtain the optimal solution by specifying quadratic programming or simulated annealing to solve the optimization problem.
-#' @param M observed turmor profile matrix for all the patient/sample, 96 by G. G is the number of patients. Each column can be mutation
+#' @param M observed tumor profile matrix for all the patient/sample, 96 by G. G is the number of patients. Each column can be mutation
 #' counts, or mutation probabilities. Each column will be normalized to sum up to 1.
 #' @param P signature profile matrix, 96 by N(N = # signatures, COSMIC: N=30)
 #' @param decompostion.method which method is selected to get the optimal solution: decomposeQP or decomposeSA
 #' @keywords optimal method: QP or SA
-#' @export
-#' @examples
-#' E1 = findSigExposures(tumorBRCA, signaturesCOSMIC, decomposeQP)
-#' sigsBRCA = c(1,2,3,5,6,8,13,17,18,20,26,30)
-#' E2 = findSigExposures(tumorBRCA, signaturesCOSMIC[, sigsBRCA], decomposeQP)
-#' E3 = findSigExposures(tumorBRCA[, 1:10], signaturesCOSMIC, decomposeSA, list(maxit=1000, temperature=100))
-#' E4 = findSigExposures(tumorBRCA[, 1:10], signaturesCOSMIC[, sigsBRCA], decomposeSA, list(maxit=2000))
-#' E5 = findSigExposures(round(tumorBRCA*10000), signaturesCOSMIC, decomposeQP)
-
+#' @keywords internal
 findSigExposures <- function(M, P, decomposition.method = decomposeQP, ...) {
   ## process and check function parameters
   ## M, P
@@ -118,11 +106,9 @@ findSigExposures <- function(M, P, decomposition.method = decomposeQP, ...) {
   return(list(exposures=exposures, errors=errors))
 }
 
-
-
 #' bootstrapSigExposures Function
 #' This function allows to obtain the bootstrap distribution of the signature exposures of a certain tumor sample
-#' @param m observed turmor profile vector for a patient/sample, 96 by 1. It can be mutation
+#' @param m observed tumor profile vector for a patient/sample, 96 by 1. It can be mutation
 #' counts, or mutation probabilities.
 #' @param P signature profile matrix, 96 by N (N = # signatures, COSMIC: N=30).
 #' @param mutation.count if m is a vector of counts, then mutation.count equals the summation of all the counts.
@@ -130,12 +116,7 @@ findSigExposures <- function(M, P, decomposition.method = decomposeQP, ...) {
 #' @param R The number of bootstrap replicates.
 #' @param decompostion.method which method is selected to get the optimal solution: decomposeQP or decomposeSA
 #' @keywords bootstrap
-#' @export
-#' @examples
-#' bootstrapSigExposures(tumorBRCA[,1], signaturesCOSMIC, 100, 2000, decomposeQP)
-#' sigsBRCA = c(1,2,3,5,6,8,13,17,18,20,26,30)
-#' bootstrapSigExposures(tumorBRCA[,1], signaturesCOSMIC[,sigsBRCA], 10, 1000, decomposeQP)
-
+#' @keywords internal
 bootstrapSigExposures <- function(m, P, R, mutation.count = NULL, decomposition.method = decomposeQP, ...) {
   ## process and check function parameters
   ## m, P
@@ -177,11 +158,9 @@ bootstrapSigExposures <- function(m, P, R, mutation.count = NULL, decomposition.
   return(list(exposures=exposures, errors=errors))
 }
 
-
-
 #' suboptimalSigExposures Function
 #' This function allows to obtain the simulated annealing distribution of the signature exposures of a certain tumor sample
-#' @param m observed turmor profile vector for a patient/sample, 96 by 1. It can be mutation
+#' @param m observed tumor profile vector for a patient/sample, 96 by 1. It can be mutation
 #' counts, or mutation probabilities.
 #' @param P signature profile matrix, 96 by N(N = # signatures, COSMIC: N=30)
 #' @param mutation.count if m is a vector of counts, then mutation.count equals the summation of all the counts.
@@ -191,10 +170,7 @@ bootstrapSigExposures <- function(m, P, R, mutation.count = NULL, decomposition.
 #' @param suboptimal.factor suboptimal error.
 #' @param control some control parameter that can be passed into the function
 #' @keywords suboptimal 'simulated annealing'
-#' @export
-#' @examples
-#' suboptimalSigExposures(tumorBRCA[,1], signaturesCOSMIC, 100, optimal.error = NULL, 1.05)
-
+#' @keywords internal
 suboptimalSigExposures <- function(m, P, R, optimal.error = NULL, suboptimal.factor = 1.05, control = list()) {
   ## process and check function parameters
   ## m, P

@@ -13,6 +13,8 @@ test_that("app server", {
   expect_is(server, "function")
 })
 
+unlink("Rplots.pdf")
+
 
 
 
