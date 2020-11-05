@@ -428,19 +428,26 @@ GenerateZipFileFromMutectVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
   }
-  SBS.list <- VCFsToSBSCatalogs(split.vcfs$SBS, ref.genome, 
-                                    trans.ranges, region)
+  SBS.list <- 
+    ICAMS::VCFsToSBSCatalogs(list.of.SBS.vcfs = split.vcfs$SBS, 
+                             ref.genome = ref.genome, 
+                             region = region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.3, detail = "generating DBS catalogs")
   }
-  DBS.list <- VCFsToDBSCatalogs(split.vcfs$DBS, ref.genome, 
-                                    trans.ranges, region)
+  DBS.list <- 
+    ICAMS::VCFsToDBSCatalogs(list.of.DBS.vcfs = split.vcfs$DBS, 
+                             ref.genome = ref.genome, 
+                             region = region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.2, detail = "generating ID catalogs")
   }
-  ID.list <- VCFsToIDCatalogs(split.vcfs$ID, ref.genome, region)
+  ID.list <- 
+    ICAMS::VCFsToIDCatalogs(list.of.vcfs = split.vcfs$ID, 
+                            ref.genome = ref.genome, 
+                            region = region)
   CombineAndReturnCatalogsForMutectVCFs <- 
     getFromNamespace("CombineAndReturnCatalogsForMutectVCFs", "ICAMS")
   catalogs0 <- 
@@ -639,18 +646,22 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
     updateProgress(value = 0.1, detail = "reading and splitting VCFs")
   }
   split.vcfs <- ReadAndSplitStrelkaSBSVCFs(files, names.of.VCFs)
-  
+
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
   }
-  SBS.list <- VCFsToSBSCatalogs(split.vcfs$SBS.vcfs, ref.genome, 
-                                    trans.ranges, region)
+  SBS.list <- 
+    ICAMS::VCFsToSBSCatalogs(list.of.SBS.vcfs = split.vcfs$SBS.vcfs, 
+                            ref.genome = ref.genome, 
+                            region = region)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.3, detail = "generating DBS catalogs")
   }
-  DBS.list <- VCFsToDBSCatalogs(split.vcfs$DBS.vcfs, ref.genome, 
-                                    trans.ranges, region)
+  DBS.list <- 
+    ICAMS::VCFsToDBSCatalogs(list.of.DBS.vcfs = split.vcfs$DBS.vcfs, 
+                             ref.genome = ref.genome, 
+                             region = region)
   
   CombineAndReturnCatalogsForStrelkaSBSVCFs <- 
     getFromNamespace("CombineAndReturnCatalogsForStrelkaSBSVCFs", "ICAMS")
@@ -828,7 +839,10 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating ID catalog")
   }
-  list <- VCFsToIDCatalogs(list.of.vcfs, ref.genome, region)
+  list <- 
+    ICAMS::VCFsToIDCatalogs(list.of.vcfs = list.of.vcfs, 
+                            ref.genome = ref.genome, 
+                            region = region)
   
   GetMutationLoadsFromStrelkaIDVCFs <-
     getFromNamespace("GetMutationLoadsFromStrelkaIDVCFs", "ICAMS")
