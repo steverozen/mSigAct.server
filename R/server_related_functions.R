@@ -41,17 +41,17 @@ GetNamesOfVCFs <- function(names.of.VCFs) {
   }
 }
 
-#' Catch errors, warnings and messages generated when executing an R expression.
+#' Catch errors, warnings and messages generated when executing an R expression
 #'
 #' @param expr An R expression to execute.
 #'
 #' @return A list containing errors, warnings and messages which were generated
-#'   when executing \code{expr}.
+#'   when executing \code{expr} and the return value from \code{expr}.
 #'
 #' @keywords internal
 CatchToList <- function(expr) {
   warning <- error <- message <- NULL
-  res <- withCallingHandlers(
+  retval <- withCallingHandlers(
     tryCatch(expr, error = function(e) {
       error <<- conditionMessage(e)
       NULL
@@ -61,12 +61,13 @@ CatchToList <- function(expr) {
     }, message = function(m) {
       message <<- append(message, conditionMessage(m))
     })
-  rm(res)
-  list(error = error, warning = warning, message = message)
+  
+  error.info <- list(error = error, warning = warning, message = message)
+  list(error.info = error.info, retval = retval)
 }
 
 #' Add notifications on the client browser using errors, warnings or messages
-#' generated when executing an R expression.
+#' generated when executing an R expression
 #'
 #' @param res A list containing errors, warnings and messages which were
 #'   generated when executing an R expression. See \code{\link{CatchToList}} for
@@ -738,6 +739,17 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
                full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
+  
+  # Add ID catalog with zero counts
+  catID <- matrix(0, nrow = length(ICAMS::catalog.row.order$ID), 
+                  ncol = length(vcf.names))
+  rownames(catID) <- ICAMS::catalog.row.order$ID
+  colnames(catID) <- vcf.names
+  catID <- as.catalog(object = catID, ref.genome = ref.genome,
+                      region = region, catalog.type = "counts")
+  
+  catalogs$catID <- catID
+  return(list(counts = catalogs, density = catalogs.density))
 }
 
 #' This function is a wrapper function processing Strelka SBS VCF files to
@@ -789,7 +801,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   
   # Catch the errors, warnings and messages and store them in a list when
   # generating a zip archive from Strelka SBS VCFs
-  res <- CatchToList(
+  result <- CatchToList(
     GenerateZipFileFromStrelkaSBSVCFs(files = vcfs.info$datapath,
                                       zipfile = file,
                                       vcf.names = vcfs.info$name,
@@ -803,10 +815,11 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   )
   
   # Get the new notification ids
-  new.ids <- AddNotifications(res)
+  new.ids <- AddNotifications(result$error.info)
   
   # Update the notification ids
-  return(UpdateNotificationIDs(ids, new.ids))
+  updated.ids <- UpdateNotificationIDs(ids, new.ids)
+  return(list(retval = result$retval, ids = updated.ids))
 }
 
 #' This function generates a zip archive from Strelka ID VCF files.

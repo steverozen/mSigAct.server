@@ -6,6 +6,9 @@ app_server <- function(input, output,session) {
   ids <- list("error" = character(0), "warning" = character(0), 
              "message" = character(0))
   
+  # Create an empty list which can be used to store the return value of processing VCFs
+  retval <- list()
+  
   # Download sample VCFs when user clicks the button
   output$downloadsampleVCFs <- downloadHandler(
     filename = function() {
@@ -47,18 +50,125 @@ app_server <- function(input, output,session) {
         # Generate a zip archive from Strelka SBS VCFs and
         # update the notification ids for errors, warnings
         # and messages
-        ids <<- 
-          ProcessStrelkaSBSVCFs(input, output, file, ids)
+        result <- ProcessStrelkaSBSVCFs(input, output, file, ids)
+        retval <<- result$retval
+        ids <<- result$ids
+        
+        counts.catalog <- retval$counts
+        density.catalog <- retval$density
+        output$selectsample <- renderUI(
+          {
+            
+            sample.names <- colnames(counts.catalog[[1]])
+            radioButtons(inputId = "selectedsamplename", 
+                         label = "Select the sample", 
+                         choices = sample.names, 
+                         selected = character(0))
+          }
+        )
+        
+        
+        observeEvent(input$selectedsamplename, {
+          output$SBS96plot <- renderPlot({
+            catSBS96 <- 
+              counts.catalog$catSBS96[, input$selectedsamplename, drop = FALSE]
+            PlotCatalog(catSBS96)
+            PlotCatalog(catSBS96)
+          })
+          
+          
+          output$SBS192plot <- renderPlot({
+            catSBS192 <- 
+              counts.catalog$catSBS192[, input$selectedsamplename, drop = FALSE]
+            PlotCatalog(catSBS192)
+          })
+          
+          output$SBS1536plot <- renderPlot({
+            catSBS1536 <- 
+              counts.catalog$catSBS1536[, input$selectedsamplename, drop = FALSE]
+            PlotCatalog(catSBS1536)
+          })
+          
+          output$DBS78plot <- renderPlot({
+            catDBS78 <- 
+              counts.catalog$catDBS78[, input$selectedsamplename, drop = FALSE]
+            PlotCatalog(catDBS78)
+          })
+          
+          output$DBS136plot <- renderPlot({
+            catDBS136 <- 
+              counts.catalog$catDBS136[, input$selectedsamplename, drop = FALSE]
+            PlotCatalog(catDBS136)
+          })
+          
+          output$DBS144plot <- renderPlot({
+            catDBS144 <- 
+              counts.catalog$catDBS144[, input$selectedsamplename, drop = FALSE]
+            PlotCatalog(catDBS144)
+          })
+          
+        })
+        
+        output$selectsample2 <- renderUI(
+          {
+            
+            sample.names <- colnames(counts.catalog[[1]])
+            selectInput(inputId = "selectedsamplename2", 
+                        label = "Select the sample", 
+                        choices = sample.names)
+          }
+        )
+        
+        output$selectcancertype <- renderUI(
+          {
+            cancer.types <- 
+              c(colnames(CancerTypeToExposureStatData()), "Unknown")
+            selectInput(inputId = "selectedcancertype", 
+                        label = "Select the cancer type", 
+                        choices = cancer.types)
+          }
+        )
+        
+        output$choosecatalogtype <- renderUI(
+          { 
+            catalog.type <- names(PCAWG7::signature$genome)
+            selectInput(inputId = "selectedcatalogtype", 
+                        label = "Select the catalog type", 
+                        choices = catalog.type)
+          }
+        )
+        
+        observeEvent(input$selectedcatalogtype, {
+          output$choosesigsubsect <- renderUI(
+            {
+              catalog.type <- input$selectedcatalogtype
+              sig.universe <- colnames(PCAWG7::signature$genome[[catalog.type]])
+              
+              checkboxGroupInput(inputId = "selectedsigsubset", 
+                                 label = "Select the subset of signatures from COSMIC", 
+                                 choices = sig.universe)
+            }
+          )
+        }
+        )
+        
+        
       } else if (input$vcftype == "strelka.id") {
         ids <<- ProcessStrelkaIDVCFs(input, output, file, ids)
       } else if (input$vcftype == "mutect") {
         ids <<- ProcessMutectVCFs(input, output, file, ids)
       }
     })
-        
+  
+  # Create radio buttons for user to select the sample
+    
+  
   # When user clicks the "Remove notifications" button, all the previous
   # notifications(error, warning or message) will be removed
   observeEvent(input$remove, {
     RemoveAllNotifications(ids)
   })
+  
+  
+  
 }

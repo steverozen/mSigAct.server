@@ -4,15 +4,17 @@ app_ui <- function() {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     
-    tabsetPanel(
-      tabPanel("ICAMS.shiny", MyTab()),
-      tabPanel("Analysis", "test")
+    navbarPage(title = "ICAMS.shiny",
+      tabPanel("Overview", MyTab1()),
+      tabPanel("Upload VCFs", MyTab2()),
+      tabPanel("Show spectrums", MyTab3()),
+      tabPanel("Signature attributions", MyTab4())
     )
   )
 }
 
 #' @import shiny
-MyTab <- function() {
+MyTab1 <- function() {
   # List the first level UI elements here 
   fixedPage(
     # Add a title on top the page
@@ -51,6 +53,18 @@ MyTab <- function() {
     # Add a horizontal line
     hr(),
     
+    # Add a footer on the page showing the URL of ICAMS package
+    p("For complete documentation of ICAMS, please refer to ",
+      a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
+        "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
+    
+  )
+}
+
+#' @import shiny
+MyTab2 <- function() {
+  # List the first level UI elements here 
+  fixedPage(
     # Add the first row of control widgets
     fixedRow(
       # Add radio buttons for user to specify the type of VCF files
@@ -149,6 +163,62 @@ MyTab <- function() {
       a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
         "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
     
+  )
+}
+
+#' @import shiny
+MyTab3 <- function() {
+  fixedPage(
+    
+    sidebarLayout(
+      
+      sidebarPanel(
+        x <- uiOutput(outputId = "selectsample")
+        
+        
+      ),
+      
+      mainPanel(
+        tabsetPanel(type = "tabs",
+                    tabPanel("SBS96", plotOutput("SBS96plot")),
+                    tabPanel("SBS192", plotOutput("SBS192plot")),
+                    tabPanel("SBS1536", plotOutput("SBS1536plot")),
+                    tabPanel("DBS78", plotOutput("DBS78plot")),
+                    tabPanel("DBS136", plotOutput("DBS136plot")),
+                    tabPanel("DBS144", plotOutput("DBS144plot"))
+        )
+      )
+        
+    )
+  )
+}
+
+#' @import shiny
+MyTab4 <- function() {
+  fixedPage(
+    
+    sidebarLayout(
+      
+      sidebarPanel(
+        x <- uiOutput(outputId = "selectsample2"),
+        
+        x1 <- uiOutput(outputId = "selectcancertype"),
+        
+        x2 <- uiOutput(outputId = "choosecatalogtype"),
+        
+        x3 <- uiOutput(outputId = "choosesigsubsect"),
+      ),
+      
+      mainPanel(
+        tabsetPanel(type = "tabs",
+                    tabPanel("SBS96", plotOutput("SBS96attributionplot")),
+                    tabPanel("SBS192", plotOutput("SBS192attributionplot")),
+                    tabPanel("DBS78", plotOutput("DBS78attributionplot")),
+                    tabPanel("ID", plotOutput("DBS144attributionplot"))
+        )
+      )
+      
+    )
   )
 }
 
