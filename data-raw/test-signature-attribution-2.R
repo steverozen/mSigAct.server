@@ -1,4 +1,4 @@
-catSBS96.1 <- PCAWG7::spectra$PCAWG$SBS96[, 1, drop = FALSE]
+
 catSBS192.1 <- PCAWG7::spectra$PCAWG$SBS192[, 1, drop = FALSE]
 my.exposure.SBS96 <- PCAWG7::exposure$PCAWG$SBS96[, 1, drop = FALSE]
 
@@ -8,9 +8,7 @@ my.exposure.DBS78 <- PCAWG7::exposure$PCAWG$DBS78[, 1, drop = FALSE]
 catID.1 <- PCAWG7::spectra$PCAWG$ID[, 1, drop = FALSE]
 my.exposure.ID <- PCAWG7::exposure$PCAWG$ID[, 1, drop = FALSE]
 
-my.sig.SBS96 <- 
-  CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
-                        sig.type = "SBS96", region = "genome")
+
 my.sig.SBS192 <-
   CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
                         sig.type = "SBS192", region = "genome")
@@ -24,10 +22,10 @@ my.sig.ID <-
 
 
 exposures.SBS96 <- GetExposureAndPlotToPdf(catalog = catSBS96.1, 
-                                     file = file.path(tempdir(), "test.SBS96.pdf"),
-                                     sig.universe = my.sig.SBS96, 
-                                     num.of.bootstrap.replicates = 1000, 
-                                     method = decomposeQP) 
+                                           file = file.path(tempdir(), "test.SBS96.pdf"),
+                                           sig.universe = my.sig.SBS96, 
+                                           num.of.bootstrap.replicates = 1000, 
+                                           method = decomposeQP) 
 
 
 
