@@ -30,3 +30,9 @@ foo4 <- SparseAssignActivity(spectra = catSBS96.1, sigs = my.sig.SBS96.4,
                              max.level = 15, 
                              p.thresh = 0.01, 
                              m.opts = DefaultManyOpts()) 
+
+my.sig.SBS96.5 <- my.sig.SBS96[, 1:14, drop = FALSE]
+foo4 <- SparseAssignActivity(spectra = catSBS96.1, sigs = my.sig.SBS96.5,
+                             max.level = 14, 
+                             p.thresh = 0.01, 
+                             m.opts = DefaultManyOpts()) 
