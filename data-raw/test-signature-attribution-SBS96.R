@@ -13,15 +13,9 @@ end.time.SBS96 <- Sys.time()
 time.taken.SBS96 <- end.time.SBS96 - start.time.SBS96
 time.taken.SBS96
 
-my.sig.SBS96.2 <- my.sig.SBS96[, 1:17, drop = FALSE]
-foo2 <- SparseAssignActivity(spectra = catSBS96.1, sigs = my.sig.SBS96.2,
-                            max.level = 9, 
-                            p.thresh = 0.01, 
-                            m.opts = DefaultManyOpts()) 
-
 my.sig.SBS96.3 <- my.sig.SBS96[, 1:16, drop = FALSE]
 foo3 <- SparseAssignActivity(spectra = catSBS96.1, sigs = my.sig.SBS96.3,
-                             max.level = 16, 
+                             max.level = 17, 
                              p.thresh = 0.01, 
                              m.opts = DefaultManyOpts()) 
 
