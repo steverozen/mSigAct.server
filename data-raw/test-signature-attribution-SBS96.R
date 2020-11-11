@@ -3,15 +3,30 @@ my.sig.SBS96 <-
   ICAMS.shiny::CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
                         sig.type = "SBS96", region = "genome")
 library(mSigAct)
+packageVersion("mSigAct")
 
+mm <- DefaultManyOpts()
+mm$trace <- 100
+
+
+start.time.SBS96 <- Sys.time()
 foo <- SparseAssignActivity(spectra = catSBS96.1, sigs = my.sig.SBS96,
                             max.level = 9, 
                             p.thresh = 0.01, 
-                            m.opts = DefaultManyOpts())
-start.time.SBS96 <- Sys.time()
+                            m.opts = mm)
 end.time.SBS96 <- Sys.time()
 time.taken.SBS96 <- end.time.SBS96 - start.time.SBS96
 time.taken.SBS96
+
+start.time.SBS96.1 <- Sys.time()
+foo <- SparseAssignActivity(spectra = catSBS96.1, sigs = my.sig.SBS96,
+                            max.level = 17, 
+                            p.thresh = 0.01, 
+                            m.opts = mm,
+                            mc.cores.per.sample = 100)
+end.time.SBS96.1 <- Sys.time()
+time.taken.SBS96.1 <- end.time.SBS96 - start.time.SBS96
+time.taken.SBS96.1
 
 my.sig.SBS96.2 <- my.sig.SBS96[, 1:17, drop = FALSE]
 foo2 <- SparseAssignActivity(spectra = catSBS96.1, sigs = my.sig.SBS96.2,
