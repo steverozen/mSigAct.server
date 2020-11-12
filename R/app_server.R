@@ -56,11 +56,11 @@ app_server <- function(input, output,session) {
         
         counts.catalog <- retval$counts
         density.catalog <- retval$density
-        output$selectsample <- renderUI(
+        output$selectSampleFromUploadedVCF <- renderUI(
           {
             
             sample.names <- colnames(counts.catalog[[1]])
-            radioButtons(inputId = "selectedsamplename", 
+            radioButtons(inputId = "sampleNameFromUploadedVCF", 
                          label = "Select the sample", 
                          choices = sample.names, 
                          selected = character(0))
@@ -68,10 +68,10 @@ app_server <- function(input, output,session) {
         )
         
         
-        observeEvent(input$selectedsamplename, {
+        observeEvent(input$sampleNameFromUploadedVCF, {
           output$SBS96plot <- renderPlot({
             catSBS96 <- 
-              counts.catalog$catSBS96[, input$selectedsamplename, drop = FALSE]
+              counts.catalog$catSBS96[, input$sampleNameFromUploadedVCF, drop = FALSE]
             PlotCatalog(catSBS96)
             PlotCatalog(catSBS96)
           })
@@ -79,41 +79,41 @@ app_server <- function(input, output,session) {
           
           output$SBS192plot <- renderPlot({
             catSBS192 <- 
-              counts.catalog$catSBS192[, input$selectedsamplename, drop = FALSE]
+              counts.catalog$catSBS192[, input$sampleNameFromUploadedVCF, drop = FALSE]
             PlotCatalog(catSBS192)
           })
           
           output$SBS1536plot <- renderPlot({
             catSBS1536 <- 
-              counts.catalog$catSBS1536[, input$selectedsamplename, drop = FALSE]
+              counts.catalog$catSBS1536[, input$sampleNameFromUploadedVCF, drop = FALSE]
             PlotCatalog(catSBS1536)
           })
           
           output$DBS78plot <- renderPlot({
             catDBS78 <- 
-              counts.catalog$catDBS78[, input$selectedsamplename, drop = FALSE]
+              counts.catalog$catDBS78[, input$sampleNameFromUploadedVCF, drop = FALSE]
             PlotCatalog(catDBS78)
           })
           
           output$DBS136plot <- renderPlot({
             catDBS136 <- 
-              counts.catalog$catDBS136[, input$selectedsamplename, drop = FALSE]
+              counts.catalog$catDBS136[, input$sampleNameFromUploadedVCF, drop = FALSE]
             PlotCatalog(catDBS136)
           })
           
           output$DBS144plot <- renderPlot({
             catDBS144 <- 
-              counts.catalog$catDBS144[, input$selectedsamplename, drop = FALSE]
+              counts.catalog$catDBS144[, input$sampleNameFromUploadedVCF, drop = FALSE]
             PlotCatalog(catDBS144)
           })
           
         })
         
-        output$selectsample2 <- renderUI(
+        output$selectSampleForAttribution <- renderUI(
           {
             
             sample.names <- colnames(counts.catalog[[1]])
-            selectInput(inputId = "selectedsamplename2", 
+            selectInput(inputId = "selectedSampleForAttribution", 
                         label = "Select the sample", 
                         choices = sample.names)
           }
@@ -160,7 +160,33 @@ app_server <- function(input, output,session) {
       }
     })
   
-  # Create radio buttons for user to select the sample
+  # When user upload catalog files, create radio buttons for user to select the
+  # sample
+  output$selectSampleFromUploadedCatalog <- observeEvent(input$upload.catalogs, {
+    renderUI(
+      { 
+        # catalog.info is a data frame that contains one row for each uploaded file, 
+        # and four columns "name", "size", "type" and "datapath". 
+        # "name": The filename provided by the web browser.
+        # "size": The size of the uploaded data, in bytes. 
+        # "type": The MIME type reported by the browser.
+        # "datapath": The path to a temp file that contains the data that was uploaded.
+        catalog.info <- input$upload.catalogs
+        catalog.paths <- catalogs.info$datapath
+        catalog <- ICAMS::ReadCatalog(file = catalog.paths, 
+                                       ref.genome = input$ref.genome,
+                                       region = input$region)
+        
+        sample.names <- colnames(catalog)
+        radioButtons(inputId = "selectedSampleFromUploadedCatalog", 
+                     label = "Select the sample", 
+                     choices = sample.names, 
+                     selected = character(0))
+      }
+    )  
+  }
+  )
+  
     
   
   # When user clicks the "Remove notifications" button, all the previous

@@ -1,6 +1,6 @@
 #' @import shiny
 #' @keywords internal
-add_vcf_type <- function() {
+AddVCFType <- function() {
   radioButtons(inputId = "vcftype", 
                label = h5(strong("Type of VCF files"), 
                           style = "color: #337ab7"),
@@ -14,9 +14,24 @@ add_vcf_type <- function() {
                selected = character(0))
 }
 
+
 #' @import shiny
 #' @keywords internal
-add_tumor_col_names <- function() {
+AddCatalogType <- function() {
+  radioButtons(inputId = "catalogtype", 
+               label = h5(strong("Type of Catalogs"), 
+                          style = "color: #337ab7"),
+               choiceNames = 
+                 list("SBS96", "SBS192", "SBS1536", "DBS78", 
+                      "DBS136", "DBS144", "ID"),
+               choiceValues = list("SBS96", "SBS192", "SBS1536", "DBS78", 
+                                   "DBS136", "DBS144", "ID"),
+               selected = character(0))
+}
+
+#' @import shiny
+#' @keywords internal
+AddTumorColNames <- function() {
   textInput(inputId = "tumor.col.names", 
             label = p(strong(h5("Names of columns in Mutect VCFs containing", 
                                 "tumor sample information",
@@ -29,7 +44,7 @@ add_tumor_col_names <- function() {
 
 #' @import shiny
 #' @keywords internal
-add_reference_genome <- function(){
+AddReferenceGenome <- function(){
   radioButtons(inputId = "ref.genome", 
                label = h5(strong("Reference genome", style = "color: #337ab7")), 
                choiceNames = 
@@ -43,7 +58,7 @@ add_reference_genome <- function(){
 
 #' @import shiny
 #' @keywords internal
-add_region <- function(){
+AddRegion <- function(){
   radioButtons(inputId = "region", 
                label = h5(strong("Genomic region"), style = "color: #337ab7"), 
                choices = 
@@ -53,7 +68,7 @@ add_region <- function(){
 
 #' @import shiny
 #' @keywords internal
-add_sample_names <- function() {
+AddSampleNames <- function() {
   textInput(inputId = "names.of.VCFs", 
             label = p(strong(h5("Sample names"), style = "color: #337ab7"),
                       h5("(e.g. name1, name2, name3...If blank, ", 
@@ -62,7 +77,7 @@ add_sample_names <- function() {
 
 #' @import shiny
 #' @keywords internal
-add_base_filename <- function() {
+AddBaseFilename <- function() {
   textInput(inputId = "base.filename",
             label = 
               p(strong(h5("Base name of the CSV and PDF files to create", 
@@ -72,7 +87,7 @@ add_base_filename <- function() {
 
 #' @import shiny
 #' @keywords internal
-add_zipfile_name <- function() {
+AddZipfileName <- function() {
   textInput(inputId = "zipfile.name",
             label = p(strong(h5("Name of zip file to create", 
                                 style = "color: #337ab7"))),
@@ -81,10 +96,18 @@ add_zipfile_name <- function() {
 
 #' @import shiny
 #' @keywords internal
-upload_vcf_files <- function() {
+UploadVCFFiles <- function() {
   div(
     fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
               multiple = TRUE), style="color: #337ab7;")
+}
+
+#' @import shiny
+#' @keywords internal
+UploadCatalogs <- function() {
+  div(
+    fileInput(inputId = "upload.catalogs", label = "Choose catalog file"), 
+    style="color: #337ab7;")
 }
 
 #' @import shiny

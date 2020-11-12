@@ -1029,3 +1029,15 @@ TransCountsCatalogToDensity <- function(list) {
   }
   return(list1)
 }
+
+
+ReadUploadedCatalogs <- function(input) {
+  # vcfs.info is a data frame that contains one row for each uploaded file, 
+  # and four columns "name", "size", "type" and "datapath". 
+  # "name": The filename provided by the web browser.
+  # "size": The size of the uploaded data, in bytes. 
+  # "type": The MIME type reported by the browser.
+  # "datapath": The path to a temp file that contains the data that was uploaded.
+}
+
+

@@ -5,16 +5,17 @@ app_ui <- function() {
     golem_add_external_resources(),
     
     navbarPage(title = "ICAMS.shiny",
-      tabPanel("Overview", MyTab1()),
-      tabPanel("Upload VCFs", MyTab2()),
-      tabPanel("Show spectrums", MyTab3()),
-      tabPanel("Signature attributions", MyTab4())
+      tabPanel("Overview", OverviewUI()),
+      tabPanel("Upload VCFs", UploadVCFUI()),
+      tabPanel("Upload Catalogs", UploadCatalogUI()),
+      tabPanel("Show spectrums", ShowSpectrumUI()),
+      tabPanel("Signature attributions", SignatureAttributionUI())
     )
   )
 }
 
 #' @import shiny
-MyTab1 <- function() {
+OverviewUI <- function() {
   # List the first level UI elements here 
   fixedPage(
     # Add a title on top the page
@@ -62,49 +63,49 @@ MyTab1 <- function() {
 }
 
 #' @import shiny
-MyTab2 <- function() {
+UploadVCFUI <- function() {
   # List the first level UI elements here 
   fixedPage(
     # Add the first row of control widgets
     fixedRow(
       # Add radio buttons for user to specify the type of VCF files
-      column(6, add_vcf_type()),
+      column(6, AddVCFType()),
       
       # Add a conditional panel for user to specify the column names in 
       # Mutect VCFs which contain the tumor sample information (if needed)
       column(6, conditionalPanel(
         condition = "input.vcftype == 'mutect'",
-        add_tumor_col_names()))
+        AddTumorColNames()))
     ),
     
     # Add the next row of control widgets
     fixedRow(
       # Add radio buttons for user to specify the reference genome
-      column(6, add_reference_genome()),
+      column(6, AddReferenceGenome()),
       
       # Add radio buttons for user to specify the genomic region
       # from where the VCFs were generated
-      column(6, add_region())
+      column(6, AddRegion())
     ),
     
     # Add the next row of control widgets
     fixedRow(
       # Add text input for user to specify the sample names
       # representing different VCF files
-      column(6, add_sample_names()),
+      column(6, AddSampleNames()),
       
       # Add text input for user to specify the base filename
       # of the CSV and PDF files generated
-      column(6, add_base_filename())
+      column(6, AddBaseFilename())
     ),
     
     # Add the next row of control widgets
     fixedRow(
       # Add text input for user to specify the zip file name
-      column(6, add_zipfile_name()),
+      column(6, AddZipfileName()),
       
       # Add a file upload control for user to upload multiple VCF files
-      column(6, upload_vcf_files())),
+      column(6, UploadVCFFiles())),
     
     
     # Add the next row of control widgets
@@ -167,15 +168,58 @@ MyTab2 <- function() {
 }
 
 #' @import shiny
-MyTab3 <- function() {
+UploadCatalogUI <- function() {
+  # List the first level UI elements here 
+  fixedPage(
+    # Add the first row of control widgets
+    fixedRow(
+      # Add radio buttons for user to specify the type of catalogs
+      column(6, AddCatalogType()),
+      
+      # Add radio buttons for user to specify the reference genome
+      column(6, AddReferenceGenome())
+    ),
+    
+    # Add the next row of control widgets
+    fixedRow(
+      # Add radio buttons for user to specify the genomic region
+      # from where the catalogs were generated
+      column(6, AddRegion()),
+      
+      # Add a file upload control for user to upload multiple VCF files
+      column(6, UploadCatalogs())
+    ),
+    
+    # Add one line break
+    br(),
+    
+    # Add a button for user to run ICAMS on sample Strelka SBS VCFs
+    fixedRow(column(6, 
+                    MyDownloadButton(outputId = "runstrelkasbsvcfs", 
+                                     label = 
+                                       paste0("Run ICAMS on two ", 
+                                              "1-sample Strelka SBS VCFs")),
+                    offset = 6)),
+    
+    # Add a horizontal line
+    hr(),
+    
+    # Add a footer on the page showing the URL of ICAMS package
+    p("For complete documentation of ICAMS, please refer to ",
+      a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
+        "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
+    
+  )
+}
+
+#' @import shiny
+ShowSpectrumUI <- function() {
   fixedPage(
     
     sidebarLayout(
       
       sidebarPanel(
-        x <- uiOutput(outputId = "selectsample")
-        
-        
+        x <- uiOutput(outputId = "selectSampleFromUploadedVCF")
       ),
       
       mainPanel(
@@ -194,13 +238,13 @@ MyTab3 <- function() {
 }
 
 #' @import shiny
-MyTab4 <- function() {
+SignatureAttributionUI <- function() {
   fixedPage(
     
     sidebarLayout(
       
       sidebarPanel(
-        x <- uiOutput(outputId = "selectsample2"),
+        x <- uiOutput(outputId = "selectSampleForAttribution"),
         
         x1 <- uiOutput(outputId = "selectcancertype"),
         
