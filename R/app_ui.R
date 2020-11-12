@@ -212,7 +212,6 @@ MyTab4 <- function() {
       mainPanel(
         tabsetPanel(type = "tabs",
                     tabPanel("SBS96", plotOutput("SBS96attributionplot")),
-                    tabPanel("SBS192", plotOutput("SBS192attributionplot")),
                     tabPanel("DBS78", plotOutput("DBS78attributionplot")),
                     tabPanel("ID", plotOutput("DBS144attributionplot"))
         )

@@ -131,7 +131,7 @@ app_server <- function(input, output,session) {
         
         output$choosecatalogtype <- renderUI(
           { 
-            catalog.type <- names(PCAWG7::signature$genome)
+            catalog.type <- c("SBS96", "DBS78", "ID")
             selectInput(inputId = "selectedcatalogtype", 
                         label = "Select the catalog type", 
                         choices = catalog.type)
