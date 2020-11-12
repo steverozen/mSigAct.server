@@ -190,17 +190,6 @@ UploadCatalogUI <- function() {
       column(6, UploadCatalogs())
     ),
     
-    # Add one line break
-    br(),
-    
-    # Add a button for user to run ICAMS on sample Strelka SBS VCFs
-    fixedRow(column(6, 
-                    MyDownloadButton(outputId = "runstrelkasbsvcfs", 
-                                     label = 
-                                       paste0("Run ICAMS on two ", 
-                                              "1-sample Strelka SBS VCFs")),
-                    offset = 6)),
-    
     # Add a horizontal line
     hr(),
     

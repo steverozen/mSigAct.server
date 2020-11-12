@@ -614,7 +614,7 @@ ProcessMutectVCFs <- function(input, output, file, ids) {
   )
   
   # Get the new notification ids
-  new.ids <- AddNotifications(res)
+  new.ids <- AddNotifications(res$error.info)
   
   # Update the notification ids
   return(UpdateNotificationIDs(ids, new.ids))
