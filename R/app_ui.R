@@ -177,14 +177,14 @@ UploadCatalogUI <- function() {
       column(6, AddCatalogType()),
       
       # Add radio buttons for user to specify the reference genome
-      column(6, AddReferenceGenome())
+      column(6, AddReferenceGenome2())
     ),
     
     # Add the next row of control widgets
     fixedRow(
       # Add radio buttons for user to specify the genomic region
       # from where the catalogs were generated
-      column(6, AddRegion()),
+      column(6, AddRegion2()),
       
       # Add a file upload control for user to upload multiple VCF files
       column(6, UploadCatalogs())
@@ -208,7 +208,8 @@ ShowSpectrumUI <- function() {
     sidebarLayout(
       
       sidebarPanel(
-        x <- uiOutput(outputId = "selectSampleFromUploadedVCF")
+        x <- uiOutput(outputId = "selectSampleFromUploadedVCF"),
+        y <- uiOutput(outputId = "selectSampleFromUploadedCatalog")
       ),
       
       mainPanel(

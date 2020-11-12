@@ -9,6 +9,9 @@ app_server <- function(input, output,session) {
   # Create an empty list which can be used to store the return value of processing VCFs
   retval <- list()
   
+  # Create a variable which can be used to store the uploaded catalog later
+  catalog <- NA
+  
   # Download sample VCFs when user clicks the button
   output$downloadsampleVCFs <- downloadHandler(
     filename = function() {
@@ -160,33 +163,80 @@ app_server <- function(input, output,session) {
       }
     })
   
-  # When user upload catalog files, create radio buttons for user to select the
-  # sample
-  output$selectSampleFromUploadedCatalog <- observeEvent(input$upload.catalogs, {
-    renderUI(
-      { 
-        # catalog.info is a data frame that contains one row for each uploaded file, 
-        # and four columns "name", "size", "type" and "datapath". 
-        # "name": The filename provided by the web browser.
-        # "size": The size of the uploaded data, in bytes. 
-        # "type": The MIME type reported by the browser.
-        # "datapath": The path to a temp file that contains the data that was uploaded.
-        catalog.info <- input$upload.catalogs
-        catalog.paths <- catalogs.info$datapath
-        catalog <- ICAMS::ReadCatalog(file = catalog.paths, 
-                                       ref.genome = input$ref.genome,
-                                       region = input$region)
-        
-        sample.names <- colnames(catalog)
-        radioButtons(inputId = "selectedSampleFromUploadedCatalog", 
-                     label = "Select the sample", 
-                     choices = sample.names, 
-                     selected = character(0))
+    # When user submit uploaded catalog for analysis, create radio buttons for
+    # user to select the sample
+    observeEvent(input$upload.catalogs, {
+      output$selectSampleFromUploadedCatalog <- 
+        renderUI(
+          { 
+            # catalog.info is a data frame that contains one row for each uploaded file, 
+            # and four columns "name", "size", "type" and "datapath". 
+            # "name": The filename provided by the web browser.
+            # "size": The size of the uploaded data, in bytes. 
+            # "type": The MIME type reported by the browser.
+            # "datapath": The path to a temp file that contains the data that was uploaded.
+            catalog.info <- input$upload.catalogs
+            catalog.paths <- catalog.info$datapath
+            uploaded.catalog <- ICAMS::ReadCatalog(file = catalog.paths, 
+                                                   ref.genome = input$ref.genome2,
+                                                   region = input$region2)
+            catalog <<- uploaded.catalog
+            
+            sample.names <- colnames(catalog)
+            radioButtons(inputId = "selectedSampleFromUploadedCatalog", 
+                         label = "Select the sample", 
+                         choices = sample.names, 
+                         selected = character(0))
+          }
+        )  
+    })
+    
+    # When user uploads new catalogs, remove the previous plots
+    observeEvent(input$upload.catalogs, {
+      output$SBS96plot <- NULL
+      output$SBS192plot <- NULL
+      output$SBS1536plot <- NULL
+      output$DBS78plot <- NULL
+      output$DBS136plot <- NULL
+      output$DBS144plot <- NULL
+      output$IDplot <- NULL
+    })
+    
+    # When user selects the sample from uploaded catalog, show 
+    # the sample's mutational spectrum
+    observeEvent(input$selectedSampleFromUploadedCatalog, {
+      
+      if (input$catalogType == "SBS96") {
+        output$SBS96plot <- renderPlot({
+          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                              drop = FALSE])})
+      } else if (input$catalogType == "SBS192") {
+        output$SBS192plot <- renderPlot({
+          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                              drop = FALSE])})
+      } else if (input$catalogType == "SBS1536") {
+        output$SBS1536plot <- renderPlot({
+          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                              drop = FALSE])})
+      } else if (input$catalogType == "DBS78") {
+        output$DBS786plot <- renderPlot({
+          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                              drop = FALSE])})
+      } else if (input$catalogType == "DBS136") {
+        output$DBS136plot <- renderPlot({
+          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                              drop = FALSE])})
+      } else if (input$catalogType == "DBS144") {
+        output$DBS1446plot <- renderPlot({
+          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                              drop = FALSE])})
+      } else if (input$catalogType == "ID") {
+        output$IDplot <- renderPlot({
+          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                              drop = FALSE])})
       }
-    )  
-  }
-  )
-  
+    })
+    
     
   
   # When user clicks the "Remove notifications" button, all the previous

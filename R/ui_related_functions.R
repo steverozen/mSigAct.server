@@ -18,7 +18,7 @@ AddVCFType <- function() {
 #' @import shiny
 #' @keywords internal
 AddCatalogType <- function() {
-  radioButtons(inputId = "catalogtype", 
+  radioButtons(inputId = "catalogType", 
                label = h5(strong("Type of Catalogs"), 
                           style = "color: #337ab7"),
                choiceNames = 
@@ -58,8 +58,32 @@ AddReferenceGenome <- function(){
 
 #' @import shiny
 #' @keywords internal
+AddReferenceGenome2 <- function(){
+  radioButtons(inputId = "ref.genome2", 
+               label = h5(strong("Reference genome", style = "color: #337ab7")), 
+               choiceNames = 
+                 list("Human GRCh37/hg19", 
+                      "Human GRCh38/hg38",
+                      "Mouse GRCm38/mm10"),
+               choiceValues = 
+                 list("hg19", "hg38", "mm10"),
+               selected = character(0))
+}
+
+#' @import shiny
+#' @keywords internal
 AddRegion <- function(){
   radioButtons(inputId = "region", 
+               label = h5(strong("Genomic region"), style = "color: #337ab7"), 
+               choices = 
+                 c("genome", "exome", "transcript", "unknown"),
+               selected = character(0))
+}
+
+#' @import shiny
+#' @keywords internal
+AddRegion2 <- function(){
+  radioButtons(inputId = "region2", 
                label = h5(strong("Genomic region"), style = "color: #337ab7"), 
                choices = 
                  c("genome", "exome", "transcript", "unknown"),
