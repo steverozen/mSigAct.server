@@ -41,7 +41,17 @@ app_server <- function(input, output,session) {
         RunICAMSOnSampleMutectVCFs(output, file, ids)
     })
   
-  # When user clicks the submit button, then the program will try to 
+  if (FALSE) {
+    output$SBS96plot <- NULL
+    output$SBS192plot <- NULL
+    output$SBS1536plot <- NULL
+    output$DBS78plot <- NULL
+    output$DBS136plot <- NULL
+    output$DBS144plot <- NULL
+    output$IDplot <- NULL
+  }
+  
+  # When user submits VCF to analysis, then the program will try to 
   # generate a zip archive based on the input files and parameters
   output$download <- downloadHandler(
     filename = function() {
@@ -64,18 +74,19 @@ app_server <- function(input, output,session) {
             
             sample.names <- colnames(counts.catalog[[1]])
             radioButtons(inputId = "sampleNameFromUploadedVCF", 
-                         label = "Select the sample", 
+                         label = "Select the sample from uploaded VCF", 
                          choices = sample.names, 
                          selected = character(0))
           }
         )
         
         
+        
         observeEvent(input$sampleNameFromUploadedVCF, {
           output$SBS96plot <- renderPlot({
+            browser()
             catSBS96 <- 
               counts.catalog$catSBS96[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            PlotCatalog(catSBS96)
             PlotCatalog(catSBS96)
           })
           
@@ -163,81 +174,81 @@ app_server <- function(input, output,session) {
       }
     })
   
-    # When user submit uploaded catalog for analysis, create radio buttons for
-    # user to select the sample
-    observeEvent(input$upload.catalogs, {
-      output$selectSampleFromUploadedCatalog <- 
-        renderUI(
-          { 
-            # catalog.info is a data frame that contains one row for each uploaded file, 
-            # and four columns "name", "size", "type" and "datapath". 
-            # "name": The filename provided by the web browser.
-            # "size": The size of the uploaded data, in bytes. 
-            # "type": The MIME type reported by the browser.
-            # "datapath": The path to a temp file that contains the data that was uploaded.
-            catalog.info <- input$upload.catalogs
-            catalog.paths <- catalog.info$datapath
-            uploaded.catalog <- ICAMS::ReadCatalog(file = catalog.paths, 
-                                                   ref.genome = input$ref.genome2,
-                                                   region = input$region2)
-            catalog <<- uploaded.catalog
-            
-            sample.names <- colnames(catalog)
-            radioButtons(inputId = "selectedSampleFromUploadedCatalog", 
-                         label = "Select the sample", 
-                         choices = sample.names, 
-                         selected = character(0))
-          }
-        )  
-    })
+  # When user submit uploaded catalog for analysis, create radio buttons for
+  # user to select the sample
+  observeEvent(input$submitCatalog, {
+    output$selectSampleFromUploadedCatalog <- 
+      renderUI(
+        { 
+          # catalog.info is a data frame that contains one row for each uploaded file, 
+          # and four columns "name", "size", "type" and "datapath". 
+          # "name": The filename provided by the web browser.
+          # "size": The size of the uploaded data, in bytes. 
+          # "type": The MIME type reported by the browser.
+          # "datapath": The path to a temp file that contains the data that was uploaded.
+          catalog.info <- input$upload.catalogs
+          catalog.paths <- catalog.info$datapath
+          uploaded.catalog <- ICAMS::ReadCatalog(file = catalog.paths, 
+                                                 ref.genome = input$ref.genome2,
+                                                 region = input$region2)
+          catalog <<- uploaded.catalog
+          
+          sample.names <- colnames(catalog)
+          radioButtons(inputId = "selectedSampleFromUploadedCatalog", 
+                       label = "Select the sample from uploaded catalog", 
+                       choices = sample.names, 
+                       selected = character(0))
+        }
+      )  
+  })
+  
+  # When user submit new catalog for analysis, remove the previous plots
+  observeEvent(input$submitCatalog, {
+    output$SBS96plot <- NULL
+    output$SBS192plot <- NULL
+    output$SBS1536plot <- NULL
+    output$DBS78plot <- NULL
+    output$DBS136plot <- NULL
+    output$DBS144plot <- NULL
+    output$IDplot <- NULL
+  })
+  
+  # When user selects the sample from uploaded catalog, show 
+  # the sample's mutational spectrum
+  observeEvent(input$selectedSampleFromUploadedCatalog, {
     
-    # When user uploads new catalogs, remove the previous plots
-    observeEvent(input$upload.catalogs, {
-      output$SBS96plot <- NULL
-      output$SBS192plot <- NULL
-      output$SBS1536plot <- NULL
-      output$DBS78plot <- NULL
-      output$DBS136plot <- NULL
-      output$DBS144plot <- NULL
-      output$IDplot <- NULL
-    })
-    
-    # When user selects the sample from uploaded catalog, show 
-    # the sample's mutational spectrum
-    observeEvent(input$selectedSampleFromUploadedCatalog, {
-      
-      if (input$catalogType == "SBS96") {
-        output$SBS96plot <- renderPlot({
-          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
-                              drop = FALSE])})
-      } else if (input$catalogType == "SBS192") {
-        output$SBS192plot <- renderPlot({
-          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
-                              drop = FALSE])})
-      } else if (input$catalogType == "SBS1536") {
-        output$SBS1536plot <- renderPlot({
-          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
-                              drop = FALSE])})
-      } else if (input$catalogType == "DBS78") {
-        output$DBS786plot <- renderPlot({
-          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
-                              drop = FALSE])})
-      } else if (input$catalogType == "DBS136") {
-        output$DBS136plot <- renderPlot({
-          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
-                              drop = FALSE])})
-      } else if (input$catalogType == "DBS144") {
-        output$DBS1446plot <- renderPlot({
-          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
-                              drop = FALSE])})
-      } else if (input$catalogType == "ID") {
-        output$IDplot <- renderPlot({
-          PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
-                              drop = FALSE])})
-      }
-    })
-    
-    
+    if (input$catalogType == "SBS96") {
+      output$SBS96plot <- renderPlot({
+        PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                            drop = FALSE])})
+    } else if (input$catalogType == "SBS192") {
+      output$SBS192plot <- renderPlot({
+        PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                            drop = FALSE])})
+    } else if (input$catalogType == "SBS1536") {
+      output$SBS1536plot <- renderPlot({
+        PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                            drop = FALSE])})
+    } else if (input$catalogType == "DBS78") {
+      output$DBS786plot <- renderPlot({
+        PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                            drop = FALSE])})
+    } else if (input$catalogType == "DBS136") {
+      output$DBS136plot <- renderPlot({
+        PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                            drop = FALSE])})
+    } else if (input$catalogType == "DBS144") {
+      output$DBS1446plot <- renderPlot({
+        PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                            drop = FALSE])})
+    } else if (input$catalogType == "ID") {
+      output$IDplot <- renderPlot({
+        PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
+                            drop = FALSE])})
+    }
+  })
+  
+  
   
   # When user clicks the "Remove notifications" button, all the previous
   # notifications(error, warning or message) will be removed

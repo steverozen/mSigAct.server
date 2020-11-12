@@ -137,22 +137,22 @@ UploadVCFUI <- function() {
     # Add one line break
     br(),
     
-    # Add a button for user to run ICAMS on sample Strelka SBS VCFs
+    # Add a button for user to run analysis on sample Strelka SBS VCFs
     fixedRow(column(6, 
                     MyDownloadButton(outputId = "runstrelkasbsvcfs", 
                                      label = 
-                                       paste0("Run ICAMS on two ", 
+                                       paste0("Run analysis on two ", 
                                               "1-sample Strelka SBS VCFs")),
                     offset = 6)),
     
     # Add one line break
     br(),
     
-    # Add a button for user to run ICAMS on sample Mutect VCFs
+    # Add a button for user to run analysis on sample Mutect VCFs
     fixedRow(column(6, 
                     MyDownloadButton(outputId = "runmutectvcfs", 
                                      label = 
-                                       paste0("Run ICAMS on two ", 
+                                       paste0("Run analysis on two ", 
                                               "1-sample Mutect VCFs")),
                     offset = 6)),
     
@@ -187,7 +187,11 @@ UploadCatalogUI <- function() {
       column(6, AddRegion2()),
       
       # Add a file upload control for user to upload multiple VCF files
-      column(6, UploadCatalogs())
+      column(6, UploadCatalogs(), 
+             actionButton(inputId = "submitCatalog", label = "Submit",
+                          style="color: #fff; 
+                                       background-color: #337ab7; 
+                                       border-color: #2e6da4"))
     ),
     
     # Add a horizontal line
