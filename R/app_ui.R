@@ -4,7 +4,7 @@ app_ui <- function() {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     
-    navbarPage(title = "ICAMS.shiny",
+    navbarPage(title = "msigact",
       tabPanel("Overview", OverviewUI()),
       tabPanel("Upload VCFs", UploadVCFUI()),
       tabPanel("Upload Catalogs", UploadCatalogUI()),
@@ -19,45 +19,36 @@ OverviewUI <- function() {
   # List the first level UI elements here 
   fixedPage(
     # Add a title on top the page
-    titlePanel(title = p("ICAMS: In-depth Characterization and Analysis of ",
-                         "Mutational Signatures", style = "color: #337ab7"),
-               windowTitle = paste0("ICAMS: In-depth Characterization and ", 
-                                    "Analysis of Mutational Signatures")),
+    titlePanel(title = p("msigact: mutational signature activity delineation ",
+                         "in cancer", style = "color: #337ab7"),
+               windowTitle = paste0("msigact: mutational signature activity ", 
+                                    "delineation in cancer")),
     
     # Add a horizontal line
     hr(),
     
-    # Add a short description of the shiny interface of ICAMS
-    p("The ", a(href = "https://shiny.rstudio.com/", "Shiny"), 
-      "interface of ",
-      a(href = "https://cran.r-project.org/web/packages/ICAMS/index.html", "ICAMS"), 
-      " allows users to upload multiple ", 
+    # Add a short description of msigact
+    p("msigact is an online tool that allows users to upload multiple ", 
       a(href = "https://tinyurl.com/rdzwnxd", "VCF"), 
       " (Variant Call Format) files and returns a zip archive which ",
       "contains mutation catalogs and PDF plots. ",
-      "Only VCF files from ",
+      "VCF files from ",
       a(href = "https://github.com/Illumina/strelka", "Strelka"), " or ",
       a(href = "https://github.com/broadgsa/gatk", "Mutect"), 
       " variant caller are supported.",
       "The uploaded VCFs must ", strong("all"), " come from the ", 
-      strong("same"), " variant caller, reference genome and region."),
+      strong("same"), " variant caller, reference genome and region.",
+      "User can also upload catalog to show the mutational spectrum ",
+      "and do signature attribution."),
     
-    # Add a link to the COSMIC website about mutational signatures
+    # Add a link to the PCAWG7 paper about mutational signatures
     p("For background information of mutational signatures, please refer ", 
       "to this paper: ",
       a(href = "https://doi.org/10.1038/s41586-020-1943-3", 
         "The repertoire of mutational signatures in human cancer"), "."),
     
     # Add an overview picture about the Shiny interface
-    img(src = "www/ICAMS.shiny-overview-v2.JPG", width = "800", height = "471"),
-    
-    # Add a horizontal line
-    hr(),
-    
-    # Add a footer on the page showing the URL of ICAMS package
-    p("For complete documentation of ICAMS, please refer to ",
-      a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
-        "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
+    img(src = "www/msigact-overview.PNG", width = "800", height = "219"),
     
   )
 }
@@ -155,15 +146,6 @@ UploadVCFUI <- function() {
                                        paste0("Run analysis on two ", 
                                               "1-sample Mutect VCFs")),
                     offset = 6)),
-    
-    # Add a horizontal line
-    hr(),
-    
-    # Add a footer on the page showing the URL of ICAMS package
-    p("For complete documentation of ICAMS, please refer to ",
-      a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
-        "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
-    
   )
 }
 
@@ -193,14 +175,6 @@ UploadCatalogUI <- function() {
                                        background-color: #337ab7; 
                                        border-color: #2e6da4"))
     ),
-    
-    # Add a horizontal line
-    hr(),
-    
-    # Add a footer on the page showing the URL of ICAMS package
-    p("For complete documentation of ICAMS, please refer to ",
-      a(href = "https://cran.rstudio.com/web/packages/ICAMS/index.html",
-        "https://cran.rstudio.com/web/packages/ICAMS/index.html"))
     
   )
 }
@@ -267,8 +241,7 @@ golem_add_external_resources <- function(){
   )
  
   tags$head(
-    golem::activate_js(),
-    golem::favicon(ico = "ICAMS")
+    golem::activate_js()
     # Add here all the external resources
     # If you have a custom.css in the inst/app/www
     # Or for example, you can add shinyalert::useShinyalert() here
