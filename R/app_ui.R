@@ -197,7 +197,8 @@ ShowSpectrumUI <- function() {
                     tabPanel("SBS1536", plotOutput("SBS1536plot")),
                     tabPanel("DBS78", plotOutput("DBS78plot")),
                     tabPanel("DBS136", plotOutput("DBS136plot")),
-                    tabPanel("DBS144", plotOutput("DBS144plot"))
+                    tabPanel("DBS144", plotOutput("DBS144plot")),
+                    tabPanel("ID", plotOutput("IDplot"))
         )
       )
         
@@ -212,13 +213,20 @@ SignatureAttributionUI <- function() {
     sidebarLayout(
       
       sidebarPanel(
-        x <- uiOutput(outputId = "selectSampleForAttribution"),
+          x <- uiOutput(outputId = "selectSampleFromVCFForAttribution"),
         
-        x1 <- uiOutput(outputId = "selectcancertype"),
-        
-        x2 <- uiOutput(outputId = "choosecatalogtype"),
-        
-        x3 <- uiOutput(outputId = "choosesigsubsect"),
+          y <- uiOutput(outputId = "selectSampleFromCatalogForAttribution"),
+          
+          y1 <- uiOutput(outputId = "selectcancertype"),
+          
+          y2 <- uiOutput(outputId = "choosecatalogtype"),
+          
+          x3 <- uiOutput(outputId = "chooseSigSubsetForSampleFromVCF"),
+          y4 <- uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog"),
+          
+          actionButton(inputId = "submitAttribution", label = "Analyze",
+                       style= "color: #fff; background-color: #337ab7; 
+                              border-color: #2e6da4")
       ),
       
       mainPanel(

@@ -12,6 +12,10 @@ app_server <- function(input, output,session) {
   # Create a variable which can be used to store the uploaded catalog later
   catalog <- NA
   
+  # Create reactiveValues object
+  # and set flag to 0 to prevent errors with adding NULL
+  #rv <- reactiveValues(downloadFlag = 0)
+  
   # Download sample VCFs when user clicks the button
   output$downloadsampleVCFs <- downloadHandler(
     filename = function() {
@@ -69,6 +73,23 @@ app_server <- function(input, output,session) {
         
         counts.catalog <- retval$counts
         density.catalog <- retval$density
+        
+        if (FALSE) {
+          # When the downloadHandler function runs, increment rv$downloadFlag
+          rv$downloadFlag <- rv$downloadFlag + 1
+          
+          if(rv$downloadFlag > 0){  # trigger event whenever the value of rv$downloadFlag changes
+            output$SBS96plot <- NULL
+            output$SBS192plot <- NULL
+            output$SBS1536plot <- NULL
+            output$DBS78plot <- NULL
+            output$DBS136plot <- NULL
+            output$DBS144plot <- NULL
+            output$IDplot <- NULL
+          }
+        }
+        
+        
         output$selectSampleFromUploadedVCF <- renderUI(
           {
             
@@ -84,7 +105,6 @@ app_server <- function(input, output,session) {
         
         observeEvent(input$sampleNameFromUploadedVCF, {
           output$SBS96plot <- renderPlot({
-            browser()
             catSBS96 <- 
               counts.catalog$catSBS96[, input$sampleNameFromUploadedVCF, drop = FALSE]
             PlotCatalog(catSBS96)
@@ -123,12 +143,12 @@ app_server <- function(input, output,session) {
           
         })
         
-        output$selectSampleForAttribution <- renderUI(
+        output$selectSampleFromVCFForAttribution <- renderUI(
           {
             
             sample.names <- colnames(counts.catalog[[1]])
-            selectInput(inputId = "selectedSampleForAttribution", 
-                        label = "Select the sample", 
+            selectInput(inputId = "selectedSampleFromVCFForAttribution", 
+                        label = "Select the sample from uploaded VCF", 
                         choices = sample.names)
           }
         )
@@ -139,7 +159,8 @@ app_server <- function(input, output,session) {
               c(colnames(CancerTypeToExposureStatData()), "Unknown")
             selectInput(inputId = "selectedcancertype", 
                         label = "Select the cancer type", 
-                        choices = cancer.types)
+                        choices = cancer.types,
+                        selected = "Biliary-AdenoCA")
           }
         )
         
@@ -148,19 +169,29 @@ app_server <- function(input, output,session) {
             catalog.type <- c("SBS96", "DBS78", "ID")
             selectInput(inputId = "selectedcatalogtype", 
                         label = "Select the catalog type", 
-                        choices = catalog.type)
+                        choices = catalog.type,
+                        selected = "SBS96")
           }
         )
         
-        observeEvent(input$selectedcatalogtype, {
-          output$choosesigsubsect <- renderUI(
+        observeEvent(input$selectedSampleFromVCFForAttribution, {
+          output$chooseSigSubsetForSampleFromVCF <- renderUI(
             {
-              catalog.type <- input$selectedcatalogtype
-              sig.universe <- colnames(PCAWG7::signature$genome[[catalog.type]])
+              sig1 <- PCAWG7::signature[["genome"]]
+              sig2 <- sig1[[input$selectedcatalogtype]]
+              sig.universe <- colnames(sig2)
               
-              checkboxGroupInput(inputId = "selectedsigsubset", 
-                                 label = "Select the subset of signatures from COSMIC", 
-                                 choices = sig.universe)
+              
+              foo <- CancerTypeToSigSubset(cancer.type = input$selectedcancertype,
+                                           tumor.cohort = "PCAWG", 
+                                           sig.type = input$selectedcatalogtype, 
+                                           region = "genome")
+              selected.sig.universe <- colnames(foo)
+              selectInput(inputId = "selectedcatalogtype", 
+                          label = "Select the signatures used for attribution for the selected sample from uploaded VCF", 
+                          choices = sig.universe,
+                          selected = selected.sig.universe,
+                          multiple = TRUE)
             }
           )
         }
@@ -172,6 +203,9 @@ app_server <- function(input, output,session) {
       } else if (input$vcftype == "mutect") {
         ids <<- ProcessMutectVCFs(input, output, file, ids)
       }
+      
+      # When the downloadHandler function runs, increment rv$downloadFlag
+      #rv$downloadFlag <- rv$downloadFlag + 1
     })
   
   # When user submit uploaded catalog for analysis, create radio buttons for
@@ -230,7 +264,7 @@ app_server <- function(input, output,session) {
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
                             drop = FALSE])})
     } else if (input$catalogType == "DBS78") {
-      output$DBS786plot <- renderPlot({
+      output$DBS78plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
                             drop = FALSE])})
     } else if (input$catalogType == "DBS136") {
@@ -238,7 +272,7 @@ app_server <- function(input, output,session) {
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
                             drop = FALSE])})
     } else if (input$catalogType == "DBS144") {
-      output$DBS1446plot <- renderPlot({
+      output$DBS144plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog, 
                             drop = FALSE])})
     } else if (input$catalogType == "ID") {
@@ -248,6 +282,59 @@ app_server <- function(input, output,session) {
     }
   })
   
+  observeEvent(input$submitCatalog, {
+    output$selectSampleFromCatalogForAttribution <- renderUI(
+      {
+        sample.names <- colnames(catalog)
+        selectInput(inputId = "selectedSampleFromCatalogForAttribution", 
+                    label = "Select the sample from uploaded catalog", 
+                    choices = sample.names)
+      }
+    )
+  })
+  
+  output$selectcancertype <- renderUI(
+    {
+      cancer.types <- 
+        c(colnames(CancerTypeToExposureStatData()), "Unknown")
+      selectInput(inputId = "selectedcancertype", 
+                  label = "Select the cancer type", 
+                  choices = cancer.types,
+                  selected = "Biliary-AdenoCA")
+    }
+  )
+  
+  output$choosecatalogtype <- renderUI(
+    { 
+      catalog.type <- c("SBS96", "DBS78", "ID")
+      selectInput(inputId = "selectedcatalogtype", 
+                  label = "Select the catalog type", 
+                  choices = catalog.type,
+                  selected = "SBS96")
+    }
+  )
+  
+  observeEvent(input$selectedSampleFromCatalogForAttribution, {
+    output$chooseSigSubsetForSampleFromCatalog <- renderUI(
+      { 
+        sig1 <- PCAWG7::signature[["genome"]]
+        sig2 <- sig1[[input$selectedcatalogtype]]
+        sig.universe <- colnames(sig2)
+        
+        
+        foo <- CancerTypeToSigSubset(cancer.type = input$selectedcancertype,
+                                     tumor.cohort = "PCAWG", 
+                                     sig.type = input$selectedcatalogtype, 
+                                     region = "genome")
+        selected.sig.universe <- colnames(foo)
+        selectInput(inputId = "selectedcatalogtype", 
+                    label = "Select the signatures used for attribution for selected sample from uploaded catalog", 
+                    choices = sig.universe,
+                    selected = selected.sig.universe,
+                    multiple = TRUE)
+      }
+    )
+  })
   
   
   # When user clicks the "Remove notifications" button, all the previous
