@@ -153,17 +153,20 @@ app_server <- function(input, output,session) {
           }
         )
         
-        output$selectcancertype <- renderUI(
-          {
-            cancer.types <- 
-              c(colnames(CancerTypeToExposureStatData()), "Unknown")
-            selectInput(inputId = "selectedcancertype", 
-                        label = "Select the cancer type", 
-                        choices = cancer.types,
-                        selected = "Biliary-AdenoCA")
-          }
-        )
+        observeEvent(input$selectedSampleFromVCFForAttribution, {
+          output$selectcancertype <- renderUI(
+            {
+              cancer.types <- 
+                c(colnames(CancerTypeToExposureStatData()), "Unknown")
+              selectInput(inputId = "selectedcancertype", 
+                          label = "Select the cancer type", 
+                          choices = cancer.types,
+                          selected = "Biliary-AdenoCA")
+            }
+          )
+        }) 
         
+        observeEvent(input$selectedSampleFromVCFForAttribution, {
         output$choosecatalogtype <- renderUI(
           { 
             catalog.type <- c("SBS96", "DBS78", "ID")
@@ -173,6 +176,7 @@ app_server <- function(input, output,session) {
                         selected = "SBS96")
           }
         )
+        }) 
         
         observeEvent(input$selectedSampleFromVCFForAttribution, {
           output$chooseSigSubsetForSampleFromVCF <- renderUI(
@@ -197,7 +201,15 @@ app_server <- function(input, output,session) {
         }
         )
         
-        
+        observeEvent(input$selectedSampleFromVCFForAttribution, {
+          output$analyzeButton1 <- renderUI(
+            { 
+              actionButton(inputId = "submitAttribution1", label = "Analyze",
+                           style= "color: #fff; background-color: #337ab7; 
+                              border-color: #2e6da4")
+            }
+          )
+        })
       } else if (input$vcftype == "strelka.id") {
         ids <<- ProcessStrelkaIDVCFs(input, output, file, ids)
       } else if (input$vcftype == "mutect") {
@@ -293,6 +305,7 @@ app_server <- function(input, output,session) {
     )
   })
   
+  observeEvent(input$submitCatalog, {
   output$selectcancertype <- renderUI(
     {
       cancer.types <- 
@@ -303,7 +316,9 @@ app_server <- function(input, output,session) {
                   selected = "Biliary-AdenoCA")
     }
   )
+  })
   
+  observeEvent(input$submitCatalog, {
   output$choosecatalogtype <- renderUI(
     { 
       catalog.type <- c("SBS96", "DBS78", "ID")
@@ -313,6 +328,7 @@ app_server <- function(input, output,session) {
                   selected = "SBS96")
     }
   )
+  })
   
   observeEvent(input$selectedSampleFromCatalogForAttribution, {
     output$chooseSigSubsetForSampleFromCatalog <- renderUI(
@@ -336,6 +352,15 @@ app_server <- function(input, output,session) {
     )
   })
   
+  observeEvent(input$selectedSampleFromCatalogForAttribution, {
+    output$analyzeButton2 <- renderUI(
+      { 
+        actionButton(inputId = "submitAttribution2", label = "Analyze",
+                     style= "color: #fff; background-color: #337ab7; 
+                              border-color: #2e6da4")
+      }
+    )
+  })
   
   # When user clicks the "Remove notifications" button, all the previous
   # notifications(error, warning or message) will be removed

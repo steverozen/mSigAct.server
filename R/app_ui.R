@@ -224,9 +224,8 @@ SignatureAttributionUI <- function() {
           x3 <- uiOutput(outputId = "chooseSigSubsetForSampleFromVCF"),
           y4 <- uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog"),
           
-          actionButton(inputId = "submitAttribution", label = "Analyze",
-                       style= "color: #fff; background-color: #337ab7; 
-                              border-color: #2e6da4")
+          x5 <- uiOutput(outputId = "analyzeButton1"),
+          y5 <- uiOutput(outputId = "analyzeButton2")
       ),
       
       mainPanel(
