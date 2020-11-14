@@ -191,7 +191,7 @@ app_server <- function(input, output,session) {
                                            sig.type = input$selectedcatalogtype, 
                                            region = "genome")
               selected.sig.universe <- colnames(foo)
-              selectInput(inputId = "selectedcatalogtype", 
+              selectInput(inputId = "selectedSigSubset1", 
                           label = "Select the signatures used for attribution for the selected sample from uploaded VCF", 
                           choices = sig.universe,
                           selected = selected.sig.universe,
@@ -343,7 +343,7 @@ app_server <- function(input, output,session) {
                                      sig.type = input$selectedcatalogtype, 
                                      region = "genome")
         selected.sig.universe <- colnames(foo)
-        selectInput(inputId = "selectedcatalogtype", 
+        selectInput(inputId = "selectedSigSubset2", 
                     label = "Select the signatures used for attribution for selected sample from uploaded catalog", 
                     choices = sig.universe,
                     selected = selected.sig.universe,
@@ -360,6 +360,95 @@ app_server <- function(input, output,session) {
                               border-color: #2e6da4")
       }
     )
+  })
+  
+  observeEvent(input$submitAttribution2, {
+    spect <- catalog[, input$selectedSampleFromCatalogForAttribution, drop = FALSE]
+    catalog.type <- input$selectedcatalogtype
+    cancer.type <- input$selectedcancertype
+    region <- input$region2
+    sig.universe <- PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
+    
+    if (catalog.type == "DBS78") {
+      PCAWG.DBS78 <-
+        PCAWG7:::SplitPCAWGMatrixByTumorType(PCAWG7::exposure$PCAWG$DBS78)
+      sigs.prop <-lapply(PCAWG.DBS78, PCAWG7:::ExposureStats1TumorType)[[cancer.type]]
+    } else if (catalog.type == "ID") {
+      PCAWG.ID <-
+        PCAWG7:::SplitPCAWGMatrixByTumorType(PCAWG7::exposure$PCAWG$ID)
+      sigs.prop <-lapply(PCAWG.ID, PCAWG7:::ExposureStats1TumorType)[[cancer.type]]
+    } else {
+      sigs.prop <- PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]]
+    }
+    
+    sig.names <- rownames(sigs.prop)
+    sigs.prop <- unlist(sigs.prop[ , 2])
+    names(sigs.prop) <- sig.names
+    
+    QP.exposure <- GetExposureWithConfidence(catalog = spect,
+                                             sig.universe = sig.universe,
+                                             num.of.bootstrap.replicates = 10000, 
+                                             method = decomposeQP,
+                                             conf.int = 0.95)
+    
+    updated.sig.universe <- sig.universe[ , rownames(QP.exposure)]
+    updated.sigs.prop <- sigs.prop[rownames(QP.exposure)]
+    
+    mapout <-
+      mSigAct::MAPAssignActivity1(
+        spect = spect,
+        sigs = updated.sig.universe,
+        sigs.presence.prop = updated.sigs.prop,
+        max.level = length(updated.sigs.prop) - 1,
+        p.thresh = 0.01,
+        eval_f = mSigAct::ObjFnBinomMaxLHNoRoundOK,
+        m.opts = mSigAct::DefaultManyOpts(), 
+        max.mc.cores = 100 )
+    
+    xx <- mSigAct:::ListOfList2Tibble(mapout$everything)
+    best <- dplyr::arrange(xx, MAP)[nrow(xx),  ]
+    bx <- best$exp[[1]]
+    OP.exp <- mSigAct:::OptimizeExposureQP(spect, updated.sig.universe[ , names(bx)])
+    
+    r.b <- mSigAct:::ReconstructSpectrum(sig.universe, exp = bx, use.sig.names = TRUE) 
+    reconstructed.catalog <- as.catalog(r.b)
+    colnames(reconstructed.catalog) <- "Reconstructed spectrum"
+    reconstructed.catalog1 <- round(reconstructed.catalog)
+    
+    if (catalog.type == "SBS96") {
+      output$SBS96SpectrumPlot <- renderPlot(
+        expr = ICAMS::PlotCatalog(spect), 
+        width = 800, height = 200
+      )
+      output$SBS96AttributionPlot <- renderPlot(
+        expr = ICAMS::PlotCatalog(reconstructed.catalog1),
+        width = 800, height = 200
+      )
+    }
+    
+    if (catalog.type == "DBS78") {
+      output$DBS78SpectrumPlot <- renderPlot(
+        expr = ICAMS::PlotCatalog(spect), 
+        width = 800, height = 200
+      )
+      output$DBS78AttributionPlot <- renderPlot(
+        expr = ICAMS::PlotCatalog(reconstructed.catalog1),
+        width = 800, height = 200
+      )
+    }
+    
+    if (catalog.type == "ID") {
+      output$IDSpectrumPlot <- renderPlot(
+        expr = ICAMS::PlotCatalog(spect), 
+        width = 800, height = 200
+      )
+      output$IDAttributionPlot <- renderPlot(
+        expr = ICAMS::PlotCatalog(reconstructed.catalog1),
+        width = 800, height = 200
+      )
+    }
+    
+    
   })
   
   # When user clicks the "Remove notifications" button, all the previous

@@ -230,9 +230,15 @@ SignatureAttributionUI <- function() {
       
       mainPanel(
         tabsetPanel(type = "tabs",
-                    tabPanel("SBS96", plotOutput("SBS96attributionplot")),
-                    tabPanel("DBS78", plotOutput("DBS78attributionplot")),
-                    tabPanel("ID", plotOutput("DBS144attributionplot"))
+                    tabPanel("SBS96", 
+                             plotOutput("SBS96SpectrumPlot"),
+                             plotOutput("SBS96AttributionPlot")),
+                    tabPanel("DBS78", 
+                             plotOutput("DBS78SpectrumPlot"),
+                             plotOutput("DBS78AttributionPlot")),
+                    tabPanel("ID", 
+                             plotOutput("IDSpectrumPlot"),
+                             plotOutput("IDAttributionPlot"))
         )
       )
       

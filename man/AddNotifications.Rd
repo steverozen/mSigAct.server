@@ -3,7 +3,7 @@
 \name{AddNotifications}
 \alias{AddNotifications}
 \title{Add notifications on the client browser using errors, warnings or messages
-generated when executing an R expression.}
+generated when executing an R expression}
 \usage{
 AddNotifications(res)
 }
@@ -17,6 +17,6 @@ A list containing the notification id for error, warning and message.
 }
 \description{
 Add notifications on the client browser using errors, warnings or messages
-generated when executing an R expression.
+generated when executing an R expression
 }
 \keyword{internal}

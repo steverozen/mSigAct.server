@@ -2,7 +2,7 @@
 % Please edit documentation in R/server_related_functions.R
 \name{CatchToList}
 \alias{CatchToList}
-\title{Catch errors, warnings and messages generated when executing an R expression.}
+\title{Catch errors, warnings and messages generated when executing an R expression}
 \usage{
 CatchToList(expr)
 }
@@ -11,9 +11,9 @@ CatchToList(expr)
 }
 \value{
 A list containing errors, warnings and messages which were generated
-  when executing \code{expr}.
+  when executing \code{expr} and the return value from \code{expr}.
 }
 \description{
-Catch errors, warnings and messages generated when executing an R expression.
+Catch errors, warnings and messages generated when executing an R expression
 }
 \keyword{internal}
