@@ -1,12 +1,18 @@
 #' Run the Shiny Application
 #' @param ... Further arguments to be passed to the function.
-#' 
+#'
 #' @keywords internal
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
 run_app <- function(...) {
   with_golem_options(
-    app = shinyApp(ui = app_ui, server = app_server), 
+    app = shinyApp(ui = app_ui, server = app_server),
     golem_opts = list(...)
   )
+}
+
+#' @keywords internal
+MyRunApp <- function() {
+  runApp(list(ui = app_ui, server = app_server),
+         host="127.0.0.1", port=8789, launch.browser = TRUE)
 }
