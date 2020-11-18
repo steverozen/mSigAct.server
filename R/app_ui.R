@@ -6,9 +6,9 @@ app_ui <- function() {
 
     navbarPage(title = "msigact",
       tabPanel("Overview", OverviewUI()),
-      tabPanel("Upload VCFs", UploadVCFUI()),
-      tabPanel("Upload Catalogs", UploadCatalogUI()),
-      tabPanel("Show spectrums", ShowSpectrumUI()),
+      tabPanel("Generate catalogs from VCFs", UploadVCFUI()),
+      tabPanel("Upload catalogs", UploadCatalogUI()),
+      tabPanel("Show spectra", ShowSpectraUI()),
       tabPanel("Signature attributions", SignatureAttributionUI())
     )
   )
@@ -48,7 +48,7 @@ OverviewUI <- function() {
         "The repertoire of mutational signatures in human cancer"), "."),
 
     # Add an overview picture about the Shiny interface
-    img(src = "www/msigact-overview.PNG", width = "800", height = "219"),
+    # img(src = "www/msigact-overview.PNG", width = "800", height = "219"),
 
   )
 }
@@ -186,7 +186,7 @@ UploadCatalogUI <- function() {
 }
 
 #' @import shiny
-ShowSpectrumUI <- function() {
+ShowSpectraUI <- function() {
   fixedPage(
 
     sidebarLayout(
@@ -239,6 +239,9 @@ SignatureAttributionUI <- function() {
                     tabPanel("SBS96",
                              plotOutput("SBS96SpectrumPlot"),
                              plotOutput("SBS96AttributionPlot")),
+                    tabPanel("SBS192",
+                             plotOutput("SBS192SpectrumPlot"),
+                             plotOutput("SBS192AttributionPlot")),
                     tabPanel("DBS78",
                              plotOutput("DBS78SpectrumPlot"),
                              plotOutput("DBS78AttributionPlot")),

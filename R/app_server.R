@@ -178,8 +178,8 @@ app_server <- function(input, output,session) {
         observeEvent(input$selectedSampleFromVCFForAttribution, {
         output$choosecatalogtype <- renderUI(
           {
-            catalog.type <- c("SBS96", "DBS78", "ID")
-            selectInput(inputId = "selectedcatalogtype",
+            catalog.type <- c("SBS96", "SBS192", "DBS78", "ID")
+            selectInput(inputId = "selectedCatalogType",
                         label = "Select the catalog type",
                         choices = catalog.type,
                         selected = "SBS96")
@@ -191,17 +191,20 @@ app_server <- function(input, output,session) {
           output$chooseSigSubsetForSampleFromVCF <- renderUI(
             {
               sig1 <- PCAWG7::signature[["genome"]]
-              sig2 <- sig1[[input$selectedcatalogtype]]
+              sig2 <- sig1[[input$selectedCatalogType]]
               sig.universe <- colnames(sig2)
 
 
               foo <- CancerTypeToSigSubset(cancer.type = input$selectedcancertype,
                                            tumor.cohort = "PCAWG",
-                                           sig.type = input$selectedcatalogtype,
+                                           sig.type = input$selectedCatalogType,
                                            region = "genome")
               selected.sig.universe <- colnames(foo)
               selectInput(inputId = "selectedSigSubset1",
-                          label = "Select the signatures used for attribution for the selected sample from uploaded VCF",
+                          label = paste0("The following signatures are preselected according ",  
+                                         "to previous assignment. Click the empty space ",
+                                         "inside the box below to add new signature or use ",
+                                         "Backspace to exclude signature"),
                           choices = sig.universe,
                           selected = selected.sig.universe,
                           multiple = TRUE)
@@ -330,8 +333,8 @@ app_server <- function(input, output,session) {
   observeEvent(input$submitCatalog, {
   output$choosecatalogtype <- renderUI(
     {
-      catalog.type <- c("SBS96", "DBS78", "ID")
-      selectInput(inputId = "selectedcatalogtype",
+      catalog.type <- c("SBS96", "SBS192", "DBS78", "ID")
+      selectInput(inputId = "selectedCatalogType",
                   label = "Select the catalog type",
                   choices = catalog.type,
                   selected = "SBS96")
@@ -343,17 +346,20 @@ app_server <- function(input, output,session) {
     output$chooseSigSubsetForSampleFromCatalog <- renderUI(
       {
         sig1 <- PCAWG7::signature[["genome"]]
-        sig2 <- sig1[[input$selectedcatalogtype]]
+        sig2 <- sig1[[input$selectedCatalogType]]
         sig.universe <- colnames(sig2)
 
 
         foo <- CancerTypeToSigSubset(cancer.type = input$selectedcancertype,
                                      tumor.cohort = "PCAWG",
-                                     sig.type = input$selectedcatalogtype,
+                                     sig.type = input$selectedCatalogType,
                                      region = "genome")
         selected.sig.universe <- colnames(foo)
         selectInput(inputId = "selectedSigSubset2",
-                    label = "Select the signatures used for attribution for selected sample from uploaded catalog",
+                    label = paste0("The following signatures are preselected according ",  
+                                   "to previous assignment. Click the empty space ",
+                                   "inside the box below to add new signature or use ",
+                                   "Backspace to exclude signature"),
                     choices = sig.universe,
                     selected = selected.sig.universe,
                     multiple = TRUE)
@@ -373,20 +379,15 @@ app_server <- function(input, output,session) {
 
   observeEvent(input$submitAttribution2, {
     spect <- catalog[, input$selectedSampleFromCatalogForAttribution, drop = FALSE]
-    catalog.type <- input$selectedcatalogtype
+    catalog.type <- input$selectedCatalogType
     cancer.type <- input$selectedcancertype
     region <- input$region2
-    sig.universe <- PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
-
-    if (catalog.type == "DBS78") {
-      PCAWG.DBS78 <-
-        PCAWG7:::SplitPCAWGMatrixByTumorType(PCAWG7::exposure$PCAWG$DBS78)
-      sigs.prop <-lapply(PCAWG.DBS78, PCAWG7:::ExposureStats1TumorType)[[cancer.type]]
-    } else if (catalog.type == "ID") {
-      PCAWG.ID <-
-        PCAWG7:::SplitPCAWGMatrixByTumorType(PCAWG7::exposure$PCAWG$ID)
-      sigs.prop <-lapply(PCAWG.ID, PCAWG7:::ExposureStats1TumorType)[[cancer.type]]
+    
+    if (catalog.type == "SBS192") {
+      sig.universe <- PCAWG7::signature[["genome"]][[catalog.type]][, input$selectedSigSubset2]
+      sigs.prop <- PCAWG7::exposure.stats$PCAWG[["SBS96"]][[cancer.type]]
     } else {
+      sig.universe <- PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
       sigs.prop <- PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]]
     }
 
@@ -412,7 +413,7 @@ app_server <- function(input, output,session) {
         p.thresh = 0.01,
         eval_f = mSigAct::ObjFnBinomMaxLHNoRoundOK,
         m.opts = mSigAct::DefaultManyOpts(),
-        max.mc.cores = 100 )
+        max.mc.cores = 100)
 
     bx <- mapout[[1]]$exp
     OP.exp <- mSigAct:::OptimizeExposureQP(spect, updated.sig.universe[ , names(bx)])
@@ -428,6 +429,17 @@ app_server <- function(input, output,session) {
         width = 800, height = 200
       )
       output$SBS96AttributionPlot <- renderPlot(
+        expr = ICAMS::PlotCatalog(reconstructed.catalog1),
+        width = 800, height = 200
+      )
+    }
+    
+    if (catalog.type == "SBS192") {
+      output$SBS192SpectrumPlot <- renderPlot(
+        expr = ICAMS::PlotCatalog(spect),
+        width = 800, height = 200
+      )
+      output$SBS192AttributionPlot <- renderPlot(
         expr = ICAMS::PlotCatalog(reconstructed.catalog1),
         width = 800, height = 200
       )
