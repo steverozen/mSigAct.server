@@ -24,6 +24,7 @@ Imports: BSgenome.Hsapiens.1000genomes.hs37d5,
     pkgload,
     quadprog,
     shiny,
+    shinybusy,
     stringi,
     zip
 Remotes: github::steverozen/ICAMSxtra,

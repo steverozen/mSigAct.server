@@ -213,6 +213,7 @@ ShowSpectraUI <- function() {
 }
 
 #' @import shiny
+#' @import shinybusy add_busy_spinner
 SignatureAttributionUI <- function() {
   fixedPage(
 
@@ -235,6 +236,9 @@ SignatureAttributionUI <- function() {
       ),
 
       mainPanel(
+        shinybusy::add_busy_spinner(spin = "fading-circle",
+                                    color = "#2e6da4", 
+                                    position = c("bottom-right")),
         tabsetPanel(type = "tabs",
                     tabPanel("SBS96",
                              plotOutput("SBS96SpectrumPlot"),

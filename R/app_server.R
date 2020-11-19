@@ -378,6 +378,7 @@ app_server <- function(input, output,session) {
   })
 
   observeEvent(input$submitAttribution2, {
+    
     spect <- catalog[, input$selectedSampleFromCatalogForAttribution, drop = FALSE]
     catalog.type <- input$selectedCatalogType
     cancer.type <- input$selectedcancertype
@@ -390,40 +391,57 @@ app_server <- function(input, output,session) {
       sig.universe <- PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
       sigs.prop <- PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]]
     }
-
+    
     sig.names <- rownames(sigs.prop)
     sigs.prop <- unlist(sigs.prop[ , 2])
     names(sigs.prop) <- sig.names
-
-    QP.exposure <- GetExposureWithConfidence(catalog = spect,
-                                             sig.universe = sig.universe,
-                                             num.of.bootstrap.replicates = 10000,
-                                             method = decomposeQP,
-                                             conf.int = 0.95)
-
-    updated.sig.universe <- sig.universe[ , rownames(QP.exposure)]
-    updated.sigs.prop <- sigs.prop[rownames(QP.exposure)]
-
+    
+    if (FALSE) {
+      QP.exposure <- GetExposureWithConfidence(catalog = spect,
+                                               sig.universe = sig.universe,
+                                               num.of.bootstrap.replicates = 10000,
+                                               method = decomposeQP,
+                                               conf.int = 0.95)
+      
+      updated.sig.universe <- sig.universe[ , rownames(QP.exposure)]
+      updated.sigs.prop <- sigs.prop[rownames(QP.exposure)]
+    }
+    
     mapout <-
       mSigAct::MAPAssignActivity1(
         spect = spect,
-        sigs = updated.sig.universe,
-        sigs.presence.prop = updated.sigs.prop,
-        max.level = length(updated.sigs.prop) - 1,
+        sigs = sig.universe,
+        sigs.presence.prop = sigs.prop,
+        max.level = length(sigs.prop) - 1,
         p.thresh = 0.01,
         eval_f = mSigAct::ObjFnBinomMaxLHNoRoundOK,
         m.opts = mSigAct::DefaultManyOpts(),
         max.mc.cores = 100)
-
-    bx <- mapout[[1]]$exp
-    OP.exp <- mSigAct:::OptimizeExposureQP(spect, updated.sig.universe[ , names(bx)])
-
-    r.b <- mSigAct:::ReconstructSpectrum(sig.universe, exp = OP.exp, use.sig.names = TRUE)
-    reconstructed.catalog <- as.catalog(r.b)
-    colnames(reconstructed.catalog) <- "Reconstructed spectrum"
+    
+    xx <- mSigAct:::ListOfList2Tibble(mapout)
+    
+    best <- dplyr::arrange(xx, .data$MAP)[nrow(xx),  ]
+    names.best <- names(best[["exp"]])
+    best.exp <- best[["exp"]][[1]]
+    if (is.null(names(best.exp))) {
+      names(best.exp) <- names.best
+    }
+    MAP.best.exp <- tibble::tibble(sig.id = names(best.exp), best.exp )
+    
+    QP.exp <- mSigAct:::OptimizeExposureQP(spect, sig.universe[ , names(best.exp), drop = FALSE])
+    QP.best.MAP.exp <-
+      tibble::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
+    
+    r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, use.sig.names = TRUE)
+    reconstructed.catalog <- as.catalog(r.qp)
+    
+    cossim <- round(mSigAct::cossim(spect, reconstructed.catalog), 5)
+    
+    colnames(reconstructed.catalog) <- paste0("MAP+QP ", cossim)
     reconstructed.catalog1 <- round(reconstructed.catalog)
-
-    if (catalog.type == "SBS96") {
+    
+    
+    if (input$selectedCatalogType == "SBS96") {
       output$SBS96SpectrumPlot <- renderPlot(
         expr = ICAMS::PlotCatalog(spect),
         width = 800, height = 200
@@ -434,7 +452,7 @@ app_server <- function(input, output,session) {
       )
     }
     
-    if (catalog.type == "SBS192") {
+    if (input$selectedCatalogType == "SBS192") {
       output$SBS192SpectrumPlot <- renderPlot(
         expr = ICAMS::PlotCatalog(spect),
         width = 800, height = 200
@@ -445,7 +463,7 @@ app_server <- function(input, output,session) {
       )
     }
 
-    if (catalog.type == "DBS78") {
+    if (input$selectedCatalogType == "DBS78") {
       output$DBS78SpectrumPlot <- renderPlot(
         expr = ICAMS::PlotCatalog(spect),
         width = 800, height = 200
@@ -456,7 +474,7 @@ app_server <- function(input, output,session) {
       )
     }
 
-    if (catalog.type == "ID") {
+    if (input$selectedCatalogType == "ID") {
       output$IDSpectrumPlot <- renderPlot(
         expr = ICAMS::PlotCatalog(spect),
         width = 800, height = 200
