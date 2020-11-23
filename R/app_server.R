@@ -11,6 +11,8 @@ app_server <- function(input, output,session) {
 
   # Create a variable which can be used to store the uploaded catalog later
   catalog <- NA
+  
+  input.catalog.type <- NA
 
   # Create reactiveValues object
   # and set flag to 0 to prevent errors with adding NULL
@@ -233,7 +235,7 @@ app_server <- function(input, output,session) {
       #rv$downloadFlag <- rv$downloadFlag + 1
     })
 
-  # When user submit uploaded catalog for analysis, create radio buttons for
+  # When user submit uploaded spectra for analysis, create radio buttons for
   # user to select the sample
   observeEvent(input$submitSpectra, {
     output$selectSampleFromUploadedCatalog <-
@@ -245,12 +247,30 @@ app_server <- function(input, output,session) {
           # "size": The size of the uploaded data, in bytes.
           # "type": The MIME type reported by the browser.
           # "datapath": The path to a temp file that contains the data that was uploaded.
-          catalog.info <- input$upload.catalogs
+          catalog.info <- input$upload.spectra
           catalog.paths <- catalog.info$datapath
           uploaded.catalog <- ICAMS::ReadCatalog(file = catalog.paths,
                                                  ref.genome = input$ref.genome2,
                                                  region = input$region2)
           catalog <<- uploaded.catalog
+          
+          if (nrow(catalog) == 96) {
+            input.catalog.type <<- "SBS96"
+          } else if (nrow(catalog) == 192) {
+            input.catalog.type <<- "SBS192"
+          } else if (nrow(catalog) == 1536) {
+            input.catalog.type <<- "SBS1536"
+          } else if (nrow(catalog) == 78) {
+            input.catalog.type <<- "DBS78"
+          } else if (nrow(catalog) == 136) {
+            input.catalog.type <<- "DBS136"
+          } else if (nrow(catalog) == 144) {
+            input.catalog.type <<- "DBS144"
+          } else if (nrow(catalog) == 83) {
+            input.catalog.type <<- "ID"
+          }
+          
+          
 
           sample.names <- colnames(catalog)
           radioButtons(inputId = "selectedSampleFromUploadedCatalog",
@@ -276,31 +296,31 @@ app_server <- function(input, output,session) {
   # the sample's mutational spectrum
   observeEvent(input$selectedSampleFromUploadedCatalog, {
 
-    if (input$catalogType == "SBS96") {
+    if (input.catalog.type == "SBS96") {
       output$SBS96plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                             drop = FALSE])})
-    } else if (input$catalogType == "SBS192") {
+    } else if (input.catalog.type == "SBS192") {
       output$SBS192plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                             drop = FALSE])})
-    } else if (input$catalogType == "SBS1536") {
+    } else if (input.catalog.type == "SBS1536") {
       output$SBS1536plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                             drop = FALSE])})
-    } else if (input$catalogType == "DBS78") {
+    } else if (input.catalog.type == "DBS78") {
       output$DBS78plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                             drop = FALSE])})
-    } else if (input$catalogType == "DBS136") {
+    } else if (input.catalog.type == "DBS136") {
       output$DBS136plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                             drop = FALSE])})
-    } else if (input$catalogType == "DBS144") {
+    } else if (input.catalog.type == "DBS144") {
       output$DBS144plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                             drop = FALSE])})
-    } else if (input$catalogType == "ID") {
+    } else if (input.catalog.type == "ID") {
       output$IDplot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                             drop = FALSE])})
@@ -316,7 +336,7 @@ app_server <- function(input, output,session) {
         # "size": The size of the uploaded data, in bytes.
         # "type": The MIME type reported by the browser.
         # "datapath": The path to a temp file that contains the data that was uploaded.
-        catalog.info <- input$upload.catalogs
+        catalog.info <- input$upload.spectra
         catalog.paths <- catalog.info$datapath
         uploaded.catalog <- ICAMS::ReadCatalog(file = catalog.paths,
                                                ref.genome = input$ref.genome2,
@@ -351,7 +371,7 @@ app_server <- function(input, output,session) {
       selectInput(inputId = "selectedCatalogType",
                   label = "Select the catalog type",
                   choices = catalog.type,
-                  selected = "SBS96")
+                  selected = input.catalog.type)
     }
   )
   })

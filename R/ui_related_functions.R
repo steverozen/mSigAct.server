@@ -128,9 +128,9 @@ UploadVCFFiles <- function() {
 
 #' @import shiny
 #' @keywords internal
-UploadCatalogs <- function() {
+UploadSpectra <- function() {
   div(
-    fileInput(inputId = "upload.catalogs", label = "Choose catalog file"), 
+    fileInput(inputId = "upload.spectra", label = "Choose spectra file"), 
     style="color: #337ab7;")
 }
 

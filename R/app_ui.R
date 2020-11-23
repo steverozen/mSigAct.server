@@ -155,32 +155,30 @@ UploadSpectraUI <- function() {
   fixedPage(
     # Add the first row of control widgets
     fixedRow(
-      # Add radio buttons for user to specify the type of catalogs
-      column(6, AddCatalogType()),
-
       # Add radio buttons for user to specify the reference genome
-      column(6, AddReferenceGenome2())
+      column(6, AddReferenceGenome2()),
+      
+      # Add radio buttons for user to specify the genomic region
+      # from where the catalogs were generated
+      column(6, AddRegion2())
     ),
 
     # Add the next row of control widgets
     fixedRow(
-      # Add radio buttons for user to specify the genomic region
-      # from where the catalogs were generated
-      column(6, AddRegion2()),
-
-      # Add a file upload control for user to upload multiple VCF files
-      column(6, UploadCatalogs(),
+      # Add a file upload control for user to upload spectra file
+      column(6, UploadSpectra(),
              actionButton(inputId = "submitSpectra", label = "Next",
                           style="color: #fff;
                                        background-color: #337ab7;
                                        border-color: #2e6da4")),
-
-      # Add a download button for user to download sample catalogs to test
-      fixedRow(column(6,
-                      downloadButton(outputId = "downloadSampleSpectra",
-                                     label = "Download sample spectra"),
-                      offset = 6)),
     ),
+    
+    br(),
+    
+    # Add a download button for user to download sample spectra to test
+    fixedRow(column(6,
+                    downloadButton(outputId = "downloadSampleSpectra",
+                                   label = "Download sample spectra")))
 
   )
 }
