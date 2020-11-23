@@ -186,7 +186,7 @@ app_server <- function(input, output,session) {
             selectInput(inputId = "selectedCatalogType",
                         label = "Select the catalog type",
                         choices = catalog.type,
-                        selected = "SBS96")
+                        selected = input.catalog.type)
           }
         )
         })
@@ -344,6 +344,22 @@ app_server <- function(input, output,session) {
                                                ref.genome = input$ref.genome2,
                                                region = input$region2)
         catalog <<- uploaded.catalog
+        
+        if (nrow(catalog) == 96) {
+          input.catalog.type <<- "SBS96"
+        } else if (nrow(catalog) == 192) {
+          input.catalog.type <<- "SBS192"
+        } else if (nrow(catalog) == 1536) {
+          input.catalog.type <<- "SBS1536"
+        } else if (nrow(catalog) == 78) {
+          input.catalog.type <<- "DBS78"
+        } else if (nrow(catalog) == 136) {
+          input.catalog.type <<- "DBS136"
+        } else if (nrow(catalog) == 144) {
+          input.catalog.type <<- "DBS144"
+        } else if (nrow(catalog) == 83) {
+          input.catalog.type <<- "ID"
+        }
         
         sample.names <- colnames(catalog)
         selectInput(inputId = "selectedSampleFromCatalogForAttribution",
