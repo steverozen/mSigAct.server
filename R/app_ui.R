@@ -7,7 +7,7 @@ app_ui <- function() {
     navbarPage(title = "msigact",
       tabPanel("Overview", OverviewUI()),
       tabPanel("Generate catalogs from VCFs", UploadVCFUI()),
-      tabPanel("Upload catalogs", UploadCatalogUI()),
+      tabPanel("Upload spectra", UploadSpectraUI()),
       tabPanel("Show spectra", ShowSpectraUI()),
       tabPanel("Signature attributions", SignatureAttributionUI())
     )
@@ -150,7 +150,7 @@ UploadVCFUI <- function() {
 }
 
 #' @import shiny
-UploadCatalogUI <- function() {
+UploadSpectraUI <- function() {
   # List the first level UI elements here
   fixedPage(
     # Add the first row of control widgets
@@ -170,7 +170,7 @@ UploadCatalogUI <- function() {
 
       # Add a file upload control for user to upload multiple VCF files
       column(6, UploadCatalogs(),
-             actionButton(inputId = "submitCatalog", label = "Submit",
+             actionButton(inputId = "submitSepctra", label = "Next",
                           style="color: #fff;
                                        background-color: #337ab7;
                                        border-color: #2e6da4")),

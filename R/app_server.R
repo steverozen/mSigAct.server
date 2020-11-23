@@ -234,7 +234,7 @@ app_server <- function(input, output,session) {
 
   # When user submit uploaded catalog for analysis, create radio buttons for
   # user to select the sample
-  observeEvent(input$submitCatalog, {
+  observeEvent(input$submitSpectra, {
     output$selectSampleFromUploadedCatalog <-
       renderUI(
         {
@@ -261,7 +261,7 @@ app_server <- function(input, output,session) {
   })
 
   # When user submit new catalog for analysis, remove the previous plots
-  observeEvent(input$submitCatalog, {
+  observeEvent(input$submitSpectra, {
     output$SBS96plot <- NULL
     output$SBS192plot <- NULL
     output$SBS1536plot <- NULL
@@ -306,7 +306,7 @@ app_server <- function(input, output,session) {
     }
   })
 
-  observeEvent(input$submitCatalog, {
+  observeEvent(input$submitSpectra, {
     output$selectSampleFromCatalogForAttribution <- renderUI(
       { 
         # catalog.info is a data frame that contains one row for each uploaded file,
@@ -330,7 +330,7 @@ app_server <- function(input, output,session) {
     )
   })
 
-  observeEvent(input$submitCatalog, {
+  observeEvent(input$submitSpectra, {
   output$selectcancertype <- renderUI(
     {
       cancer.types <-
@@ -343,7 +343,7 @@ app_server <- function(input, output,session) {
   )
   })
 
-  observeEvent(input$submitCatalog, {
+  observeEvent(input$submitSpectra, {
   output$choosecatalogtype <- renderUI(
     {
       catalog.type <- c("SBS96", "SBS192", "DBS78", "ID")
