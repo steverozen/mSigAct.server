@@ -1,58 +1,52 @@
-if (interactive()) {
-  library(shiny)
-  library(shinybusy)
+max_plots <- 5
+
+ui <- fluidPage(
   
-  ui <- fluidPage(
-    
-    # Use this function somewhere in UI
-    add_busy_spinner(spin = "cube-grid"),
-    # or use a different spinner
-    # add_busy_spinner(spin = "radar", margins = c(10, 20)),
-    
-    headerPanel('Iris k-means clustering'),
-    
-    sidebarLayout(
-      sidebarPanel(
-        selectInput('xcol', 'X Variable', names(iris)),
-        selectInput('ycol', 'Y Variable', names(iris),
-                    selected=names(iris)[[2]]),
-        numericInput('clusters', 'Cluster count', 3,
-                     min = 1, max = 9),
-        actionButton("sleep", "Long calculation")
-      ),
-      mainPanel(
-        plotOutput('plot1')
-      )
-    )
+  headerPanel("Dynamic number of plots"),
+  
+  sidebarPanel(
+    sliderInput("n", "Number of plots", value=1, min=1, max=5)
+  ),
+  
+  mainPanel(
+    # This is the dynamic UI for the plots
+    uiOutput("plots")
   )
+)
+
+server <- function(input, output) {
   
-  server <- function(input, output, session) {
-    
-    selectedData <- reactive({
-      iris[, c(input$xcol, input$ycol)]
+  # Insert the right number of plot output objects into the web page
+  output$plots <- renderUI({
+    plot_output_list <- lapply(1:input$n, function(i) {
+      plotname <- paste("plot", i, sep="")
+      plotOutput(plotname, height = 280, width = 250)
     })
     
-    clusters <- reactive({
-      kmeans(selectedData(), input$clusters)
-    })
-    
-    output$plot1 <- renderPlot({
-      palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
-                "#FF7F00", "#FFFF33", "#A65628", "#F781BF",
-                "#999999"))
+    # Convert the list to a tagList - this is necessary for the list of items
+    # to display properly.
+    do.call(tagList, plot_output_list)
+  })
+  
+  # Call renderPlot for each one. Plots are only actually generated when they
+  # are visible on the web page.
+  for (i in 1:max_plots) {
+    # Need local so that each item gets its own number. Without it, the value
+    # of i in the renderPlot() will be the same across all instances, because
+    # of when the expression is evaluated.
+    local({
+      my_i <- i
+      plotname <- paste("plot", my_i, sep="")
       
-      par(mar = c(5.1, 4.1, 0, 1))
-      plot(selectedData(),
-           col = clusters()$cluster,
-           pch = 20, cex = 3)
-      points(clusters()$centers, pch = 4, cex = 4, lwd = 4)
+      output[[plotname]] <- renderPlot({
+        plot(1:my_i, 1:my_i,
+             xlim = c(1, max_plots),
+             ylim = c(1, max_plots),
+             main = paste("1:", my_i, ".  n is ", input$n, sep = "")
+        )
+      })
     })
-    
-    observeEvent(input$sleep, {
-      Sys.sleep(5)
-    })
-    
   }
-  
-  shinyApp(ui, server)
 }
+
+shinyApp(ui, server)

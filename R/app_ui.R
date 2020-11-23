@@ -177,8 +177,8 @@ UploadCatalogUI <- function() {
 
       # Add a download button for user to download sample catalogs to test
       fixedRow(column(6,
-                      downloadButton(outputId = "downloadSampleCatalogs",
-                                     label = "Download the sample catalogs"),
+                      downloadButton(outputId = "downloadSampleSpectra",
+                                     label = "Download sample spectra"),
                       offset = 6)),
     ),
 

@@ -26,12 +26,12 @@ app_server <- function(input, output,session) {
     })
 
   # Download sample catalogs when user clicks the button
-  output$downloadSampleCatalogs <- downloadHandler(
+  output$downloadSampleSpectra <- downloadHandler(
     filename = function() {
-      "sample-catalogs.zip"
+      "msigact-sample-spectra.zip"
     },
     content = function(file) {
-      PrepareSampleCatalogs(file)
+      PrepareSampleSpectra(file)
     })
 
   # Run ICAMS on sample Strelka SBS VCFs when user clicks the button

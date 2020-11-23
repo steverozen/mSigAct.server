@@ -983,10 +983,10 @@ PrepareSampleVCFs <- function(file) {
 #' @import zip
 #'
 #' @keywords internal
-PrepareSampleCatalogs <- function(file) {
-  dir <- system.file("extdata/sample-catalogs", package = "ICAMS.shiny")
-  files <- list.files(dir, full.names = TRUE)
-  zip::zipr(files, zipfile = file)
+PrepareSampleSpectra <- function(file) {
+  path <- system.file("extdata/msigact-sample-spectra.zip", 
+                     package = "ICAMS.shiny")
+  file.copy(from = path, to = file)
 }
 
 #' @keywords internal
