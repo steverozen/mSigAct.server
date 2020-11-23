@@ -201,10 +201,11 @@ app_server <- function(input, output,session) {
                                            region = "genome")
               selected.sig.universe <- colnames(foo)
               selectInput(inputId = "selectedSigSubset1",
-                          label = paste0("The following signatures are preselected according ",  
-                                         "to previous assignment. Use your mouse to click one ",
-                                         "signature and use Backspace key to exclude the signature. ",
-                                         "Click the empty space inside the box below to add new signature."),
+                          label = paste0("These signatures were preselected based ",  
+                                         "on cancer type. Move your cursor to click one ",
+                                         "signature and press Backspace key to exclude ", 
+                                         "the signature. Click the empty space inside ",
+                                         "the box below to add new signature."),
                           choices = sig.universe,
                           selected = selected.sig.universe,
                           multiple = TRUE)
@@ -369,10 +370,11 @@ app_server <- function(input, output,session) {
                                      region = "genome")
         selected.sig.universe <- colnames(foo)
         selectInput(inputId = "selectedSigSubset2",
-                    label = paste0("The following signatures are preselected according ",  
-                                   "to previous assignment. Use your mouse to click one ",
-                                   "signature and use Backspace key to exclude the signature. ",
-                                   "Click the empty space inside the box below to add new signature."),
+                    label = paste0("These signatures were preselected based ",  
+                                   "on cancer type. Move your cursor to click one ",
+                                   "signature and press Backspace key to exclude ", 
+                                   "the signature. Click the empty space inside ",
+                                   "the box below to add new signature."),
                     choices = sig.universe,
                     selected = selected.sig.universe,
                     multiple = TRUE)

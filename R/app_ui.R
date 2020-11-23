@@ -170,7 +170,7 @@ UploadSpectraUI <- function() {
 
       # Add a file upload control for user to upload multiple VCF files
       column(6, UploadCatalogs(),
-             actionButton(inputId = "submitSepctra", label = "Next",
+             actionButton(inputId = "submitSpectra", label = "Next",
                           style="color: #fff;
                                        background-color: #337ab7;
                                        border-color: #2e6da4")),
