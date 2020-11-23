@@ -202,9 +202,9 @@ app_server <- function(input, output,session) {
               selected.sig.universe <- colnames(foo)
               selectInput(inputId = "selectedSigSubset1",
                           label = paste0("The following signatures are preselected according ",  
-                                         "to previous assignment. Click the empty space ",
-                                         "inside the box below to add new signature or use ",
-                                         "Backspace to exclude signature"),
+                                         "to previous assignment. Use your mouse to click one ",
+                                         "signature and use Backspace key to exclude the signature. ",
+                                         "Click the empty space inside the box below to add new signature."),
                           choices = sig.universe,
                           selected = selected.sig.universe,
                           multiple = TRUE)
@@ -308,7 +308,20 @@ app_server <- function(input, output,session) {
 
   observeEvent(input$submitCatalog, {
     output$selectSampleFromCatalogForAttribution <- renderUI(
-      {
+      { 
+        # catalog.info is a data frame that contains one row for each uploaded file,
+        # and four columns "name", "size", "type" and "datapath".
+        # "name": The filename provided by the web browser.
+        # "size": The size of the uploaded data, in bytes.
+        # "type": The MIME type reported by the browser.
+        # "datapath": The path to a temp file that contains the data that was uploaded.
+        catalog.info <- input$upload.catalogs
+        catalog.paths <- catalog.info$datapath
+        uploaded.catalog <- ICAMS::ReadCatalog(file = catalog.paths,
+                                               ref.genome = input$ref.genome2,
+                                               region = input$region2)
+        catalog <<- uploaded.catalog
+        
         sample.names <- colnames(catalog)
         selectInput(inputId = "selectedSampleFromCatalogForAttribution",
                     label = "Select the sample from uploaded catalog",
@@ -357,9 +370,9 @@ app_server <- function(input, output,session) {
         selected.sig.universe <- colnames(foo)
         selectInput(inputId = "selectedSigSubset2",
                     label = paste0("The following signatures are preselected according ",  
-                                   "to previous assignment. Click the empty space ",
-                                   "inside the box below to add new signature or use ",
-                                   "Backspace to exclude signature"),
+                                   "to previous assignment. Use your mouse to click one ",
+                                   "signature and use Backspace key to exclude the signature. ",
+                                   "Click the empty space inside the box below to add new signature."),
                     choices = sig.universe,
                     selected = selected.sig.universe,
                     multiple = TRUE)
