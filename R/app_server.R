@@ -437,55 +437,53 @@ app_server <- function(input, output,session) {
     
     cossim <- round(mSigAct::cossim(spect, reconstructed.catalog), 5)
     
-    colnames(reconstructed.catalog) <- paste0("MAP+QP ", cossim)
+    colnames(reconstructed.catalog) <- 
+      paste0("MAP+QP (cosine similarity = ", cossim, ")")
     reconstructed.catalog1 <- round(reconstructed.catalog)
     
+    max_plots <- nrow(QP.best.MAP.exp) + 2
+    output$sigContributionPlot <- renderUI({
+      plot_output_list <- lapply(1:max_plots, function(i) {
+        plotname <- paste("plot", i, sep="")
+        plotOutput(plotname)
+      })
+      
+      tagList(plot_output_list)
+    })
     
-    if (input$selectedCatalogType == "SBS96") {
-      output$SBS96SpectrumPlot <- renderPlot(
-        expr = ICAMS::PlotCatalog(spect),
-        width = 800, height = 200
-      )
-      output$SBS96AttributionPlot <- renderPlot(
-        expr = ICAMS::PlotCatalog(reconstructed.catalog1),
-        width = 800, height = 200
-      )
+    for (i in 1:max_plots) {
+      # Need local so that each item gets its own number. Without it, the value
+      # of i in the renderPlot() will be the same across all instances, because
+      # of when the expression is evaluated.
+      local({
+        my_i <- i
+        plotname <- paste("plot", my_i, sep="")
+        
+        if (my_i == 1) {
+          output[[plotname]] <- renderPlot(
+            expr = ICAMS::PlotCatalog(spect)
+            #width = 800, height = 200, 
+          )
+        } else if (my_i == 2) {
+          output[[plotname]] <- renderPlot(
+            expr = ICAMS::PlotCatalog(reconstructed.catalog1)
+            #width = 800, height = 200)
+          )
+        } else {
+          output[[plotname]] <- renderPlot({
+            sig.name <- QP.best.MAP.exp$sig.id[my_i-2]
+            sig.catalog <- sig.universe[, sig.name, drop = FALSE]
+            colnames(sig.catalog) <- 
+              paste0(sig.name, " (exposure = ", 
+                     round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
+            ICAMS::PlotCatalog(sig.catalog)
+            
+          }) #width = 800, height = 200)
+        }
+      })
     }
     
-    if (input$selectedCatalogType == "SBS192") {
-      output$SBS192SpectrumPlot <- renderPlot(
-        expr = ICAMS::PlotCatalog(spect),
-        width = 800, height = 200
-      )
-      output$SBS192AttributionPlot <- renderPlot(
-        expr = ICAMS::PlotCatalog(reconstructed.catalog1),
-        width = 800, height = 200
-      )
-    }
-
-    if (input$selectedCatalogType == "DBS78") {
-      output$DBS78SpectrumPlot <- renderPlot(
-        expr = ICAMS::PlotCatalog(spect),
-        width = 800, height = 200
-      )
-      output$DBS78AttributionPlot <- renderPlot(
-        expr = ICAMS::PlotCatalog(reconstructed.catalog1),
-        width = 800, height = 200
-      )
-    }
-
-    if (input$selectedCatalogType == "ID") {
-      output$IDSpectrumPlot <- renderPlot(
-        expr = ICAMS::PlotCatalog(spect),
-        width = 800, height = 200
-      )
-      output$IDAttributionPlot <- renderPlot(
-        expr = ICAMS::PlotCatalog(reconstructed.catalog1),
-        width = 800, height = 200
-      )
-    }
-
-
+    
   })
 
   # When user clicks the "Remove notifications" button, all the previous

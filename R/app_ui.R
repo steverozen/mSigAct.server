@@ -239,20 +239,10 @@ SignatureAttributionUI <- function() {
         shinybusy::add_busy_spinner(spin = "fading-circle",
                                     color = "#2e6da4", 
                                     position = c("bottom-right")),
-        tabsetPanel(type = "tabs",
-                    tabPanel("SBS96",
-                             plotOutput("SBS96SpectrumPlot"),
-                             plotOutput("SBS96AttributionPlot")),
-                    tabPanel("SBS192",
-                             plotOutput("SBS192SpectrumPlot"),
-                             plotOutput("SBS192AttributionPlot")),
-                    tabPanel("DBS78",
-                             plotOutput("DBS78SpectrumPlot"),
-                             plotOutput("DBS78AttributionPlot")),
-                    tabPanel("ID",
-                             plotOutput("IDSpectrumPlot"),
-                             plotOutput("IDAttributionPlot"))
-        )
+        
+        
+        uiOutput("sigContributionPlot")
+        
       )
 
     )
