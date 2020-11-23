@@ -31,7 +31,7 @@ GenerateZipFileFromMutectVCFs(
 \code{\link[ICAMS]{ICAMS}}.}
 
 \item{trans.ranges}{Optional. If \code{ref.genome} specifies one of the
-\code{\link[BSgenome]{BSgenome}} object 
+\code{\link[BSgenome]{BSgenome}} object
 \enumerate{
   \item \code{\link[BSgenome.Hsapiens.1000genomes.hs37d5]{BSgenome.Hsapiens.1000genomes.hs37d5}}
   \item \code{\link[BSgenome.Hsapiens.UCSC.hg38]{BSgenome.Hsapiens.UCSC.hg38}}

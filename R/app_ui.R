@@ -211,7 +211,6 @@ ShowSpectraUI <- function() {
 }
 
 #' @import shiny
-#' @import shinybusy add_busy_spinner
 SignatureAttributionUI <- function() {
   fixedPage(
 
@@ -234,6 +233,7 @@ SignatureAttributionUI <- function() {
       ),
 
       mainPanel(
+        shinyjs::useShinyjs(),
         shinybusy::add_busy_spinner(spin = "fading-circle",
                                     color = "#2e6da4", 
                                     position = c("bottom-left")),

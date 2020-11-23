@@ -13,6 +13,8 @@ app_server <- function(input, output,session) {
   catalog <- NA
   
   input.catalog.type <- NA
+  
+  plot.names <- vector(mode = "character")
 
   # Create reactiveValues object
   # and set flag to 0 to prevent errors with adding NULL
@@ -411,8 +413,13 @@ app_server <- function(input, output,session) {
       }
     )
   })
-
+  
   observeEvent(input$submitAttribution2, {
+    if (length(plot.names) > 0) {
+      for (i in 1:length(plot.names)) {
+        shinyjs::hide(id = plot.names[i])
+      }
+    }
     
     spect <- catalog[, input$selectedSampleFromCatalogForAttribution, drop = FALSE]
     catalog.type <- input$selectedCatalogType
@@ -480,6 +487,7 @@ app_server <- function(input, output,session) {
     output$sigContributionPlot <- renderUI({
       plot_output_list <- lapply(1:max_plots, function(i) {
         plotname <- paste("plot", i, sep="")
+        plot.names[i] <<- plotname
         plotOutput(plotname)
       })
       
@@ -516,6 +524,10 @@ app_server <- function(input, output,session) {
           }) #width = 800, height = 200)
         }
       })
+    }
+    
+    for (i in length(plot.names)) {
+      shinyjs::show(id = plot.names[i])
     }
     
     
