@@ -34,20 +34,20 @@ HomeUI <- function() {
     h5(tags$ol(
       tags$li("Create and plot mutational spectrum \"catalogs\" from VCF* files"),
       br(),
-      actionButton(inputId = "linkToTab2", 
-                   label = "Generate catalogs",
-                   style="color: #fff; background-color: #337ab7;
-                           border-color: #2e6da4;
-                           padding:4px; font-size:80%"),
+      actionLink(inputId = "linkToTab2", 
+                   label = "Generate catalogs"),
+                   #style="color: #fff; background-color: #337ab7;
+                   #        border-color: #2e6da4;
+                   #        padding:4px; font-size:80%"),
       rep_br(2),
       tags$li("Estimate which mutational signatures contributed to a",
               "mutational spectrum"),
       br(),
-      actionButton(inputId = "linkToTab3", 
-                   label = "Upload spectra",
-                   style="color: #fff; background-color: #337ab7;
-                           border-color: #2e6da4;
-                           padding:4px; font-size:80%"),
+      actionLink(inputId = "linkToTab3", 
+                   label = "Upload spectra"),
+                   #style="color: #fff; background-color: #337ab7;
+                   #        border-color: #2e6da4;
+                   #        padding:4px; font-size:80%"),
       rep_br(2)
     )),
     
@@ -64,6 +64,15 @@ HomeUI <- function() {
         "\"The repertoire of mutational signatures in human cancer\""),
       " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",
       "COSMIC Mutational Signatures")),
+    
+    if (FALSE) {
+      fixedRow(column(2, shinyhelper::helper(shiny::actionButton("go", "click me!"),
+                                             icon = "question-circle",
+                                             colour = "grey",
+                                             type = "inline",
+                                             content = "ClickHelp")))
+    },
+    
     
     # Add an overview picture about the Shiny interface
     img(src = "www/rozen-mut-sig-collage.png", width = "601", height = "430")
@@ -164,6 +173,8 @@ UploadVCFUI <- function() {
                                        paste0("Run analysis on two ",
                                               "1-sample Mutect VCFs")),
                     offset = 6)),
+    
+    verbatimTextOutput(outputId = "testoutput")
   )
 }
 

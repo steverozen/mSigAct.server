@@ -3,6 +3,8 @@
 app_server <- function(input, output,session) {
   # List the first level callModules here
   
+  output$Text <- renderText({ c("VCF") })
+  
   # When user clicks the action link on Home page, direct user to the relevant tab
   observeEvent(input$linkToTab2, {
     shinydashboard::updateTabItems(session = session, inputId = "panels", 
@@ -79,7 +81,20 @@ app_server <- function(input, output,session) {
     output$DBS144plot <- NULL
     output$IDplot <- NULL
   }
-
+  
+  
+  vcftype <- reactive({
+    validate(
+      need(input$vcftype %in% c("strelka.sbs", "strelka.id", "mutect"),
+           label = "variant caller")
+    )
+    paste0(input$vcftype, "test")
+  })
+  
+  output$testoutput <- renderText(
+    vcftype()
+  )
+  
   # When user submits VCF to analysis, then the program will try to
   # generate a zip archive based on the input files and parameters
   output$download <- downloadHandler(
@@ -92,6 +107,7 @@ app_server <- function(input, output,session) {
         # Generate a zip archive from Strelka SBS VCFs and
         # update the notification ids for errors, warnings
         # and messages
+
         result <- ProcessStrelkaSBSVCFs(input, output, file, ids)
         retval <<- result$retval
         ids <<- result$ids
