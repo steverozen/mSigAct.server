@@ -984,7 +984,7 @@ PrepareSampleVCFs <- function(file) {
 #'
 #' @keywords internal
 PrepareSampleSpectra <- function(file) {
-  path <- system.file("extdata/msigact-sample-spectra.zip", 
+  path <- system.file("extdata/mSigAct-sample-spectra.zip", 
                      package = "ICAMS.shiny")
   file.copy(from = path, to = file)
 }

@@ -44,7 +44,7 @@ app_server <- function(input, output,session) {
   # Download sample catalogs when user clicks the button
   output$downloadSampleSpectra <- downloadHandler(
     filename = function() {
-      "msigact-sample-spectra.zip"
+      "mSigAct-sample-spectra.zip"
     },
     content = function(file) {
       PrepareSampleSpectra(file)

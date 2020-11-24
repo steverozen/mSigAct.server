@@ -4,8 +4,8 @@ app_ui <- function() {
     # Leave this function for adding external resources
     golem_add_external_resources(),
 
-    navbarPage(title = "msigact", id = "panels",
-      tabPanel(title = "Home", OverviewUI()),
+    navbarPage(title = "mSigAct", id = "panels",
+      tabPanel(title = "Home", HomeUI()),
       tabPanel(title = "Generate spectrum catalogs from VCFs", 
                UploadVCFUI(), value = "tab2"),
       tabPanel(title = "Upload spectra", UploadSpectraUI(), value = "tab3"),
@@ -16,7 +16,7 @@ app_ui <- function() {
 }
 
 #' @import shiny
-OverviewUI <- function() {
+HomeUI <- function() {
   # List the first level UI elements here
   fixedPage(
     # Add a title on top the page
