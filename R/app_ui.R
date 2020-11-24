@@ -5,8 +5,8 @@ app_ui <- function() {
     golem_add_external_resources(),
 
     navbarPage(title = "msigact",
-      tabPanel("Overview", OverviewUI()),
-      tabPanel("Generate catalogs from VCFs", UploadVCFUI()),
+      tabPanel("Home", OverviewUI()),
+      tabPanel("Generate spectrum catalogs from VCFs", UploadVCFUI()),
       tabPanel("Upload spectra", UploadSpectraUI()),
       tabPanel("Show spectra", ShowSpectraUI()),
       tabPanel("Signature attributions", SignatureAttributionUI())
@@ -19,36 +19,34 @@ OverviewUI <- function() {
   # List the first level UI elements here
   fixedPage(
     # Add a title on top the page
-    titlePanel(title = p("msigact: mutational signature activity delineation ",
-                         "in cancer", style = "color: #337ab7"),
-               windowTitle = paste0("msigact: mutational signature activity ",
-                                    "delineation in cancer")),
+    titlePanel(title = p("mSigAct: Mutational Signature Activity",
+                         style = "color: #337ab7"),
+               windowTitle = paste0("mSigAct: Mutational Signature Activity")),
 
     # Add a horizontal line
-    hr(),
+    # hr(),
 
     # Add a short description of msigact
-    p("msigact is an online tool that allows users to upload multiple ",
-      a(href = "https://tinyurl.com/rdzwnxd", "VCF"),
-      " (Variant Call Format) files and returns a zip archive which ",
-      "contains mutation catalogs and PDF plots. ",
-      "VCF files from ",
+    p("This web site has two main functions:"),
+    tags$ol(
+      tags$li("Create and plot mutational spectrum \"catalogs\" from VCF* files"),
+      tags$li("Estimate which mutational signatures contributed to a",
+              "mutational spectrum")
+    ),
+
+    p( a(href = "https://tinyurl.com/rdzwnxd", "*VCF"),
+       " files contain one mutation per line, and are created ",
+      "by variant callers such as ",
       a(href = "https://github.com/Illumina/strelka", "Strelka"), " or ",
-      a(href = "https://github.com/broadgsa/gatk", "Mutect"),
-      " variant caller are supported.",
-      "The uploaded VCFs must ", strong("all"), " come from the ",
-      strong("same"), " variant caller, reference genome and region.",
-      "User can also upload catalog to show the mutational spectrum ",
-      "and do signature attribution."),
+      a(href = "https://github.com/broadgsa/gatk", "Mutect")),
 
     # Add a link to the PCAWG7 paper about mutational signatures
-    p("For background information of mutational signatures, please refer ",
-      "to this paper: ",
+    p("For background see ",
       a(href = "https://doi.org/10.1038/s41586-020-1943-3",
-        "The repertoire of mutational signatures in human cancer"), "."),
+        "\"The repertoire of mutational signatures in human cancer\""),
+      " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",
+      "COSMIC Mutational Signatures"))
 
-    # Add an overview picture about the Shiny interface
-    # img(src = "www/msigact-overview.PNG", width = "800", height = "219"),
 
   )
 }
@@ -157,7 +155,7 @@ UploadSpectraUI <- function() {
     fixedRow(
       # Add radio buttons for user to specify the reference genome
       column(6, AddReferenceGenome2()),
-      
+
       # Add radio buttons for user to specify the genomic region
       # from where the catalogs were generated
       column(6, AddRegion2())
@@ -172,9 +170,9 @@ UploadSpectraUI <- function() {
                                        background-color: #337ab7;
                                        border-color: #2e6da4")),
     ),
-    
+
     br(),
-    
+
     # Add a download button for user to download sample spectra to test
     fixedRow(column(6,
                     downloadButton(outputId = "downloadSampleSpectra",
@@ -235,12 +233,12 @@ SignatureAttributionUI <- function() {
       mainPanel(
         shinyjs::useShinyjs(),
         shinybusy::add_busy_spinner(spin = "fading-circle",
-                                    color = "#2e6da4", 
+                                    color = "#2e6da4",
                                     position = c("bottom-left")),
-        
-        
+
+
         uiOutput("sigContributionPlot")
-        
+
       )
 
     )
