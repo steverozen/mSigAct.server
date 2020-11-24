@@ -45,8 +45,10 @@ OverviewUI <- function() {
       a(href = "https://doi.org/10.1038/s41586-020-1943-3",
         "\"The repertoire of mutational signatures in human cancer\""),
       " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",
-      "COSMIC Mutational Signatures"))
-
+      "COSMIC Mutational Signatures")),
+    
+    # Add an overview picture about the Shiny interface
+    img(src = "www/rozen-mut-sig-collage.png", width = "601", height = "430")
 
   )
 }
