@@ -4,10 +4,11 @@ app_ui <- function() {
     # Leave this function for adding external resources
     golem_add_external_resources(),
 
-    navbarPage(title = "msigact",
-      tabPanel("Home", OverviewUI()),
-      tabPanel("Generate spectrum catalogs from VCFs", UploadVCFUI()),
-      tabPanel("Upload spectra", UploadSpectraUI()),
+    navbarPage(title = "msigact", id = "panels",
+      tabPanel(title = "Home", OverviewUI()),
+      tabPanel(title = "Generate spectrum catalogs from VCFs", 
+               UploadVCFUI(), value = "tab2"),
+      tabPanel(title = "Upload spectra", UploadSpectraUI(), value = "tab3"),
       tabPanel("Show spectra", ShowSpectraUI()),
       tabPanel("Signature attributions", SignatureAttributionUI())
     )
@@ -22,26 +23,43 @@ OverviewUI <- function() {
     titlePanel(title = p("mSigAct: Mutational Signature Activity",
                          style = "color: #337ab7"),
                windowTitle = paste0("mSigAct: Mutational Signature Activity")),
-
-    # Add a horizontal line
-    # hr(),
+    
+    
+    # Add one line break
+    # br(),
 
     # Add a short description of msigact
-    p("This web site has two main functions:"),
-    tags$ol(
-      tags$li("Create and plot mutational spectrum \"catalogs\" from VCF* files"),
-      tags$li("Estimate which mutational signatures contributed to a",
-              "mutational spectrum")
-    ),
+    h5("This web site has two main functions:"),
 
-    p( a(href = "https://tinyurl.com/rdzwnxd", "*VCF"),
+    h5(tags$ol(
+      tags$li("Create and plot mutational spectrum \"catalogs\" from VCF* files"),
+      br(),
+      actionButton(inputId = "linkToTab2", 
+                   label = "Generate catalogs",
+                   style="color: #fff; background-color: #337ab7;
+                           border-color: #2e6da4;
+                           padding:4px; font-size:80%"),
+      rep_br(2),
+      tags$li("Estimate which mutational signatures contributed to a",
+              "mutational spectrum"),
+      br(),
+      actionButton(inputId = "linkToTab3", 
+                   label = "Upload spectra",
+                   style="color: #fff; background-color: #337ab7;
+                           border-color: #2e6da4;
+                           padding:4px; font-size:80%"),
+      rep_br(2)
+    )),
+    
+
+    h5( a(href = "https://tinyurl.com/rdzwnxd", "*VCF"),
        " files contain one mutation per line, and are created ",
       "by variant callers such as ",
       a(href = "https://github.com/Illumina/strelka", "Strelka"), " or ",
       a(href = "https://github.com/broadgsa/gatk", "Mutect")),
 
     # Add a link to the PCAWG7 paper about mutational signatures
-    p("For background see ",
+    h5("For background see ",
       a(href = "https://doi.org/10.1038/s41586-020-1943-3",
         "\"The repertoire of mutational signatures in human cancer\""),
       " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",

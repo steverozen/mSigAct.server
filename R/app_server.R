@@ -1,6 +1,16 @@
 #' @import shiny
+#' @import shinydashboard
 app_server <- function(input, output,session) {
   # List the first level callModules here
+  
+  # When user clicks the action link on Home page, direct user to the relevant tab
+  observeEvent(input$linkToTab2, {
+    updateTabItems(session = session, inputId = "panels", selected = "tab2")
+  })
+  
+  observeEvent(input$linkToTab3, {
+    updateTabItems(session = session, inputId = "panels", selected = "tab3")
+  })
 
   # Create an empty list which can be used to store notification ids later
   ids <- list("error" = character(0), "warning" = character(0),
