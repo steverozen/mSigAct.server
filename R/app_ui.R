@@ -32,23 +32,12 @@ HomeUI <- function() {
     h5("This web site has two main functions:"),
 
     h5(tags$ol(
-      tags$li("Create and plot mutational spectrum \"catalogs\" from VCF* files"),
+      tags$li(actionLink(inputId = "linkToTab2", 
+                   label = "Create and plot mutational spectrum \"catalogs\" from VCF* files")),
       br(),
-      actionLink(inputId = "linkToTab2", 
-                   label = "Generate catalogs"),
-                   #style="color: #fff; background-color: #337ab7;
-                   #        border-color: #2e6da4;
-                   #        padding:4px; font-size:80%"),
-      rep_br(2),
-      tags$li("Estimate which mutational signatures contributed to a",
-              "mutational spectrum"),
-      br(),
-      actionLink(inputId = "linkToTab3", 
-                   label = "Upload spectra"),
-                   #style="color: #fff; background-color: #337ab7;
-                   #        border-color: #2e6da4;
-                   #        padding:4px; font-size:80%"),
-      rep_br(2)
+      tags$li(actionLink(inputId = "linkToTab3", 
+                   label = paste0("Estimate which mutational signatures contributed to a",
+                 "mutational spectrum"))),
     )),
     
 
