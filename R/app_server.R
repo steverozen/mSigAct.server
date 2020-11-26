@@ -3,6 +3,9 @@
 app_server <- function(input, output,session) {
   # List the first level callModules here
   
+  # Need to exclude the buttons from themselves being bookmarked
+  #setBookmarkExclude(c("bookmark1"))
+  
   hideTab(inputId = "panels", target = "tab4")
   
   hideTab(inputId = "panels", target = "tab5")

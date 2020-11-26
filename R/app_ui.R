@@ -1,5 +1,5 @@
 #' @import shiny
-app_ui <- function() {
+app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
@@ -249,7 +249,8 @@ SignatureAttributionUI <- function() {
           y4 <- uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog"),
 
           x5 <- uiOutput(outputId = "analyzeButton1"),
-          y6 <- uiOutput(outputId = "analyzeButton2")
+          y6 <- uiOutput(outputId = "analyzeButton2"),
+          bookmarkButton()
       ),
 
       mainPanel(
