@@ -472,6 +472,8 @@ app_server <- function(input, output,session) {
     )
   })
   
+  
+  
   observeEvent(input$submitAttribution2, {
     if (length(plot.names) > 0) {
       for (i in 1:length(plot.names)) {
@@ -585,7 +587,121 @@ app_server <- function(input, output,session) {
     
     
   })
-
+  
+  observeEvent(input$submitAttribution3, {
+    if (length(plot.names) > 0) {
+      for (i in 1:length(plot.names)) {
+        shinyjs::hide(id = plot.names[i])
+      }
+    }
+    
+    spect <- catalog[, input$selectedSampleFromCatalogForAttribution, drop = FALSE]
+    catalog.type <- input$selectedCatalogType
+    cancer.type <- input$selectedcancertype
+    region <- input$region2
+    
+    if (catalog.type == "SBS192") {
+      sig.universe <- PCAWG7::signature[["genome"]][[catalog.type]][, input$selectedSigSubset2]
+      sigs.prop <- PCAWG7::exposure.stats$PCAWG[["SBS96"]][[cancer.type]]
+    } else {
+      sig.universe <- PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
+      sigs.prop <- PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]]
+    }
+    
+    sig.names <- rownames(sigs.prop)
+    sigs.prop <- unlist(sigs.prop[ , 2])
+    names(sigs.prop) <- sig.names
+    
+    if (FALSE) {
+      QP.exposure <- GetExposureWithConfidence(catalog = spect,
+                                               sig.universe = sig.universe,
+                                               num.of.bootstrap.replicates = 10000,
+                                               method = decomposeQP,
+                                               conf.int = 0.95)
+      
+      updated.sig.universe <- sig.universe[ , rownames(QP.exposure)]
+      updated.sigs.prop <- sigs.prop[rownames(QP.exposure)]
+    }
+    
+    mapout <-
+      mSigAct::MAPAssignActivity1(
+        spect = spect,
+        sigs = sig.universe,
+        sigs.presence.prop = sigs.prop,
+        max.level = length(sigs.prop) - 1,
+        p.thresh = 0.01,
+        eval_f = mSigAct::ObjFnBinomMaxLHNoRoundOK,
+        m.opts = mSigAct::DefaultManyOpts(),
+        max.mc.cores = 100)
+    
+    MAP.best.exp <- mapout$MAP
+    
+    QP.exp <- 
+      mSigAct:::OptimizeExposureQP(spect, sig.universe[ , 
+                                                        MAP.best.exp$sig.id, 
+                                                        drop = FALSE])
+    QP.best.MAP.exp <-
+      tibble::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
+    
+    r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, use.sig.names = TRUE)
+    reconstructed.catalog <- as.catalog(r.qp)
+    
+    cossim <- round(mSigAct::cossim(spect, reconstructed.catalog), 5)
+    
+    colnames(reconstructed.catalog) <- 
+      paste0("MAP+QP (cosine similarity = ", cossim, ")")
+    reconstructed.catalog1 <- round(reconstructed.catalog)
+    
+    max_plots <- nrow(QP.best.MAP.exp) + 2
+    output$sigContributionPlot <- renderUI({
+      plot_output_list <- lapply(1:max_plots, function(i) {
+        plotname <- paste("plot", i, sep="")
+        plot.names[i] <<- plotname
+        plotOutput(plotname)
+      })
+      
+      tagList(plot_output_list)
+    })
+    
+    for (i in 1:max_plots) {
+      # Need local so that each item gets its own number. Without it, the value
+      # of i in the renderPlot() will be the same across all instances, because
+      # of when the expression is evaluated.
+      local({
+        my_i <- i
+        plotname <- paste("plot", my_i, sep="")
+        
+        if (my_i == 1) {
+          output[[plotname]] <- renderPlot(
+            expr = ICAMS::PlotCatalog(spect)
+            #width = 800, height = 200, 
+          )
+        } else if (my_i == 2) {
+          output[[plotname]] <- renderPlot(
+            expr = ICAMS::PlotCatalog(reconstructed.catalog1)
+            #width = 800, height = 200)
+          )
+        } else {
+          output[[plotname]] <- renderPlot({
+            sig.name <- QP.best.MAP.exp$sig.id[my_i-2]
+            sig.catalog <- sig.universe[, sig.name, drop = FALSE]
+            colnames(sig.catalog) <- 
+              paste0(sig.name, " (exposure = ", 
+                     round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
+            ICAMS::PlotCatalog(sig.catalog)
+            
+          }) #width = 800, height = 200)
+        }
+      })
+    }
+    
+    for (i in length(plot.names)) {
+      shinyjs::show(id = plot.names[i])
+    }
+    
+    
+  })
+  
   # When user clicks the "Remove notifications" button, all the previous
   # notifications(error, warning or message) will be removed
   observeEvent(input$remove, {
