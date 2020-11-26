@@ -462,6 +462,16 @@ app_server <- function(input, output,session) {
     )
   })
   
+  observeEvent(input$selectedSampleFromCatalogForAttribution, {
+    output$analyzeButton3 <- renderUI(
+      {
+        actionButton(inputId = "submitAttribution3", label = "Analyze",
+                     style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4")
+      }
+    )
+  })
+  
   observeEvent(input$submitAttribution2, {
     if (length(plot.names) > 0) {
       for (i in 1:length(plot.names)) {

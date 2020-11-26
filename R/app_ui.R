@@ -245,10 +245,11 @@ SignatureAttributionUI <- function() {
           y2 <- uiOutput(outputId = "choosecatalogtype"),
 
           x3 <- uiOutput(outputId = "chooseSigSubsetForSampleFromVCF"),
+          y5 <- uiOutput(outputId = "analyzeButton3"),
           y4 <- uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog"),
 
           x5 <- uiOutput(outputId = "analyzeButton1"),
-          y5 <- uiOutput(outputId = "analyzeButton2")
+          y6 <- uiOutput(outputId = "analyzeButton2")
       ),
 
       mainPanel(
