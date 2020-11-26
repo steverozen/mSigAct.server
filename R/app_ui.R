@@ -119,7 +119,7 @@ UploadVCFUI <- function() {
     # Add the next row of control widgets
     fixedRow(column(6,
                     MyDownloadButton(outputId = "download",
-                                     label = "Submit",
+                                     label = "Create catalogs",
                                      style="color: #fff;
                                        background-color: #337ab7;
                                        border-color: #2e6da4"),
