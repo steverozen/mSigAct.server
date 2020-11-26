@@ -9,8 +9,9 @@ app_ui <- function() {
       tabPanel(title = "Generate spectrum catalogs from VCFs", 
                UploadVCFUI(), value = "tab2"),
       tabPanel(title = "Upload spectra", UploadSpectraUI(), value = "tab3"),
-      tabPanel("Show spectra", ShowSpectraUI()),
-      tabPanel("Signature attributions", SignatureAttributionUI())
+      tabPanel(title = "Show spectra", ShowSpectraUI(), value = "tab4"),
+      tabPanel(title = "Signature attributions", SignatureAttributionUI(), 
+               value = "tab5")
     )
   )
 }

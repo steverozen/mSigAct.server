@@ -3,7 +3,9 @@
 app_server <- function(input, output,session) {
   # List the first level callModules here
   
-  output$Text <- renderText({ c("VCF") })
+  hideTab(inputId = "panels", target = "tab4")
+  
+  hideTab(inputId = "panels", target = "tab5")
   
   # When user clicks the action link on Home page, direct user to the relevant tab
   observeEvent(input$linkToTab2, {
@@ -268,6 +270,8 @@ app_server <- function(input, output,session) {
   # When user submit uploaded spectra for analysis, create radio buttons for
   # user to select the sample
   observeEvent(input$submitSpectra, {
+    showTab(inputId = "panels", target = "tab4")
+    showTab(inputId = "panels", target = "tab5")
     output$selectSampleFromUploadedCatalog <-
       renderUI(
         {
@@ -329,7 +333,7 @@ app_server <- function(input, output,session) {
     if (input.catalog.type == "SBS96") {
       output$SBS96plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
-                            drop = FALSE])})
+                            drop = FALSE])}, width = 800, height = 260)
     } else if (input.catalog.type == "SBS192") {
       output$SBS192plot <- renderPlot({
         PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
