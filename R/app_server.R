@@ -508,17 +508,12 @@ app_server <- function(input, output,session) {
         m.opts = mSigAct::DefaultManyOpts(),
         max.mc.cores = 100)
     
-    xx <- mSigAct:::ListOfList2Tibble(mapout)
+    MAP.best.exp <- mapout$MAP
     
-    best <- dplyr::arrange(xx, .data$MAP)[nrow(xx),  ]
-    names.best <- names(best[["exp"]])
-    best.exp <- best[["exp"]][[1]]
-    if (is.null(names(best.exp))) {
-      names(best.exp) <- names.best
-    }
-    MAP.best.exp <- tibble::tibble(sig.id = names(best.exp), best.exp )
-    
-    QP.exp <- mSigAct:::OptimizeExposureQP(spect, sig.universe[ , names(best.exp), drop = FALSE])
+    QP.exp <- 
+      mSigAct:::OptimizeExposureQP(spect, sig.universe[ , 
+                                                        MAP.best.exp$sig.id, 
+                                                        drop = FALSE])
     QP.best.MAP.exp <-
       tibble::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
     
