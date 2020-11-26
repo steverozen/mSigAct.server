@@ -649,7 +649,7 @@ app_server <- function(input, output,session) {
     cossim <- round(mSigAct::cossim(spect, reconstructed.catalog), 5)
     
     colnames(reconstructed.catalog) <- 
-      paste0("MAP+QP (cosine similarity = ", cossim, ")")
+      paste0("reconstructed (cosine similarity = ", cossim, ")")
     reconstructed.catalog1 <- round(reconstructed.catalog)
     
     max_plots <- nrow(QP.best.MAP.exp) + 2
