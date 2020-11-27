@@ -495,10 +495,10 @@ app_server <- function(input, output,session) {
     
     if (catalog.type == "SBS192") {
       sig.universe <- PCAWG7::signature[["genome"]][[catalog.type]][, input$selectedSigSubset2]
-      sigs.prop <- PCAWG7::exposure.stats$PCAWG[["SBS96"]][[cancer.type]]
+      sigs.prop <- PCAWG7::exposure.stats$PCAWG[["SBS96"]][[cancer.type]][colnames(sig.universe), ]
     } else {
       sig.universe <- PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
-      sigs.prop <- PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]]
+      sigs.prop <- PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]][colnames(sig.universe), ]
     }
     
     sig.names <- rownames(sigs.prop)
@@ -610,10 +610,10 @@ app_server <- function(input, output,session) {
     
     if (catalog.type == "SBS192") {
       sig.universe <- PCAWG7::signature[["genome"]][[catalog.type]][, input$selectedSigSubset2]
-      sigs.prop <- PCAWG7::exposure.stats$PCAWG[["SBS96"]][[cancer.type]]
+      sigs.prop <- PCAWG7::exposure.stats$PCAWG[["SBS96"]][[cancer.type]][colnames(sig.universe), ]
     } else {
       sig.universe <- PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
-      sigs.prop <- PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]]
+      sigs.prop <- PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]][colnames(sig.universe), ]
     }
     
     sig.names <- rownames(sigs.prop)
@@ -732,7 +732,5 @@ app_server <- function(input, output,session) {
   observeEvent(input$remove, {
     RemoveAllNotifications(ids)
   })
-
-
 
 }
