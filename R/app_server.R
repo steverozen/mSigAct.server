@@ -200,11 +200,11 @@ app_server <- function(input, output,session) {
         )
 
         observeEvent(input$selectedSampleFromVCFForAttribution, {
-          output$selectcancertype <- renderUI(
+          output$selectCancerType <- renderUI(
             {
               cancer.types <-
                 c(colnames(CancerTypeToExposureStatData()), "Unknown")
-              selectInput(inputId = "selectedcancertype",
+              selectInput(inputId = "selectedCancerType",
                           label = "Select the cancer type",
                           choices = cancer.types,
                           selected = "Biliary-AdenoCA")
@@ -232,7 +232,7 @@ app_server <- function(input, output,session) {
               sig.universe <- colnames(sig2)
 
 
-              foo <- CancerTypeToSigSubset(cancer.type = input$selectedcancertype,
+              foo <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType,
                                            tumor.cohort = "PCAWG",
                                            sig.type = input$selectedCatalogType,
                                            region = "genome")
@@ -405,14 +405,13 @@ app_server <- function(input, output,session) {
   })
 
   observeEvent(input$submitSpectra, {
-  output$selectcancertype <- renderUI(
+  output$selectCancerType <- renderUI(
     {
       cancer.types <-
-        c(colnames(CancerTypeToExposureStatData()), "Unknown")
-      selectInput(inputId = "selectedcancertype",
+        c("Unknown", colnames(CancerTypeToExposureStatData()))
+      selectInput(inputId = "selectedCancerType",
                   label = "Select the cancer type",
-                  choices = cancer.types,
-                  selected = "Biliary-AdenoCA")
+                  choices = cancer.types)
     }
   )
   })
@@ -429,43 +428,50 @@ app_server <- function(input, output,session) {
   )
   })
 
-  observeEvent(input$selectedSampleFromCatalogForAttribution, {
-    output$chooseSigSubsetForSampleFromCatalog <- renderUI(
-      {
-        sig1 <- PCAWG7::signature[["genome"]]
-        sig2 <- sig1[[input$selectedCatalogType]]
-        sig.universe <- colnames(sig2)
-
-
-        foo <- CancerTypeToSigSubset(cancer.type = input$selectedcancertype,
-                                     tumor.cohort = "PCAWG",
-                                     sig.type = input$selectedCatalogType,
-                                     region = "genome")
-        selected.sig.universe <- colnames(foo)
-        selectInput(inputId = "selectedSigSubset2",
-                    label = paste0("These signatures were preselected based ",  
-                                   "on cancer type. Move your cursor to click one ",
-                                   "signature and press Backspace key to exclude ", 
-                                   "the signature. Click the empty space inside ",
-                                   "the box below to add new signature."),
-                    choices = sig.universe,
-                    selected = selected.sig.universe,
-                    multiple = TRUE)
-      }
-    )
+  observeEvent(input$selectedCancerType, {
+    if (input$selectedCancerType != "Unknown") {
+      output$chooseSigSubsetForSampleFromCatalog <- renderUI(
+        {
+          sig1 <- PCAWG7::signature[["genome"]]
+          sig2 <- sig1[[input$selectedCatalogType]]
+          sig.universe <- colnames(sig2)
+          
+          if (input$selectedCancerType == "Unknown") {
+            selected.sig.universe <- NULL
+          } else {
+            tmp <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType,
+                                         tumor.cohort = "PCAWG",
+                                         sig.type = input$selectedCatalogType,
+                                         region = "genome")
+            selected.sig.universe <- colnames(tmp)
+          }
+          
+          selectInput(inputId = "selectedSigSubset2",
+                      label = paste0("These signatures were preselected based ",  
+                                     "on cancer type. Move your cursor to click one ",
+                                     "signature and press Backspace key to exclude ", 
+                                     "the signature. Click the empty space inside ",
+                                     "the box below to add new signature."),
+                      choices = sig.universe,
+                      selected = selected.sig.universe,
+                      multiple = TRUE)
+        }
+      )
+    }
+    
   })
 
-  observeEvent(input$selectedSampleFromCatalogForAttribution, {
-    output$analyzeButton2 <- renderUI(
-      {
-        actionButton(inputId = "submitAttribution2", label = "Analyze",
-                     style= "color: #fff; background-color: #337ab7;
+  observeEvent(input$selectedSigSubset2, {
+      output$analyzeButton2 <- renderUI(
+        {
+          actionButton(inputId = "submitAttribution2", label = "Analyze",
+                       style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4")
-      }
-    )
+        }
+      )
   })
   
-  observeEvent(input$selectedSampleFromCatalogForAttribution, {
+  observeEvent(input$selectedSigSubset2, {
     output$analyzeButton3 <- renderUI(
       {
         actionButton(inputId = "submitAttribution3", label = "Analyze",
@@ -474,8 +480,6 @@ app_server <- function(input, output,session) {
       }
     )
   })
-  
-  
   
   observeEvent(input$submitAttribution2, {
     if (length(plot.names) > 0) {
@@ -486,7 +490,7 @@ app_server <- function(input, output,session) {
     
     spect <- catalog[, input$selectedSampleFromCatalogForAttribution, drop = FALSE]
     catalog.type <- input$selectedCatalogType
-    cancer.type <- input$selectedcancertype
+    cancer.type <- input$selectedCancerType
     region <- input$region2
     
     if (catalog.type == "SBS192") {
@@ -533,13 +537,14 @@ app_server <- function(input, output,session) {
       tibble::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
     
     r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, use.sig.names = TRUE)
-    reconstructed.catalog <- as.catalog(r.qp)
+    reconstructed.catalog0 <- as.catalog(r.qp, ref.genome = input$ref.genome2, 
+                                         region = input$region2)
     
-    cossim <- round(mSigAct::cossim(spect, reconstructed.catalog), 5)
+    cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
     
-    colnames(reconstructed.catalog) <- 
-      paste0("MAP+QP (cosine similarity = ", cossim, ")")
-    reconstructed.catalog1 <- round(reconstructed.catalog)
+    colnames(reconstructed.catalog0) <- 
+      paste0("reconstructed (cosine similarity = ", cossim, ")")
+    reconstructed.catalog <- round(reconstructed.catalog0)
     
     max_plots <- nrow(QP.best.MAP.exp) + 2
     output$sigContributionPlot <- renderUI({
@@ -567,7 +572,7 @@ app_server <- function(input, output,session) {
           )
         } else if (my_i == 2) {
           output[[plotname]] <- renderPlot(
-            expr = ICAMS::PlotCatalog(reconstructed.catalog1)
+            expr = ICAMS::PlotCatalog(reconstructed.catalog)
             #width = 800, height = 200)
           )
         } else {
@@ -600,7 +605,7 @@ app_server <- function(input, output,session) {
     
     spect <- catalog[, input$selectedSampleFromCatalogForAttribution, drop = FALSE]
     catalog.type <- input$selectedCatalogType
-    cancer.type <- input$selectedcancertype
+    cancer.type <- input$selectedCancerType
     region <- input$region2
     
     if (catalog.type == "SBS192") {
@@ -647,13 +652,14 @@ app_server <- function(input, output,session) {
       tibble::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
     
     r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, use.sig.names = TRUE)
-    reconstructed.catalog <- as.catalog(r.qp)
+    reconstructed.catalog0 <- as.catalog(r.qp, ref.genome = input$ref.genome2, 
+                                         region = input$region2)
     
-    cossim <- round(mSigAct::cossim(spect, reconstructed.catalog), 5)
+    cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
     
-    colnames(reconstructed.catalog) <- 
+    colnames(reconstructed.catalog0) <- 
       paste0("reconstructed (cosine similarity = ", cossim, ")")
-    reconstructed.catalog1 <- round(reconstructed.catalog)
+    reconstructed.catalog <- round(reconstructed.catalog0)
     
     max_plots <- nrow(QP.best.MAP.exp) + 2
     output$sigContributionPlot <- renderUI({
@@ -681,7 +687,7 @@ app_server <- function(input, output,session) {
           )
         } else if (my_i == 2) {
           output[[plotname]] <- renderPlot(
-            expr = ICAMS::PlotCatalog(reconstructed.catalog1)
+            expr = ICAMS::PlotCatalog(reconstructed.catalog)
             #width = 800, height = 200)
           )
         } else {
@@ -701,8 +707,24 @@ app_server <- function(input, output,session) {
     for (i in length(plot.names)) {
       shinyjs::show(id = plot.names[i])
     }
-    
-    
+  })
+  
+  observeEvent(input$submitAttribution1, {
+    output$bookmarkButton <- renderUI(
+      bookmarkButton()
+    )
+  })
+  
+  observeEvent(input$submitAttribution2, {
+    output$bookmarkButton <- renderUI(
+      bookmarkButton()
+    )
+  })
+  
+  observeEvent(input$submitAttribution3, {
+    output$bookmarkButton <- renderUI(
+      bookmarkButton()
+    )
   })
   
   # When user clicks the "Remove notifications" button, all the previous

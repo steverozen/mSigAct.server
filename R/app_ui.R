@@ -240,17 +240,22 @@ SignatureAttributionUI <- function() {
 
           y <- uiOutput(outputId = "selectSampleFromCatalogForAttribution"),
 
-          y1 <- uiOutput(outputId = "selectcancertype"),
+          y1 <- uiOutput(outputId = "selectCancerType"),
 
           y2 <- uiOutput(outputId = "choosecatalogtype"),
 
           x3 <- uiOutput(outputId = "chooseSigSubsetForSampleFromVCF"),
           y5 <- uiOutput(outputId = "analyzeButton3"),
+          #x7 <- uiOutput(outputId = "bookmarkButton3"),
+          
+          br(),
           y4 <- uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog"),
 
           x5 <- uiOutput(outputId = "analyzeButton1"),
           y6 <- uiOutput(outputId = "analyzeButton2"),
-          bookmarkButton()
+          br(),
+          x8 <- uiOutput(outputId = "bookmarkButton"),
+          #x7 <- uiOutput(outputId = "bookmarkButton2")
       ),
 
       mainPanel(

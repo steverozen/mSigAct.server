@@ -1044,5 +1044,60 @@ TransCountsCatalogToDensity <- function(list) {
 }
 
 
+#' Title
+#'
+#' @param list.of.catalogs 
+#' 
+#' @param file 
+#' 
+#' @param plot.SBS12 
+#' 
+#' @param cex 
+#' 
+#' @param grid 
+#' 
+#' @param upper 
+#' 
+#' @param xlabels 
+#' 
+#' @param ylim 
+#'
+#' @return 
+PlotListOfCatalogsToPdf <- function(list.of.catalogs, 
+                                    file, 
+                                    plot.SBS12, 
+                                    cex     = 0.8,
+                                    grid    = TRUE, 
+                                    upper   = TRUE, 
+                                    xlabels = TRUE,
+                                    ylim    = NULL) {
+    old.par.tck.value <- par("tck")
+    # Setting the width and length for A4 size plotting
+    grDevices::pdf(file, width = 8.2677, height = 11.6929, onefile = TRUE)
+    par(tck = old.par.tck.value)
+    # opar <- par(no.readonly = TRUE)
+    
+    
+    num.of.catalogs <- length(list.of.catalogs)
+    opar <- par(mfrow = c(8, 1), mar = c(4, 5.5, 2, 1), oma = c(1, 1, 2, 1))
+    on.exit(par(opar))
+    
+    for (i in 1:num.of.catalogs) {
+      catalog <- list.of.catalogs[[i]]
+      num.of.samples <- ncol(catalog)
+      
+      for (j in 1:num.of.samples) {
+        cat <- catalog[, j, drop = FALSE]
+        PlotCatalog(cat, plot.SBS12 = plot.SBS12, cex = cex, grid = grid, 
+                    upper = upper, xlabels = xlabels, ylim = ylim)
+      }
+      
+    }
+    
+    grDevices::dev.off()
+    invisible(list(plot.success = TRUE))
+  }
+
+
 
 
