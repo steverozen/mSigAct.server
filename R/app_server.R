@@ -3,8 +3,8 @@
 app_server <- function(input, output,session) {
   # List the first level callModules here
   
-  # Need to exclude the buttons from themselves being bookmarked
-  #setBookmarkExclude(c("bookmark1"))
+  plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
+                             sig.universe = NULL, QP.best.MAP.exp = NULL)
   
   hideTab(inputId = "panels", target = "tab4")
   
@@ -546,6 +546,12 @@ app_server <- function(input, output,session) {
       paste0("reconstructed (cosine similarity = ", cossim, ")")
     reconstructed.catalog <- round(reconstructed.catalog0)
     
+    
+    plotdata$spect <<- spect
+    plotdata$reconstructed.catalog <<- reconstructed.catalog
+    plotdata$sig.universe <<- sig.universe
+    plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
+    
     max_plots <- nrow(QP.best.MAP.exp) + 2
     output$sigContributionPlot <- renderUI({
       plot_output_list <- lapply(1:max_plots, function(i) {
@@ -661,6 +667,11 @@ app_server <- function(input, output,session) {
       paste0("reconstructed (cosine similarity = ", cossim, ")")
     reconstructed.catalog <- round(reconstructed.catalog0)
     
+    plotdata$spect <<- spect
+    plotdata$reconstructed.catalog <<- reconstructed.catalog
+    plotdata$sig.universe <<- sig.universe
+    plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
+    
     max_plots <- nrow(QP.best.MAP.exp) + 2
     output$sigContributionPlot <- renderUI({
       plot_output_list <- lapply(1:max_plots, function(i) {
@@ -708,6 +719,76 @@ app_server <- function(input, output,session) {
       shinyjs::show(id = plot.names[i])
     }
   })
+  
+  
+  # Save extra values in state$values when we bookmark
+  onBookmark(function(state) {
+    state$values$previousSpect <- plotdata$spect
+    state$values$previousReconstructed.catalog <- plotdata$reconstructed.catalog
+    state$values$previousSig.universe <- plotdata$sig.universe
+    state$values$previousQP.best.MAP.exp <- plotdata$QP.best.MAP.exp
+  })
+  
+  # Read values from state$values when we restore
+  onRestore(function(state) {
+    spect <- state$values$previousSpect
+    reconstructed.catalog <- state$values$previousReconstructed.catalog
+    sig.universe <- state$values$previousSig.universe
+    QP.best.MAP.exp <- state$values$previousQP.best.MAP.exp
+    
+    #spect <- plotdata$spect
+    #reconstructed.catalog <- plotdata$reconstructed.catalog 
+    #sig.universe <- plotdata$sig.universe 
+    #QP.best.MAP.exp <- plotdata$QP.best.MAP.exp 
+    
+    max_plots <- nrow(QP.best.MAP.exp) + 2
+    output$sigContributionPlot <- renderUI({
+      plot_output_list <- lapply(1:max_plots, function(i) {
+        plotname <- paste("plot", i, sep="")
+        plot.names[i] <<- plotname
+        plotOutput(plotname)
+      })
+      
+      tagList(plot_output_list)
+    })
+    
+    for (i in 1:max_plots) {
+      # Need local so that each item gets its own number. Without it, the value
+      # of i in the renderPlot() will be the same across all instances, because
+      # of when the expression is evaluated.
+      local({
+        my_i <- i
+        plotname <- paste("plot", my_i, sep="")
+        
+        if (my_i == 1) {
+          output[[plotname]] <- renderPlot(
+            expr = ICAMS::PlotCatalog(spect)
+            #width = 800, height = 200, 
+          )
+        } else if (my_i == 2) {
+          output[[plotname]] <- renderPlot(
+            expr = ICAMS::PlotCatalog(reconstructed.catalog)
+            #width = 800, height = 200)
+          )
+        } else {
+          output[[plotname]] <- renderPlot({
+            sig.name <- QP.best.MAP.exp$sig.id[my_i-2]
+            sig.catalog <- sig.universe[, sig.name, drop = FALSE]
+            colnames(sig.catalog) <- 
+              paste0(sig.name, " (exposure = ", 
+                     round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
+            ICAMS::PlotCatalog(sig.catalog)
+            
+          }) #width = 800, height = 200)
+        }
+      })
+    }
+  })
+  
+  # Exclude the Analyze button from bookmarking
+  
+  setBookmarkExclude(c("submitAttribution1", "submitAttribution2", 
+                       "submitAttribution3"))
   
   observeEvent(input$submitAttribution1, {
     output$bookmarkButton <- renderUI(
