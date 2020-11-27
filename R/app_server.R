@@ -21,10 +21,13 @@ app_server <- function(input, output,session) {
                                    selected = "tab3")
   })
 
-  # Create an empty list which can be used to store notification ids later
+  # Create an empty list which can be used to store notification ids for
+  # generating catalogs later
   ids <- list("error" = character(0), "warning" = character(0),
              "message" = character(0))
-
+  
+  # error.ids <- character(0)
+  
   # Create an empty list which can be used to store the return value of processing VCFs
   retval <- list()
 
@@ -87,23 +90,13 @@ app_server <- function(input, output,session) {
     output$IDplot <- NULL
   }
   
-  
-  vcftype <- reactive({
-    validate(
-      need(input$vcftype %in% c("strelka.sbs", "strelka.id", "mutect"),
-           label = "variant caller")
-    )
-    paste0(input$vcftype, "test")
-  })
-  
-  output$testoutput <- renderText(
-    vcftype()
-  )
-  
   # When user submits VCF to analysis, then the program will try to
   # generate a zip archive based on the input files and parameters
   output$download <- downloadHandler(
+
     filename = function() {
+      errors <- CheckInputsForVCF(input)
+      ids$error <<- AddErrorMessage(errors)
       paste0(input$zipfile.name, ".zip")
     },
 
@@ -115,7 +108,9 @@ app_server <- function(input, output,session) {
 
         result <- ProcessStrelkaSBSVCFs(input, output, file, ids)
         retval <<- result$retval
+        old.error.ids <- ids$error
         ids <<- result$ids
+        ids$error <- append(ids$error, old.error.ids)
 
         counts.catalog <- retval$counts
         density.catalog <- retval$density
@@ -261,18 +256,43 @@ app_server <- function(input, output,session) {
           )
         })
       } else if (input$vcftype == "strelka.id") {
+        old.error.ids <- ids$error
         ids <<- ProcessStrelkaIDVCFs(input, output, file, ids)
+        ids$error <- append(ids$error, old.error.ids)
       } else if (input$vcftype == "mutect") {
+        old.error.ids <- ids$error
         ids <<- ProcessMutectVCFs(input, output, file, ids)
+        ids$error <- append(ids$error, old.error.ids)
       }
 
       # When the downloadHandler function runs, increment rv$downloadFlag
       #rv$downloadFlag <- rv$downloadFlag + 1
     })
-
+  
+  observeEvent(input$upload.spectra, {
+    output$nextButton <- renderUI(
+      actionButton(inputId = "submitSpectra", label = "Next",
+                   style="color: #fff; background-color: #337ab7;
+                          border-color: #2e6da4")
+    )
+  })
+  
+  actionButton(inputId = "remove2",
+               label = "Remove notifications")
+  
+  observeEvent(input$submitSpectra, {
+    output$removeButton2 <- renderUI(
+      actionButton(inputId = "remove2",
+                   label = "Remove notifications")
+    )
+  })
+  
   # When user submit uploaded spectra for analysis, create radio buttons for
   # user to select the sample
   observeEvent(input$submitSpectra, {
+    errors <- CheckInputsForSpectra(input)
+    ids$error <<- AddErrorMessage(errors)
+    
     showTab(inputId = "panels", target = "tab4")
     showTab(inputId = "panels", target = "tab5")
     output$selectSampleFromUploadedCatalog <-
@@ -811,6 +831,10 @@ app_server <- function(input, output,session) {
   # When user clicks the "Remove notifications" button, all the previous
   # notifications(error, warning or message) will be removed
   observeEvent(input$remove, {
+    RemoveAllNotifications(ids)
+  })
+  
+  observeEvent(input$remove2, {
     RemoveAllNotifications(ids)
   })
 

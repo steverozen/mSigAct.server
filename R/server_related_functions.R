@@ -66,6 +66,59 @@ CatchToList <- function(expr) {
   list(error.info = error.info, retval = retval)
 }
 
+#' @keywords internal
+CheckInputsForSpectra <- function(input) {
+  error <- character(0)
+  if (is.null(input$ref.genome2)) {
+    error <- append(error, "Reference genome must be provided")
+  }
+  
+  if (is.null(input$region2)) {
+    error <- append(error, "Genomic region must be provided")
+  }
+  
+  return(error)
+}
+
+#' @keywords internal
+CheckInputsForVCF <- function(input) {
+  error <- character(0)
+  if (is.null(input$vcftype)) {
+    error <- append(error, "Type of VCF files must be provided")
+  }
+  
+  if (is.null(input$ref.genome)) {
+    error <- append(error, "Reference genome must be provided")
+  }
+  
+  
+  if (is.null(input$region)) {
+    error <- append(error, "Genomic region must be provided")
+  }
+  
+  return(error)
+}
+
+#' @keywords internal
+AddErrorMessage <- function(error) {
+  id <- NULL
+  
+  if (!is.null(error)) {
+    for (i in 1:length(error)) {
+      id.error <- showNotification(ui = "Error:", action = error[i],
+                                   duration = NULL, type = "error")
+      id <- append(id, id.error)
+    }
+  }
+  
+  return(id)
+}
+
+#' @keywords internal
+RemoveErrorMessage <- function(id) {
+  sapply(ids, FUN = removeNotification)
+}
+
 #' Add notifications on the client browser using errors, warnings or messages
 #' generated when executing an R expression
 #'

@@ -186,10 +186,10 @@ UploadSpectraUI <- function() {
     fixedRow(
       # Add a file upload control for user to upload spectra file
       column(6, UploadSpectra(),
-             actionButton(inputId = "submitSpectra", label = "Next",
-                          style="color: #fff;
-                                       background-color: #337ab7;
-                                       border-color: #2e6da4")),
+             uiOutput(outputId = "nextButton"),
+             br(),
+             uiOutput(outputId = "removeButton2"),
+             offset = 6)
     ),
 
     br(),
@@ -197,7 +197,8 @@ UploadSpectraUI <- function() {
     # Add a download button for user to download sample spectra to test
     fixedRow(column(6,
                     downloadButton(outputId = "downloadSampleSpectra",
-                                   label = "Download sample spectra")))
+                                   label = "Download sample spectra"),
+                    offset = 6))
 
   )
 }

@@ -115,7 +115,7 @@ AddZipfileName <- function() {
   textInput(inputId = "zipfile.name",
             label = p(strong(h5("Name of zip file to create", 
                                 style = "color: #337ab7"))),
-            value = "ICAMS.output")
+            value = "mSigAct-catalogs-output")
 }
 
 #' @import shiny
