@@ -123,7 +123,7 @@ AddZipfileName <- function() {
 UploadVCFFiles <- function() {
   div(
     fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
-              multiple = TRUE), style="color: #337ab7;")
+              multiple = TRUE, accept = ".vcf"), style="color: #337ab7;")
 }
 
 #' @import shiny
