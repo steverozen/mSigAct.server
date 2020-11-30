@@ -68,7 +68,7 @@ CatchToList <- function(expr) {
 
 #' @keywords internal
 CheckInputsForSpectra <- function(input) {
-  error <- character(0)
+  error <- NULL
   if (is.null(input$ref.genome2)) {
     error <- append(error, "Reference genome must be provided")
   }

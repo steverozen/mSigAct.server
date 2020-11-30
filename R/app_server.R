@@ -45,7 +45,7 @@ app_server <- function(input, output,session) {
   # Download sample VCFs when user clicks the button
   output$downloadsampleVCFs <- downloadHandler(
     filename = function() {
-      "sample-VCFs.zip"
+      "mSigAct-sample-VCFs.zip"
     },
     content = function(file) {
       PrepareSampleVCFs(file)
