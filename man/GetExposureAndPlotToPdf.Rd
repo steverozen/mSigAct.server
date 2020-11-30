@@ -15,8 +15,7 @@ GetExposureAndPlotToPdf(
 )
 }
 \arguments{
-\item{catalog}{A \strong{counts} catalog as defined in \code{\link{ICAMS}}.
-It can only has \strong{one} column.}
+\item{catalog}{A 1-column \strong{counts} catalog as defined in \code{\link{ICAMS}}.}
 
 \item{file}{The name of the PDF file to be produced.}
 
@@ -24,9 +23,9 @@ It can only has \strong{one} column.}
 
 \item{num.of.bootstrap.replicates}{The number of bootstrap replicates.}
 
-\item{method}{Method used to get the optimal solution for signature attribution.}
+\item{method}{Method to get the optimal solution for signature attribution.}
 
-\item{conf.int}{A number specifying the required confidence interval.}
+\item{conf.int}{The required confidence interval.}
 
 \item{...}{Optional arguments passed to \code{ICAMSxtra::PlotExposureToPdf}}
 }
@@ -35,8 +34,9 @@ Get signature exposure for one sample and plot to Pdf
 }
 \section{Value}{
 
-A matrix showing the signature exposure results for
-  \code{catalog} with lower and upper bound of the specified confidence
-  interval.
+  A matrix with one row per signature, with each row showing
+  lower and upper bounds of the confidence
+  interval and the mean of the estimated exposure,
+ only for those signatures with a lower bound  > 0.
 }
 
