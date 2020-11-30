@@ -123,15 +123,15 @@ AddZipfileName <- function() {
 UploadVCFFiles <- function() {
   div(
     fileInput(inputId = "vcf.files", label = "Choose VCF Files", 
-              multiple = TRUE, accept = ".vcf"), style="color: #337ab7;")
+              multiple = TRUE, accept = c(".vcf", ".VCF")), style="color: #337ab7;")
 }
 
 #' @import shiny
 #' @keywords internal
 UploadSpectra <- function() {
   div(
-    fileInput(inputId = "upload.spectra", label = "Choose spectra file"), 
-    style="color: #337ab7;")
+    fileInput(inputId = "upload.spectra", label = "Choose spectra file",
+              accept = c(".csv", ".CSV")), style="color: #337ab7;")
 }
 
 #' @import shiny
