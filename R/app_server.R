@@ -98,8 +98,9 @@ app_server <- function(input, output,session) {
   output$download <- downloadHandler(
 
     filename = function() {
+      
       errors <- CheckInputsForVCF(input)
-      ids$error <<- AddErrorMessage(errors)
+      ids$error <<- append(ids$error, AddErrorMessage(errors))
       paste0(input$zipfile.name, ".zip")
     },
 
@@ -280,9 +281,6 @@ app_server <- function(input, output,session) {
     )
   })
   
-  actionButton(inputId = "remove2",
-               label = "Remove notifications")
-  
   observeEvent(input$submitSpectra, {
     output$removeButton2 <- renderUI(
       actionButton(inputId = "remove2",
@@ -294,7 +292,7 @@ app_server <- function(input, output,session) {
   # user to select the sample
   observeEvent(input$submitSpectra, {
     errors <- CheckInputsForSpectra(input)
-    ids$error <<- AddErrorMessage(errors)
+    ids$error <<- append(ids$error, AddErrorMessage(errors))
     
     showTab(inputId = "panels", target = "tab4")
     showTab(inputId = "panels", target = "tab5")
