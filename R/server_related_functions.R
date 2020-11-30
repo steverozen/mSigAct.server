@@ -82,7 +82,7 @@ CheckInputsForSpectra <- function(input) {
 
 #' @keywords internal
 CheckInputsForVCF <- function(input) {
-  error <- character(0)
+  error <- NULL
   if (is.null(input$vcftype)) {
     error <- append(error, "Type of VCF files must be provided")
   }
@@ -1052,7 +1052,7 @@ RunICAMSOnSampleStrelkaSBSVCFs <- function(output, file, ids) {
     data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)
   input$names.of.VCFs <- paste(name, collapse = ", ")
   input$base.filename <- "HepG2"
-  input$zipfile.name <- "mSigAct-test-run-Strelka-SBS-VCFs"
+  input$zipfile.name <- "mSigAct-test-run-Strelka-SBS-VCFs-output"
   input$ref.genome <- "hg19"
   input$region <- "genome"
   ProcessStrelkaSBSVCFs(input, output, file, ids)
@@ -1069,7 +1069,7 @@ RunICAMSOnSampleMutectVCFs <- function(output, file, ids) {
   input$names.of.VCFs <- paste(name, collapse = ", ")
   input$tumor.col.names <- "NA"
   input$base.filename <- "HepG2"
-  input$zipfile.name <- "mSigAct-test-run-Mutect-VCFs"
+  input$zipfile.name <- "mSigAct-test-run-Mutect-VCFs-output"
   input$ref.genome <- "hg19"
   input$region <- "genome"
   ProcessMutectVCFs(input, output, file, ids)

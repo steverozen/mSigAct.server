@@ -60,20 +60,20 @@ app_server <- function(input, output,session) {
       PrepareSampleSpectra(file)
     })
 
-  # Run ICAMS on sample Strelka SBS VCFs when user clicks the button
+  # Run analysis on sample Strelka SBS VCFs when user clicks the button
   output$runstrelkasbsvcfs <- downloadHandler(
     filename = function() {
-      "ICAMS-test-run-Strelka-SBS-VCFs.zip"
+      "mSigAct-test-run-Strelka-SBS-VCFs-output.zip"
     },
     content = function(file) {
       ids <<-
         RunICAMSOnSampleStrelkaSBSVCFs(output, file, ids)
     })
 
-  # Run ICAMS on sample Mutect VCFs when user clicks the button
+  # Run analysis on sample Mutect VCFs when user clicks the button
   output$runmutectvcfs <- downloadHandler(
     filename = function() {
-      "ICAMS-test-run-Mutect-VCFs.zip"
+      "mSigAct-test-run-Mutect-VCFs-output.zip"
     },
     content = function(file) {
       ids <<-
