@@ -3,6 +3,9 @@
 app_server <- function(input, output,session) {
   # List the first level callModules here
   
+  # Increase the file upload limit to 100MB
+  options(shiny.maxRequestSize=100*1024^2)
+  
   plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
                              sig.universe = NULL, QP.best.MAP.exp = NULL)
   
