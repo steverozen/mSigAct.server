@@ -9,6 +9,11 @@ plan(multiprocess)
 app_server <- function(input, output,session) {
   # List the first level callModules here
   
+  fut <- NULL
+  result_val <- reactiveVal()
+  running <- reactiveVal(FALSE)
+  interruptor <- ipc::AsyncInterruptor$new()
+
   # Increase the file upload limit to 100MB
   options(shiny.maxRequestSize=100*1024^2)
   
@@ -509,6 +514,13 @@ app_server <- function(input, output,session) {
   })
   
   observeEvent(input$submitAttribution2, {
+    
+    #Don't do anything if in the middle of a run
+    if(running())
+      return(NULL)
+    running(TRUE)
+    
+    
     if (length(plot.names) > 0) {
       for (i in 1:length(plot.names)) {
         shinyjs::hide(id = plot.names[i])
@@ -551,11 +563,12 @@ app_server <- function(input, output,session) {
     progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
                                        message = "Analysis in progress",
                                        detail = "This may take a while...")
+    result_val(NULL)
     
-    future::future(
+    fut <- future::future(
       {
         # Close the progress when this reactive exits (even if there's an error)
-        on.exit(progress$close())
+        # on.exit(progress$close())
         
         # Create a callback function to update progress. Each time this is called, it
         # will increase the progress by that value and update the detail
@@ -578,8 +591,10 @@ app_server <- function(input, output,session) {
           eval_g_ineq = mSigAct::g_ineq_for_ObjFnBinomMaxLH2,
           m.opts = mSigAct::DefaultManyOpts(),
           max.mc.cores = 50,
-          each.level.callback.fn = updateProgress
+          each.level.callback.fn = updateProgress,
+          progressMonitor = function(df) interruptor$execInterrupts()
         )
+        
         return(retval)
       }) %...>% {
       retval <- .
@@ -656,11 +671,32 @@ app_server <- function(input, output,session) {
       for (i in length(plot.names)) {
         shinyjs::show(id = plot.names[i])
       }
+      
+      } %...>% result_val
+    
+    # Show notification on error or user interrupt
+    fut <- catch(fut,
+                 function(e){
+                   result_val(NULL)
+                   print(e$message)
+                   showNotification(e$message)
+                 })
+    
+    # When done with analysis, remove progress bar
+    fut <- finally(fut, function(){
+      progress$close()
+      running(FALSE) # Declare done with run
+    })
+    
+    # Return something other than the future so we don't block the UI
+    NULL
+  })
+  
+  # Send interrupt signal to future
+  observeEvent(input$cancel,{
+    if(running()) {
+      interruptor$interrupt("User Interrupt")
     }
-    
-    
-    
-    
   })
   
   observeEvent(input$submitAttributionOnTop, {
