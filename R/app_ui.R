@@ -254,7 +254,9 @@ SignatureAttributionUI <- function() {
 
           x5 <- uiOutput(outputId = "analyzeButtonForVCF"),
           y6 <- uiOutput(outputId = "analyzeButton2"),
-          actionButton(inputId = "cancel", label = "Cancel"),
+          br(),
+          uiOutput(outputId = "cancelButton"),
+          #actionButton(inputId = "cancel", label = "Cancel"),
           br(),
           x8 <- uiOutput(outputId = "bookmarkButton"),
           #x7 <- uiOutput(outputId = "bookmarkButton2")

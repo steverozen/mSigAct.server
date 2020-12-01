@@ -1,7 +1,7 @@
 library(promises)
 library(future)
-# Must use plan(multiprocess), otherwise the progress bar for async process will
-# not work properly
+# Cannot use plan(multicore), otherwise the progress bar for asynchronous
+# process will not work properly
 plan(multiprocess)
 
 #' @import shiny
@@ -592,7 +592,7 @@ app_server <- function(input, output,session) {
           m.opts = mSigAct::DefaultManyOpts(),
           max.mc.cores = 50,
           each.level.callback.fn = updateProgress,
-          progressMonitor = function(df) interruptor$execInterrupts()
+          progress.monitor = function(df) interruptor$execInterrupts()
         )
         
         return(retval)
@@ -881,6 +881,24 @@ app_server <- function(input, output,session) {
         }
       })
     }
+  })
+  
+  observeEvent(input$submitAttributionForVCF, {
+    output$cancelButton <- renderUI(
+      actionButton(inputId = "cancel", label = "Cancel")
+    )
+  })
+  
+  observeEvent(input$submitAttribution2, {
+    output$cancelButton <- renderUI(
+      actionButton(inputId = "cancel", label = "Cancel")
+    )
+  })
+  
+  observeEvent(input$submitAttributionOnTop, {
+    output$cancelButton <- renderUI(
+      actionButton(inputId = "cancel", label = "Cancel")
+    )
   })
   
   # Exclude the Analyze button from bookmarking
