@@ -476,7 +476,13 @@ app_server <- function(input, output,session) {
                                          tumor.cohort = "PCAWG",
                                          sig.type = input$selectedCatalogType,
                                          region = "genome")
-            selected.sig.universe <- colnames(tmp)
+            selected.sig.universe0 <- colnames(tmp)
+            
+            # Exclude possible artifact signatures
+            possible.artifacts <- mSigAct::PossibleArtifacts()
+            
+            selected.sig.universe <- 
+              setdiff(selected.sig.universe0, possible.artifacts)
           }
           
           selectInput(inputId = "selectedSigSubset2",
