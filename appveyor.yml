@@ -33,8 +33,8 @@ build_script:
   #- travis-tool.sh bioc_install BSgenome.Hsapiens.1000genomes.hs37d5
   #- travis-tool.sh bioc_install BSgenome.Hsapiens.UCSC.hg38
   #- travis-tool.sh bioc_install BSgenome.Mmusculus.UCSC.mm10
-  - travis-tool.sh bioc_install GenomeInfoDbData
   - travis-tool.sh install_deps
+  - travis-tool.sh bioc_install GenomeInfoDbData
 
 test_script:
   - travis-tool.sh run_tests
