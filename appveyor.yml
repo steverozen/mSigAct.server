@@ -17,6 +17,7 @@ environment:
   global:
     R_VERSION: stable
     USE_RTOOLS: true
+    BIOC_USE_DEVEL: "FALSE"
     PKGTYPE: binary
     _R_CHECK_FORCE_SUGGESTS_: false
     CRAN: "https://cloud.r-project.org"
