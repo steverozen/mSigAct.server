@@ -15,25 +15,26 @@ cache:
 
 environment:
   global:
-    R_ARCH: x64
+    R_VERSION: stable
     USE_RTOOLS: true
-    BIOC_USE_DEVEL: "FALSE"
+    PKGTYPE: binary
     _R_CHECK_FORCE_SUGGESTS_: false
     CRAN: "https://cloud.r-project.org"
+    R_REMOTES_STANDALONE: true
   # NOT_CRAN: true
   # env vars that may need to be set, at least temporarily, from time to time
   # see https://github.com/krlmlr/r-appveyor#readme for details
   # USE_RTOOLS: true
-  # R_REMOTES_STANDALONE: true
+  
 
 # Adapt as necessary starting from here
 
 build_script:
-  - travis-tool.sh bioc_install BSgenome.Hsapiens.1000genomes.hs37d5
-  - travis-tool.sh bioc_install BSgenome.Hsapiens.UCSC.hg38
-  - travis-tool.sh bioc_install BSgenome.Mmusculus.UCSC.mm10
-  - travis-tool.sh bioc_install GenomeInfoDbData
-  - travis-tool.sh install_deps
+  #- travis-tool.sh bioc_install BSgenome.Hsapiens.1000genomes.hs37d5
+  #- travis-tool.sh bioc_install BSgenome.Hsapiens.UCSC.hg38
+  #- travis-tool.sh bioc_install BSgenome.Mmusculus.UCSC.mm10
+  #- travis-tool.sh bioc_install GenomeInfoDbData
+  #- travis-tool.sh install_deps
 
 test_script:
   - travis-tool.sh run_tests
