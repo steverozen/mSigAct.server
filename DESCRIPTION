@@ -31,7 +31,7 @@ Imports: config,
     tibble,
     zip
 Remotes: github::steverozen/ICAMSxtra,
-    github::steverozen/mSigAct@master,
+    github::steverozen/mSigAct,
     github::steverozen/PCAWG7
 RoxygenNote: 7.1.1
 Suggests: BSgenome.Hsapiens.1000genomes.hs37d5,
