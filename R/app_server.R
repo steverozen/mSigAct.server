@@ -1,9 +1,10 @@
-library(promises)
-library(future)
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-plan(multisession)
+future::plan(future::multisession)
 
+#' @import tibble
+#' @import promises
+#' @import ipc
 #' @import shiny
 #' @import shinydashboard
 app_server <- function(input, output,session) {
@@ -602,7 +603,7 @@ app_server <- function(input, output,session) {
       MAP.best.exp <- retval$MAP
       
       QP.exp <- 
-        mSigAct:::OptimizeExposureQP(spect, 
+        mSigAct::OptimizeExposureQP(spect, 
                                      sig.universe[ , MAP.best.exp$sig.id, 
                                                    drop = FALSE])
       QP.best.MAP.exp <-
@@ -675,15 +676,15 @@ app_server <- function(input, output,session) {
       } %...>% result_val
     
     # Show notification on error or user interrupt
-    fut <- catch(fut,
-                 function(e){
-                   result_val(NULL)
-                   print(e$message)
-                   showNotification(e$message)
-                 })
+    fut <- promises::catch(fut,
+                           function(e){
+                             result_val(NULL)
+                             print(e$message)
+                             showNotification(e$message)
+                           })
     
     # When done with analysis, remove progress bar
-    fut <- finally(fut, function(){
+    fut <- promises::finally(fut, function(){
       progress$close()
       running(FALSE) # Declare done with run
     })
@@ -748,7 +749,7 @@ app_server <- function(input, output,session) {
         MAP.best.exp <- mapout$MAP
         
         QP.exp <- 
-          mSigAct:::OptimizeExposureQP(spect, sig.universe[ , 
+          mSigAct::OptimizeExposureQP(spect, sig.universe[ , 
                                                             MAP.best.exp$sig.id, 
                                                             drop = FALSE])
         QP.best.MAP.exp <-

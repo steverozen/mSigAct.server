@@ -37,36 +37,6 @@ decomposeQP <- function(m, P, ...){
   return(exposures)
 }
 
-#' decomposeSA Function
-#'
-#' This function allows to get the optimal solution by using simulated annealing to solve the optimization problem.
-#' @param m observed tumor profile vector for a single patient/sample, 96 by 1. m is normalized.
-#' @param P signature profile matrix, 96 by N(N = # signatures, COSMIC: N=30)
-#' @param control some control parameter that can be passed into the GenSA function
-#' @keywords simulated annealing
-#' @export
-#Wrapper for GenSA function to run simulated annealing
-decomposeSA <- function(m, P, control = list()) {
-  #objective function to be minimized
-  #local version of Frobenius norm to simplify and speed-up the objective function
-  FrobeniusNorm.local <- function(exposures) {
-    estimate = P %*% exposures
-    return(sqrt(sum((m - (estimate / sum(estimate)))^2)))
-  }
-  # N: how many signatures are selected
-  N = ncol(P)
-  #change our suggestion to control GenSA function based on user's requirements
-  our.control = list(maxit=1000, temperature=10, nb.stop.improvement=1000, simple.function=TRUE)
-  our.control[names(control)] = control
-  #Solve the problem using simulated annealing package GenSA
-  sa = GenSA::GenSA(lower=rep(0.0,N), upper=rep(1.0,N), fn=FrobeniusNorm.local, control=our.control)
-  #Normalize the solution
-  exposures = sa$par/sum(sa$par)
-  
-  return(exposures)
-}
-
-
 #' findSigExposures Function
 #' wrapper function
 #' This function allows to obtain the optimal solution by specifying quadratic programming or simulated annealing to solve the optimization problem.
@@ -158,52 +128,6 @@ bootstrapSigExposures <- function(m, P, R, mutation.count = NULL, decomposition.
   return(list(exposures=exposures, errors=errors))
 }
 
-#' suboptimalSigExposures Function
-#' This function allows to obtain the simulated annealing distribution of the signature exposures of a certain tumor sample
-#' @param m observed tumor profile vector for a patient/sample, 96 by 1. It can be mutation
-#' counts, or mutation probabilities.
-#' @param P signature profile matrix, 96 by N(N = # signatures, COSMIC: N=30)
-#' @param mutation.count if m is a vector of counts, then mutation.count equals the summation of all the counts.
-#'  If m is probabilities, then mutation.count has to be specified.
-#' @param R The number of replicates/trials of simulated annealing.
-#' @param optimal.error if it is NULL, then use SA method to obtain. Or you can provide one.
-#' @param suboptimal.factor suboptimal error.
-#' @param control some control parameter that can be passed into the function
-#' @keywords suboptimal 'simulated annealing'
-#' @keywords internal
-suboptimalSigExposures <- function(m, P, R, optimal.error = NULL, suboptimal.factor = 1.05, control = list()) {
-  ## process and check function parameters
-  ## m, P
-  P = as.matrix(P)
-  if(length(m) != nrow(P))
-    stop("Length of vector 'm' and number of rows of matrix 'P' must be the same.")
-  if(any(names(m) != rownames(P)))
-    stop("Elements of vector 'm' and rows of matrix 'P' must have the same names (mutations types).")
-  if(ncol(P) == 1)
-    stop("Matrices 'P' must have at least 2 columns (signatures).")
-  
-  ## normalize m to be a vector of probabilities.
-  m = m/sum(m)
-  
-  ## If optimal.error is null, we compute it by default SA method ('decomposeSA').
-  if(is.null(optimal.error)) {
-    sa_expos = decomposeSA(m, P, control)
-    optimal.error = FrobeniusNorm(m, P, sa_expos)
-  }
-  
-  ## find suboptimal solutions using simulated annealing with predefined error (with respect to optimal error)
-  control$threshold.stop = suboptimal.factor * optimal.error
-  ## matrix of signature exposures per replicate/trial (column)
-  exposures = replicate(R, decomposeSA(m, P, control))
-  rownames(exposures) = colnames(P)
-  colnames(exposures) = paste0('Replicate_',seq(R))
-  
-  ## compute estimation error for each replicate/trial (Frobenius norm)
-  errors = apply(exposures, 2, function(e) FrobeniusNorm(m,P,e))
-  names(errors) = colnames(exposures)
-  
-  return(list(exposures=exposures, errors=errors))
-}
 
 FrobeniusNorm <- function(M, P, E) {
   sqrt(sum((M-P%*%E)^2))

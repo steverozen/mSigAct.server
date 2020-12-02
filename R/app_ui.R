@@ -16,6 +16,7 @@ app_ui <- function(request) {
   )
 }
 
+#' @import shinyhelper
 #' @import shiny
 HomeUI <- function() {
   # List the first level UI elements here

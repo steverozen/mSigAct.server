@@ -9,31 +9,34 @@ Encoding: UTF-8
 LazyData: true
 Language: en-US
 biocViews:
-Imports: BSgenome.Hsapiens.1000genomes.hs37d5,
-    BSgenome.Hsapiens.UCSC.hg38,
-    BSgenome.Mmusculus.UCSC.mm10,
-    config,
+Depends: 
+    R (>= 3.5)
+Imports: config,
     data.table,
-    GenSA,
+    future,
     golem,
-    htmltools,
     ICAMS,
     ICAMSxtra,
+    htmltools,
+    ipc,
     mSigAct,
     PCAWG7,
-    pkgload,
+    promises,
     quadprog,
     shiny,
     shinydashboard,
+    shinyhelper,
     shinyjs,
     stringi,
+    tibble,
     zip
 Remotes: github::steverozen/ICAMSxtra,
     github::steverozen/mSigAct,
     github::steverozen/PCAWG7
 RoxygenNote: 7.1.1
-Suggests: 
+Suggests: BSgenome.Hsapiens.1000genomes.hs37d5,
+    BSgenome.Hsapiens.UCSC.hg38,
+    BSgenome.Mmusculus.UCSC.mm10,
     testthat (>= 2.1.0),
     shinytest
-Depends: 
-    R (>= 2.10)
+

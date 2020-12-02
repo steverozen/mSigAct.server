@@ -1096,26 +1096,12 @@ TransCountsCatalogToDensity <- function(list) {
   return(list1)
 }
 
+# Quiets concerns of R CMD check about no visible binding for global variable
+if(getRversion() >= "2.15.1") {
+  utils::globalVariables(c("%...>%", ".", "ids"))
+}
 
-#' Title
-#'
-#' @param list.of.catalogs 
-#' 
-#' @param file 
-#' 
-#' @param plot.SBS12 
-#' 
-#' @param cex 
-#' 
-#' @param grid 
-#' 
-#' @param upper 
-#' 
-#' @param xlabels 
-#' 
-#' @param ylim 
-#'
-#' @return 
+#' @keywords internal
 PlotListOfCatalogsToPdf <- function(list.of.catalogs, 
                                     file, 
                                     plot.SBS12, 
@@ -1124,16 +1110,14 @@ PlotListOfCatalogsToPdf <- function(list.of.catalogs,
                                     upper   = TRUE, 
                                     xlabels = TRUE,
                                     ylim    = NULL) {
-    old.par.tck.value <- par("tck")
+    old.par.tck.value <- graphics::par("tck")
     # Setting the width and length for A4 size plotting
     grDevices::pdf(file, width = 8.2677, height = 11.6929, onefile = TRUE)
-    par(tck = old.par.tck.value)
-    # opar <- par(no.readonly = TRUE)
-    
+    graphics::par(tck = old.par.tck.value)
     
     num.of.catalogs <- length(list.of.catalogs)
-    opar <- par(mfrow = c(8, 1), mar = c(4, 5.5, 2, 1), oma = c(1, 1, 2, 1))
-    on.exit(par(opar))
+    opar <- graphics::par(mfrow = c(8, 1), mar = c(4, 5.5, 2, 1), oma = c(1, 1, 2, 1))
+    on.exit(graphics::par(opar))
     
     for (i in 1:num.of.catalogs) {
       catalog <- list.of.catalogs[[i]]
@@ -1150,7 +1134,4 @@ PlotListOfCatalogsToPdf <- function(list.of.catalogs,
     grDevices::dev.off()
     invisible(list(plot.success = TRUE))
   }
-
-
-
 
