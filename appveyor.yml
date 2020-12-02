@@ -36,6 +36,7 @@ build_script:
   #- travis-tool.sh bioc_install BSgenome.Mmusculus.UCSC.mm10
   - travis-tool.sh install_deps
   - travis-tool.sh bioc_install GenomeInfoDbData
+  - travis-tool.sh install_github steverozen/ICAMSxtra
 
 test_script:
   - travis-tool.sh run_tests
