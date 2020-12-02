@@ -2,7 +2,7 @@ library(promises)
 library(future)
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-plan(multiprocess)
+plan(multisession)
 
 #' @import shiny
 #' @import shinydashboard
@@ -579,7 +579,8 @@ app_server <- function(input, output,session) {
           # value = 1/max.level - 0.01,
           # detail = paste0("Testing removal of subsets of ", df, " signatures (",
           #                 length(subsets2), " subsets)"))
-          progress$inc(amount = value + 0.01, detail = detail)
+          progress$inc(amount = value, detail = detail)
+          interruptor$execInterrupts()
         }
         retval <- mSigAct::MAPAssignActivity1(
           spect = spect,
@@ -591,8 +592,7 @@ app_server <- function(input, output,session) {
           eval_g_ineq = mSigAct::g_ineq_for_ObjFnBinomMaxLH2,
           m.opts = mSigAct::DefaultManyOpts(),
           max.mc.cores = 50,
-          each.level.callback.fn = updateProgress,
-          progress.monitor = function(df) interruptor$execInterrupts()
+          progress.monitor = updateProgress
         )
         
         return(retval)
@@ -695,7 +695,7 @@ app_server <- function(input, output,session) {
   # Send interrupt signal to future
   observeEvent(input$cancel,{
     if(running()) {
-      interruptor$interrupt("User Interrupt")
+      interruptor$interrupt("Task cancelled")
     }
   })
   
