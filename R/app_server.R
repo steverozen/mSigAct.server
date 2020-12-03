@@ -604,81 +604,94 @@ app_server <- function(input, output,session) {
         
         return(retval)
       }) %...>% {
-      retval <- .
-      
-      MAP.best.exp <- retval$MAP
-      
-      QP.exp <- 
-        mSigAct::OptimizeExposureQP(spect, 
-                                     sig.universe[ , MAP.best.exp$sig.id, 
-                                                   drop = FALSE])
-      QP.best.MAP.exp <-
-        tibble::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
-      
-      r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
-                                           use.sig.names = TRUE)
-      reconstructed.catalog0 <- 
-        as.catalog(r.qp, ref.genome = input$ref.genome2, 
-                   region = input$region2)
-      
-      cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
-      
-      colnames(reconstructed.catalog0) <- 
-        paste0("reconstructed (cosine similarity = ", cossim, ")")
-      reconstructed.catalog <- round(reconstructed.catalog0)
-      
-      plotdata$spect <<- spect
-      plotdata$reconstructed.catalog <<- reconstructed.catalog
-      plotdata$sig.universe <<- sig.universe
-      plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
-      
-      max_plots <- nrow(QP.best.MAP.exp) + 2
-      output$sigContributionPlot <- renderUI({
-        plot_output_list <- lapply(1:max_plots, function(i) {
-          plotname <- paste("plot", i, sep="")
-          plot.names[i] <<- plotname
-          plotOutput(plotname)
-        })
+        retval <- .
         
-        tagList(plot_output_list)
-      })
-      
-      for (i in 1:max_plots) {
-        # Need local so that each item gets its own number. Without it, the value
-        # of i in the renderPlot() will be the same across all instances, because
-        # of when the expression is evaluated.
-        local({
-          my_i <- i
-          plotname <- paste("plot", my_i, sep="")
+        if (retval$success == FALSE || is.null(retval$success)) {
+          output$sigContributionPlot <- renderUI({
+            output$attributionMessage <- 
+              renderText(paste0("The algorithm could not find the optimal number of ", 
+                                "signatures that explain the spectrum. Please reduce the ", 
+                                "number of signatures used."))
+            tagList(
+              textOutput(outputId = "attributionMessage")
+            )
+          })
+        } else {
+          MAP.best.exp <- retval$MAP
           
-          if (my_i == 1) {
-            output[[plotname]] <- renderPlot(
-              expr = ICAMS::PlotCatalog(spect)
-              #width = 800, height = 200, 
-            )
-          } else if (my_i == 2) {
-            output[[plotname]] <- renderPlot(
-              expr = ICAMS::PlotCatalog(reconstructed.catalog)
-              #width = 800, height = 200)
-            )
-          } else {
-            output[[plotname]] <- renderPlot({
-              sig.name <- QP.best.MAP.exp$sig.id[my_i-2]
-              sig.catalog <- sig.universe[, sig.name, drop = FALSE]
-              colnames(sig.catalog) <- 
-                paste0(sig.name, " (exposure = ", 
-                       round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
-              ICAMS::PlotCatalog(sig.catalog)
+          QP.exp <- 
+            mSigAct::OptimizeExposureQP(spect, 
+                                        sig.universe[ , MAP.best.exp$sig.id, 
+                                                      drop = FALSE])
+          QP.best.MAP.exp <-
+            tibble::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
+          
+          r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
+                                               use.sig.names = TRUE)
+          reconstructed.catalog0 <- 
+            as.catalog(r.qp, ref.genome = input$ref.genome2, 
+                       region = input$region2)
+          
+          cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
+          
+          colnames(reconstructed.catalog0) <- 
+            paste0("reconstructed (cosine similarity = ", cossim, ")")
+          reconstructed.catalog <- round(reconstructed.catalog0)
+          
+          plotdata$spect <<- spect
+          plotdata$reconstructed.catalog <<- reconstructed.catalog
+          plotdata$sig.universe <<- sig.universe
+          plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
+          
+          max_plots <- nrow(QP.best.MAP.exp) + 2
+          output$sigContributionPlot <- renderUI({
+            plot_output_list <- lapply(1:max_plots, function(i) {
+              plotname <- paste("plot", i, sep="")
+              plot.names[i] <<- plotname
+              plotOutput(plotname)
+            })
+            
+            tagList(plot_output_list)
+          })
+          
+          for (i in 1:max_plots) {
+            # Need local so that each item gets its own number. Without it, the value
+            # of i in the renderPlot() will be the same across all instances, because
+            # of when the expression is evaluated.
+            local({
+              my_i <- i
+              plotname <- paste("plot", my_i, sep="")
               
-            }) #width = 800, height = 200)
+              if (my_i == 1) {
+                output[[plotname]] <- renderPlot(
+                  expr = ICAMS::PlotCatalog(spect)
+                  #width = 800, height = 200, 
+                )
+              } else if (my_i == 2) {
+                output[[plotname]] <- renderPlot(
+                  expr = ICAMS::PlotCatalog(reconstructed.catalog)
+                  #width = 800, height = 200)
+                )
+              } else {
+                output[[plotname]] <- renderPlot({
+                  sig.name <- QP.best.MAP.exp$sig.id[my_i-2]
+                  sig.catalog <- sig.universe[, sig.name, drop = FALSE]
+                  colnames(sig.catalog) <- 
+                    paste0(sig.name, " (exposure = ", 
+                           round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
+                  ICAMS::PlotCatalog(sig.catalog)
+                  
+                }) #width = 800, height = 200)
+              }
+            })
           }
-        })
-      }
-      
-      for (i in length(plot.names)) {
-        shinyjs::show(id = plot.names[i])
-      }
-      
+          
+          for (i in length(plot.names)) {
+            shinyjs::show(id = plot.names[i])
+          }
+          
+        }
+        
       } %...>% result_val
     
     # Show notification on error or user interrupt
