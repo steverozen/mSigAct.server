@@ -682,12 +682,12 @@ app_server <- function(input, output,session) {
               if (my_i == 1) {
                 output[[plotname]] <- renderPlot(
                   expr = ICAMS::PlotCatalog(spect)
-                  #width = 800, height = 200, 
+                  ,width = 800, height = 260
                 )
               } else if (my_i == 2) {
                 output[[plotname]] <- renderPlot(
                   expr = ICAMS::PlotCatalog(reconstructed.catalog)
-                  #width = 800, height = 200)
+                  ,width = 800, height = 260
                 )
               } else {
                 output[[plotname]] <- renderPlot({
@@ -698,7 +698,7 @@ app_server <- function(input, output,session) {
                            round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
                   ICAMS::PlotCatalog(sig.catalog)
                   
-                }) #width = 800, height = 200)
+                }, width = 800, height = 260) 
               }
             })
           }
@@ -874,12 +874,12 @@ app_server <- function(input, output,session) {
               if (my_i == 1) {
                 output[[plotname]] <- renderPlot(
                   expr = ICAMS::PlotCatalog(spect)
-                  #width = 800, height = 200, 
+                  , width = 800, height = 260
                 )
               } else if (my_i == 2) {
                 output[[plotname]] <- renderPlot(
                   expr = ICAMS::PlotCatalog(reconstructed.catalog)
-                  #width = 800, height = 200)
+                  , width = 800, height = 260
                 )
               } else {
                 output[[plotname]] <- renderPlot({
@@ -890,7 +890,7 @@ app_server <- function(input, output,session) {
                            round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
                   ICAMS::PlotCatalog(sig.catalog)
                   
-                }) #width = 800, height = 200)
+                }, width = 800, height = 260)
               }
             })
           }
