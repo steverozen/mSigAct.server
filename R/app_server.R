@@ -928,19 +928,22 @@ app_server <- function(input, output,session) {
   
   observeEvent(input$submitAttributionForVCF, {
     output$bookmarkButton <- renderUI(
-      bookmarkButton()
+      bookmarkButton(label = "Save the session",
+                     title = "This application's state can be saved on the server for 12 hours.")
     )
   })
   
   observeEvent(input$submitAttribution2, {
     output$bookmarkButton <- renderUI(
-      bookmarkButton()
+      bookmarkButton(label = "Save the session",
+                     title = "This application's state can be saved on the server for 12 hours.")
     )
   })
   
   observeEvent(input$submitAttributionOnTop, {
     output$bookmarkButton <- renderUI(
-      bookmarkButton()
+      bookmarkButton(label = "Save the session",
+                     title = "This application's state can be saved on the server for 12 hours.")
     )
   })
   
