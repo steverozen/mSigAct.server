@@ -396,6 +396,23 @@ app_server <- function(input, output,session) {
                             drop = FALSE])})
     }
   })
+  
+  # When user selects the sample from uploaded catalog, show
+  # the sample's mutational spectrum
+  observeEvent(input$selectedSampleFromUploadedCatalog, {
+    
+    output$spectraPlot <- renderUI(
+      {
+        output$spectrum <- renderPlot(
+          {
+            PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
+                                drop = FALSE])
+          }, width = 800, height = 260)
+        plotOutput(outputId = "spectrum")
+      }
+    )
+        
+  })
 
   observeEvent(input$submitSpectra, {
     output$selectSampleFromCatalogForAttribution <- renderUI(

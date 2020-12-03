@@ -216,15 +216,22 @@ ShowSpectraUI <- function() {
       ),
 
       mainPanel(
-        tabsetPanel(type = "tabs",
-                    tabPanel("SBS96", plotOutput("SBS96plot")),
-                    tabPanel("SBS192", plotOutput("SBS192plot")),
-                    tabPanel("SBS1536", plotOutput("SBS1536plot")),
-                    tabPanel("DBS78", plotOutput("DBS78plot")),
-                    tabPanel("DBS136", plotOutput("DBS136plot")),
-                    tabPanel("DBS144", plotOutput("DBS144plot")),
-                    tabPanel("ID", plotOutput("IDplot"))
-        )
+        
+        
+        if (FALSE) {
+          tabsetPanel(type = "tabs",
+                      tabPanel("SBS96", plotOutput("SBS96plot")),
+                      tabPanel("SBS192", plotOutput("SBS192plot")),
+                      tabPanel("SBS1536", plotOutput("SBS1536plot")),
+                      tabPanel("DBS78", plotOutput("DBS78plot")),
+                      tabPanel("DBS136", plotOutput("DBS136plot")),
+                      tabPanel("DBS144", plotOutput("DBS144plot")),
+                      tabPanel("ID", plotOutput("IDplot"))
+          )
+        },
+        
+        uiOutput(outputId = "spectraPlot")
+        
       )
 
     )
