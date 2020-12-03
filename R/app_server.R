@@ -603,7 +603,7 @@ app_server <- function(input, output,session) {
         )
         
         return(retval)
-      }) %...>% {
+      }, seed = TRUE) %...>% {
         retval <- .
         
         if (retval$success == FALSE || is.null(retval$success)) {
@@ -795,7 +795,7 @@ app_server <- function(input, output,session) {
         )
         
         return(retval)
-      }) %...>% {
+      }, seed = TRUE) %...>% {
         retval <- .
         
         if (retval$success == FALSE || is.null(retval$success)) {
