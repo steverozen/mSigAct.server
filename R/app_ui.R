@@ -262,6 +262,8 @@ SignatureAttributionUI <- function() {
           x8 <- uiOutput(outputId = "bookmarkButton"),
           #x7 <- uiOutput(outputId = "bookmarkButton2")
           #x9 <- uiOutput(outputId = "restoreResults")
+          br(),
+          x9 <- uiOutput(outputId = "attributionResults"),
       ),
 
       mainPanel(

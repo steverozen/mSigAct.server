@@ -875,6 +875,31 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   return(list(retval = result$retval, ids = updated.ids))
 }
 
+PrepareAttributionResults <- function (input, file, plotdata) {
+  spect <- plotdata$spect
+  QP.best.MAP.exp <- plotdata$QP.best.MAP.exp
+  reconstructed.catalog <- plotdata$reconstructed.catalog
+  sig.universe <- plotdata$sig.universe
+  
+  sigs.names <- QP.best.MAP.exp$sig.id
+  sigs <- sig.universe[, sigs.names, drop = FALSE]
+  colnames(sigs) <- 
+    paste0(colnames(sigs), " (exposure = ", 
+           round(QP.best.MAP.exp$QP.best.MAP.exp), ")")
+  
+  list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
+  
+  output.file <- file.path(tempdir(), "result.pdf")
+  PlotListOfCatalogsToPdf(list.of.catalogs, file = output.file)
+  #plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
+  #                           sig.universe = NULL, QP.best.MAP.exp = NULL)
+  
+  #path <- system.file("extdata/mSigAct-sample-spectra.zip", 
+  #                    package = "ICAMS.shiny")
+  file.copy(from = output.file, to = file)
+}
+
+
 #' This function generates a zip archive from Strelka ID VCF files.
 #'
 #' @inheritParams GenerateZipFileFromMutectVCFs
