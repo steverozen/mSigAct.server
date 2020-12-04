@@ -13,8 +13,11 @@ app_ui <- function(request) {
       tabPanel(title = "Show spectra", ShowSpectraUI(), 
                value = "showSpectraTab"),
       tabPanel(title = "Signature attributions", SignatureAttributionUI(), 
-               value = "sigAttributionTab")
-    )
+               value = "sigAttributionTab"),
+      position = "fixed-top"),
+    
+    # Add padding because navbar pinned at the top
+    tags$style(type="text/css", "body {padding-top: 70px;}")
   )
 }
 
@@ -23,6 +26,8 @@ app_ui <- function(request) {
 HomeUI <- function() {
   # List the first level UI elements here
   fixedPage(
+    
+    
     # Add a title on top the page
     titlePanel(title = p("mSigAct: Mutational Signature Activity",
                          style = "color: #337ab7"),
