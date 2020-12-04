@@ -190,8 +190,12 @@ UploadSpectraUI <- function() {
       # Add a file upload control for user to upload spectra file
       column(6, offset = 6,
              UploadSpectra(),
-             downloadButton(outputId = "downloadSampleSpectra",
-                            label = "Download sample spectra")
+             splitLayout(
+               cellWidths = c("25%", "75%"),
+               actionButton(inputId = "preloadSpectra", label = "Preload spectra"),
+               downloadButton(outputId = "downloadSampleSpectra",
+                              label = "Download sample spectra")
+             )
              )
       
     ),

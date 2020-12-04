@@ -27,6 +27,7 @@ Imports: config,
     shinydashboard,
     shinyhelper,
     shinyjs,
+    shinyWidgets,
     stringi,
     tibble,
     zip

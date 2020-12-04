@@ -1,3 +1,5 @@
+# Send interrupt signal to future
+
 submitAttribution <- reactive({
   list(input$submitAttributionOnTop, input$submitAttribution2)
 })
