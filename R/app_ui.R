@@ -7,11 +7,13 @@ app_ui <- function(request) {
     navbarPage(title = "mSigAct", id = "panels",
       tabPanel(title = "Home", HomeUI()),
       tabPanel(title = "Generate spectrum catalogs from VCFs",
-               UploadVCFUI(), value = "tab2"),
-      tabPanel(title = "Upload spectra", UploadSpectraUI(), value = "tab3"),
-      tabPanel(title = "Show spectra", ShowSpectraUI(), value = "tab4"),
+               UploadVCFUI(), value = "generateCatalogTab"),
+      tabPanel(title = "Upload spectra", UploadSpectraUI(), 
+               value = "uploadSpectraTab"),
+      tabPanel(title = "Show spectra", ShowSpectraUI(), 
+               value = "showSpectraTab"),
       tabPanel(title = "Signature attributions", SignatureAttributionUI(), 
-               value = "tab5")
+               value = "sigAttributionTab")
     )
   )
 }
@@ -34,10 +36,10 @@ HomeUI <- function() {
     h5("This web site has two main functions:"),
 
     h5(tags$ol(
-      tags$li(actionLink(inputId = "linkToTab2",
+      tags$li(actionLink(inputId = "linkToGenerateCatalogTab",
                    label = "Create and plot mutational spectrum \"catalogs\" from VCF* files")),
       br(),
-      tags$li(actionLink(inputId = "linkToTab3",
+      tags$li(actionLink(inputId = "linkToUploadSpectraTab",
                    label = paste0("Estimate which mutational signatures contributed to a ",
                  "mutational spectrum"))),
     )),
