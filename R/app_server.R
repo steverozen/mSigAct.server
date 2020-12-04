@@ -36,24 +36,6 @@ app_server <- function(input, output, session) {
                                    selected = "uploadSpectraTab")
   })
   
-  # When user clicks the action button on "Upload Spectra" page, direct user to
-  # the relevant tab
-  observeEvent(input$showSpectraFromCatalog, {
-    req(input$ref.genome2, input$region2)
-    showTab(inputId = "panels", target = "showSpectraTab")
-    showTab(inputId = "panels", target = "sigAttributionTab")
-    shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                   selected = "showSpectraTab")
-  })
-  
-  observeEvent(input$sigAttributionFromCatalog, {
-    req(input$ref.genome2, input$region2)
-    showTab(inputId = "panels", target = "showSpectraTab")
-    showTab(inputId = "panels", target = "sigAttributionTab")
-    shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                   selected = "sigAttributionTab")
-  })
-
   # Create an empty list which can be used to store notification ids for
   # generating catalogs later
   ids <- list("error" = character(0), "warning" = character(0),
@@ -66,6 +48,8 @@ app_server <- function(input, output, session) {
   catalog <- NA
   
   catalog.path <- input.catalog.type <- NA
+  
+  showSBS192Catalog <- TRUE
   
   plot.names <- vector(mode = "character")
 
@@ -368,11 +352,49 @@ app_server <- function(input, output, session) {
     }
   })
   
-  # When user clicks "Show spectra" for uploaded catalog, create radio buttons for
-  # user to select the sample
+  # Check the arguments for uploaded spectra
+  observeEvent(
+    CheckArgumentsForSpectra(),
+    {
+      if (TwoActionButtonsClicked(input) == FALSE) {
+        return()
+      } else {
+        retval <- CheckInputsForSpectra(input, catalog.path)
+        ids$error <<- append(ids$error, AddErrorMessage(retval$error))
+        showSBS192Catalog <<- retval$SBS192.check
+      }
+    }
+  )
+  
+  # When user clicks the action button on "Upload Spectra" page, direct user to
+  # the relevant tab
+  observeEvent(input$showSpectraFromCatalog, {
+    
+    if (TwoActionButtonsClicked(input) == FALSE) {
+      return()
+    } else if (showSBS192Catalog == FALSE) {
+      return()
+    } else {
+      req(input$ref.genome2, input$region2)
+      showTab(inputId = "panels", target = "showSpectraTab")
+      showTab(inputId = "panels", target = "sigAttributionTab")
+      shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                     selected = "showSpectraTab")
+    }
+  })
+
   observeEvent(CheckArgumentsForSpectra(), {
     
     req(input$ref.genome2, input$region2)
+    
+    # Delete the previous spectra plot
+    output$spectraPlotFromCatalog <- NULL
+    
+    
+    if (showSBS192Catalog == FALSE) {
+      return()
+    }
+    
     output$selectSampleFromUploadedCatalog <-
       renderUI(
         {
@@ -494,24 +516,14 @@ app_server <- function(input, output, session) {
     return(TRUE)
   }
   
-  # Check the arguments for uploaded spectra
-  observeEvent(
-    CheckArgumentsForSpectra(),
-    {
-      if (TwoActionButtonsClicked(input) == FALSE) {
-        return()
-      } else {
-        errors <- CheckInputsForSpectra(input)
-        ids$error <<- append(ids$error, AddErrorMessage(errors))
-      }
-      }
-  )
-  
-  
   observeEvent(
     CheckArgumentsForSpectra(),
     {
       req(input$ref.genome2, input$region2)
+      
+      if (showSBS192Catalog == FALSE) {
+        return()
+      }
       
       output$selectSampleFromCatalogForAttribution <- renderUI(
         { 
@@ -541,31 +553,28 @@ app_server <- function(input, output, session) {
                       choices = sample.names)
         }
       )
+      
+      output$selectCancerType <- renderUI(
+        {
+          cancer.types <-
+            c("Unknown", colnames(CancerTypeToExposureStatData()))
+          selectInput(inputId = "selectedCancerType",
+                      label = "Select the cancer type",
+                      choices = cancer.types)
+        }
+      )
+      
+      output$choosecatalogtype <- renderUI(
+        {
+          catalog.type <- c("SBS96", "SBS192", "DBS78", "ID")
+          selectInput(inputId = "selectedCatalogType",
+                      label = "Select the catalog type",
+                      choices = catalog.type,
+                      selected = input.catalog.type)
+        }
+      )
     })
 
-  observeEvent(CheckArgumentsForSpectra(), {
-  output$selectCancerType <- renderUI(
-    {
-      cancer.types <-
-        c("Unknown", colnames(CancerTypeToExposureStatData()))
-      selectInput(inputId = "selectedCancerType",
-                  label = "Select the cancer type",
-                  choices = cancer.types)
-    }
-  )
-  })
-
-  observeEvent(CheckArgumentsForSpectra(), {
-  output$choosecatalogtype <- renderUI(
-    {
-      catalog.type <- c("SBS96", "SBS192", "DBS78", "ID")
-      selectInput(inputId = "selectedCatalogType",
-                  label = "Select the catalog type",
-                  choices = catalog.type,
-                  selected = input.catalog.type)
-    }
-  )
-  })
 
   observeEvent(input$selectedCancerType, {
     if (input$selectedCancerType != "Unknown") {

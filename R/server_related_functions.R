@@ -67,8 +67,9 @@ CatchToList <- function(expr) {
 }
 
 #' @keywords internal
-CheckInputsForSpectra <- function(input) {
+CheckInputsForSpectra <- function(input, catalog.path) {
   error <- NULL
+  SBS192.check <- TRUE
   if (is.null(input$ref.genome2)) {
     error <- append(error, "Reference genome must be provided")
   }
@@ -77,7 +78,15 @@ CheckInputsForSpectra <- function(input) {
     error <- append(error, "Genomic region must be provided")
   }
   
-  return(error)
+  catalog <- ICAMS::ReadCatalog(catalog.path)
+  
+  if (nrow(catalog) == 192 && !(input$region2 %in% c("transcript", "exome"))) {
+    error <- append(error, paste0("The genomic region for SBS192 catalog should",
+                                  ' be either "transcript" or "exome"'))
+    SBS192.check <- FALSE
+  }
+  
+  return(list(error = error, SBS192.check = SBS192.check))
 }
 
 #' @keywords internal
