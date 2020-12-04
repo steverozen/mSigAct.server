@@ -230,7 +230,8 @@ ShowSpectraUI <- function() {
           )
         },
         
-        uiOutput(outputId = "spectraPlot")
+        uiOutput(outputId = "spectraPlotFromVCF"),
+        uiOutput(outputId = "spectraPlotFromCatalog")
         
       )
 

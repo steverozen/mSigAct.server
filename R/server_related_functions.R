@@ -875,6 +875,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   return(list(retval = result$retval, ids = updated.ids))
 }
 
+#' @keywords internal
 PrepareAttributionResults <- function (input, file, plotdata) {
   spect <- plotdata$spect
   QP.best.MAP.exp <- plotdata$QP.best.MAP.exp
@@ -1126,6 +1127,12 @@ if(getRversion() >= "2.15.1") {
   utils::globalVariables(c("%...>%", ".", "ids"))
 }
 
+#' Plot List of catalogs to Pdf
+#' 
+#' @param list.of.catalogs List of catalogs in \code{\link{ICAMS}} format.
+#'
+#' @inheritParams ICAMS::PlotCatalogToPdf
+#'
 #' @keywords internal
 PlotListOfCatalogsToPdf <- function(list.of.catalogs, 
                                     file, 
