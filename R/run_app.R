@@ -15,5 +15,5 @@ run_app <- function(...) {
 MyRunApp <- function() {
   enableBookmarking(store = "server")
   runApp(list(ui = app_ui, server = app_server),
-         host="127.0.0.1", port=8789, launch.browser = TRUE)
+         host="127.0.0.1", port=8790, launch.browser = TRUE)
 }

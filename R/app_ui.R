@@ -142,28 +142,28 @@ UploadVCFUI <- function() {
     # Add a download button for user to download VCF files to test
     fixedRow(column(6,
                     downloadButton(outputId = "downloadsampleVCFs",
-                                   label = "Download the sample VCFs"),
+                                   label = "Download example VCFs"),
                     offset = 6)),
 
     # Add one line break
     br(),
 
-    # Add a button for user to run analysis on sample Strelka SBS VCFs
+    # Add a button for user to run analysis on example Strelka SBS VCFs
     fixedRow(column(6,
                     MyDownloadButton(outputId = "runstrelkasbsvcfs",
                                      label =
-                                       paste0("Run analysis on two ",
+                                       paste0("Example analysis on two ",
                                               "1-sample Strelka SBS VCFs")),
                     offset = 6)),
 
     # Add one line break
     br(),
 
-    # Add a button for user to run analysis on sample Mutect VCFs
+    # Add a button for user to run analysis on example Mutect VCFs
     fixedRow(column(6,
                     MyDownloadButton(outputId = "runmutectvcfs",
                                      label =
-                                       paste0("Run analysis on two ",
+                                       paste0("Example analysis on two ",
                                               "1-sample Mutect VCFs")),
                     offset = 6)),
 
@@ -191,10 +191,11 @@ UploadSpectraUI <- function() {
       column(6, offset = 6,
              UploadSpectra(),
              splitLayout(
-               cellWidths = c("25%", "75%"),
-               actionButton(inputId = "preloadSpectra", label = "Preload spectra"),
+               cellWidths = c("40%", "60%"),
+               actionButton(inputId = "preloadSpectra", 
+                            label = "Loaded example DBS78"),
                downloadButton(outputId = "downloadSampleSpectra",
-                              label = "Download sample spectra")
+                              label = "Download example spectra")
              )
              )
       
@@ -225,7 +226,8 @@ ShowSpectraUI <- function() {
 
       sidebarPanel(
         x <- uiOutput(outputId = "selectSampleFromUploadedVCF"),
-        y <- uiOutput(outputId = "selectSampleFromUploadedCatalog")
+        y <- uiOutput(outputId = "selectSampleFromUploadedCatalog"),
+        uiOutput(outputId = "buttonToSigAttribution")
       ),
 
       mainPanel(

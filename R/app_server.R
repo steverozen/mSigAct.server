@@ -397,12 +397,25 @@ app_server <- function(input, output, session) {
           }
           
           sample.names <- colnames(catalog)
-          radioButtons(inputId = "selectedSampleFromUploadedCatalog",
-                       label = "Select the sample from uploaded catalog",
-                       choices = sample.names,
-                       selected = character(0))
+          
+          tagList(
+            radioButtons(inputId = "selectedSampleFromUploadedCatalog",
+                         label = "Select spectrum to view",
+                         choices = sample.names,
+                         selected = character(0)),
+            actionButton(inputId = "clickToSigAttribution",
+                         label = "Signature attribution",
+                         style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4")
+          )
         }
       )
+  })
+  
+  # When user clicks the action button on Show spectra page, direct user to the relevant tab
+  observeEvent(input$clickToSigAttribution, {
+    shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                   selected = "sigAttributionTab")
   })
 
   # When user submit new catalog for analysis, remove the previous plots
@@ -612,6 +625,7 @@ app_server <- function(input, output, session) {
     )
   })
   
+  # Synchronous programming code starts here
   submitAttribution <- reactive({
     list(input$submitAttributionOnTop, input$submitAttribution2)
   })
@@ -818,6 +832,8 @@ app_server <- function(input, output, session) {
       # Return something other than the future so we don't block the UI
       NULL
     })
+  
+  # Synchronous programming code ends here
   
   # Send interrupt signal to future
   observeEvent(input$cancel,{
