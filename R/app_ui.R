@@ -199,8 +199,8 @@ UploadSpectraUI <- function() {
     # Add a download button for user to download sample spectra to test
     fixedRow(column(6, offset = 6,
                     splitLayout(cellWidths = c("25%", "75%"), 
-                                uiOutput(outputId = "nextButton"), 
-                                uiOutput(outputId = "nextButton2"))
+                                uiOutput(outputId = "showSpectra"), 
+                                uiOutput(outputId = "sigAttribution"))
              )),
     
     br(),

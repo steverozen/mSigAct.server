@@ -299,31 +299,32 @@ app_server <- function(input, output,session) {
     })
   
   observeEvent(input$upload.spectra, {
-    output$nextButton <- renderUI(
-      actionButton(inputId = "submitSpectra", label = "Next",
+    output$showSpectra <- renderUI(
+      actionButton(inputId = "showSpectraFromCatalog", label = "Show spectra",
                    style="color: #fff; background-color: #337ab7;
                           border-color: #2e6da4")
     )
   })
   
   observeEvent(input$upload.spectra, {
-    output$nextButton2 <- renderUI(
-      actionButton(inputId = "submitSpectra2", label = "Next2",
+    output$sigAttribution <- renderUI(
+      actionButton(inputId = "sigAttributionFromCatalog", 
+                   label = "Signature attribution",
                    style="color: #fff; background-color: #337ab7;
                           border-color: #2e6da4")
     )
   })
   
-  observeEvent(input$submitSpectra, {
+  observeEvent(input$showSpectraFromCatalog, {
     output$removeButton2 <- renderUI(
       actionButton(inputId = "remove2",
                    label = "Remove notifications")
     )
   })
   
-  # When user submit uploaded spectra for analysis, create radio buttons for
+  # When user clicks "Show spectra" for uploaded catalog, create radio buttons for
   # user to select the sample
-  observeEvent(input$submitSpectra, {
+  observeEvent(input$showSpectraFromCatalog, {
     errors <- CheckInputsForSpectra(input)
     ids$error <<- append(ids$error, AddErrorMessage(errors))
     
@@ -373,7 +374,7 @@ app_server <- function(input, output,session) {
   })
 
   # When user submit new catalog for analysis, remove the previous plots
-  observeEvent(input$submitSpectra, {
+  observeEvent(input$showSpectraFromCatalog, {
     output$SBS96plot <- NULL
     output$SBS192plot <- NULL
     output$SBS1536plot <- NULL
@@ -434,7 +435,7 @@ app_server <- function(input, output,session) {
         
   })
 
-  observeEvent(input$submitSpectra, {
+  observeEvent(input$sigAttributionFromCatalog, {
     output$selectSampleFromCatalogForAttribution <- renderUI(
       { 
         # catalog.info is a data frame that contains one row for each uploaded file,
@@ -474,7 +475,7 @@ app_server <- function(input, output,session) {
     )
   })
 
-  observeEvent(input$submitSpectra, {
+  observeEvent(input$sigAttributionFromCatalog, {
   output$selectCancerType <- renderUI(
     {
       cancer.types <-
@@ -486,7 +487,7 @@ app_server <- function(input, output,session) {
   )
   })
 
-  observeEvent(input$submitSpectra, {
+  observeEvent(input$sigAttributionFromCatalog, {
   output$choosecatalogtype <- renderUI(
     {
       catalog.type <- c("SBS96", "SBS192", "DBS78", "ID")
