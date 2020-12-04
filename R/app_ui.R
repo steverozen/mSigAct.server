@@ -186,20 +186,27 @@ UploadSpectraUI <- function() {
     # Add the next row of control widgets
     fixedRow(
       # Add a file upload control for user to upload spectra file
-      column(6, UploadSpectra(),
-             uiOutput(outputId = "nextButton"),
-             br(),
-             uiOutput(outputId = "removeButton2"),
-             offset = 6)
+      column(6, offset = 6,
+             UploadSpectra(),
+             downloadButton(outputId = "downloadSampleSpectra",
+                            label = "Download sample spectra")
+             )
+      
     ),
-
+    
     br(),
 
     # Add a download button for user to download sample spectra to test
-    fixedRow(column(6,
-                    downloadButton(outputId = "downloadSampleSpectra",
-                                   label = "Download sample spectra"),
-                    offset = 6))
+    fixedRow(column(6, offset = 6,
+                    splitLayout(cellWidths = c("25%", "75%"), 
+                                uiOutput(outputId = "nextButton"), 
+                                uiOutput(outputId = "nextButton2"))
+             )),
+    
+    br(),
+    
+    fixedRow(column(6, offset = 6, 
+                    uiOutput(outputId = "removeButton2")))
 
   )
 }

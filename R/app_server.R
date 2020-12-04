@@ -306,6 +306,14 @@ app_server <- function(input, output,session) {
     )
   })
   
+  observeEvent(input$upload.spectra, {
+    output$nextButton2 <- renderUI(
+      actionButton(inputId = "submitSpectra2", label = "Next2",
+                   style="color: #fff; background-color: #337ab7;
+                          border-color: #2e6da4")
+    )
+  })
+  
   observeEvent(input$submitSpectra, {
     output$removeButton2 <- renderUI(
       actionButton(inputId = "remove2",
