@@ -21,9 +21,9 @@ app_server <- function(input, output,session) {
   plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
                              sig.universe = NULL, QP.best.MAP.exp = NULL)
   
-  hideTab(inputId = "panels", target = "tab4")
+  hideTab(inputId = "panels", target = "showSpectraTab")
   
-  hideTab(inputId = "panels", target = "tab5")
+  hideTab(inputId = "panels", target = "sigAttributionTab")
   
   # When user clicks the action link on Home page, direct user to the relevant tab
   observeEvent(input$linkToGenerateCatalogTab, {
@@ -40,12 +40,16 @@ app_server <- function(input, output,session) {
   # the relevant tab
   observeEvent(input$showSpectraFromCatalog, {
     req(input$ref.genome2, input$region2)
+    showTab(inputId = "panels", target = "showSpectraTab")
+    showTab(inputId = "panels", target = "sigAttributionTab")
     shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                    selected = "showSpectraTab")
   })
   
   observeEvent(input$sigAttributionFromCatalog, {
     req(input$ref.genome2, input$region2)
+    showTab(inputId = "panels", target = "showSpectraTab")
+    showTab(inputId = "panels", target = "sigAttributionTab")
     shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                    selected = "sigAttributionTab")
   })
@@ -329,21 +333,21 @@ app_server <- function(input, output,session) {
     )
   })
   
-  observeEvent(input$showSpectraFromCatalog, {
-    output$removeButton2 <- renderUI(
-      actionButton(inputId = "remove2",
-                   label = "Remove notifications")
-    )
+  observeEvent(CheckArgumentsForSpectra(), {
+    
+    if (TwoActionButtonsClicked(input) == FALSE) {
+      return()
+    } else {
+      output$removeButton2 <- renderUI(
+        actionButton(inputId = "remove2",
+                     label = "Remove notifications"))
+    }
   })
   
   # When user clicks "Show spectra" for uploaded catalog, create radio buttons for
   # user to select the sample
   observeEvent(input$showSpectraFromCatalog, {
-    errors <- CheckInputsForSpectra(input)
-    ids$error <<- append(ids$error, AddErrorMessage(errors))
     
-    showTab(inputId = "panels", target = "tab4")
-    showTab(inputId = "panels", target = "tab5")
     output$selectSampleFromUploadedCatalog <-
       renderUI(
         {
@@ -448,51 +452,80 @@ app_server <- function(input, output,session) {
     )
         
   })
-
-  observeEvent(input$sigAttributionFromCatalog, {
-    errors <- CheckInputsForSpectra(input)
-    ids$error <<- append(ids$error, AddErrorMessage(errors))
-    
-    output$selectSampleFromCatalogForAttribution <- renderUI(
-      { 
-        # catalog.info is a data frame that contains one row for each uploaded file,
-        # and four columns "name", "size", "type" and "datapath".
-        # "name": The filename provided by the web browser.
-        # "size": The size of the uploaded data, in bytes.
-        # "type": The MIME type reported by the browser.
-        # "datapath": The path to a temp file that contains the data that was uploaded.
-        catalog.info <- input$upload.spectra
-        catalog.paths <- catalog.info$datapath
-        uploaded.catalog <- ICAMS::ReadCatalog(file = catalog.paths,
-                                               ref.genome = input$ref.genome2,
-                                               region = input$region2)
-        catalog <<- uploaded.catalog
-        
-        if (nrow(catalog) == 96) {
-          input.catalog.type <<- "SBS96"
-        } else if (nrow(catalog) == 192) {
-          input.catalog.type <<- "SBS192"
-        } else if (nrow(catalog) == 1536) {
-          input.catalog.type <<- "SBS1536"
-        } else if (nrow(catalog) == 78) {
-          input.catalog.type <<- "DBS78"
-        } else if (nrow(catalog) == 136) {
-          input.catalog.type <<- "DBS136"
-        } else if (nrow(catalog) == 144) {
-          input.catalog.type <<- "DBS144"
-        } else if (nrow(catalog) == 83) {
-          input.catalog.type <<- "ID"
-        }
-        
-        sample.names <- colnames(catalog)
-        selectInput(inputId = "selectedSampleFromCatalogForAttribution",
-                    label = "Select the sample from uploaded catalog",
-                    choices = sample.names)
-      }
-    )
+  
+  CheckArgumentsForSpectra <- reactive({
+    list(input$showSpectraFromCatalog, input$sigAttributionFromCatalog)
   })
+  
+  TwoActionButtonsClicked <- function(input) {
+    if(is.null(input$showSpectraFromCatalog) && is.null(input$sigAttributionFromCatalog)){
+      return(FALSE)
+    }
+    if(input$showSpectraFromCatalog == 0 && input$sigAttributionFromCatalog == 0){
+      return(FALSE)
+    }
+    return(TRUE)
+  }
+  
+  # Check the arguments for uploaded spectra
+  observeEvent(
+    CheckArgumentsForSpectra(),
+    {
+      if (TwoActionButtonsClicked(input) == FALSE) {
+        return()
+      } else {
+        errors <- CheckInputsForSpectra(input)
+        ids$error <<- append(ids$error, AddErrorMessage(errors))
+      }
+      }
+  )
+  
+  
+  observeEvent(
+    CheckArgumentsForSpectra(),
+    {
+      req(input$ref.genome2, input$region2)
+      
+      output$selectSampleFromCatalogForAttribution <- renderUI(
+        { 
+          # catalog.info is a data frame that contains one row for each uploaded file,
+          # and four columns "name", "size", "type" and "datapath".
+          # "name": The filename provided by the web browser.
+          # "size": The size of the uploaded data, in bytes.
+          # "type": The MIME type reported by the browser.
+          # "datapath": The path to a temp file that contains the data that was uploaded.
+          catalog.info <- input$upload.spectra
+          catalog.paths <- catalog.info$datapath
+          uploaded.catalog <- ICAMS::ReadCatalog(file = catalog.paths,
+                                                 ref.genome = input$ref.genome2,
+                                                 region = input$region2)
+          catalog <<- uploaded.catalog
+          
+          if (nrow(catalog) == 96) {
+            input.catalog.type <<- "SBS96"
+          } else if (nrow(catalog) == 192) {
+            input.catalog.type <<- "SBS192"
+          } else if (nrow(catalog) == 1536) {
+            input.catalog.type <<- "SBS1536"
+          } else if (nrow(catalog) == 78) {
+            input.catalog.type <<- "DBS78"
+          } else if (nrow(catalog) == 136) {
+            input.catalog.type <<- "DBS136"
+          } else if (nrow(catalog) == 144) {
+            input.catalog.type <<- "DBS144"
+          } else if (nrow(catalog) == 83) {
+            input.catalog.type <<- "ID"
+          }
+          
+          sample.names <- colnames(catalog)
+          selectInput(inputId = "selectedSampleFromCatalogForAttribution",
+                      label = "Select the sample from uploaded catalog",
+                      choices = sample.names)
+        }
+      )
+    })
 
-  observeEvent(input$sigAttributionFromCatalog, {
+  observeEvent(CheckArgumentsForSpectra(), {
   output$selectCancerType <- renderUI(
     {
       cancer.types <-
@@ -504,7 +537,7 @@ app_server <- function(input, output,session) {
   )
   })
 
-  observeEvent(input$sigAttributionFromCatalog, {
+  observeEvent(CheckArgumentsForSpectra(), {
   output$choosecatalogtype <- renderUI(
     {
       catalog.type <- c("SBS96", "SBS192", "DBS78", "ID")
