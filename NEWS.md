@@ -1,3 +1,7 @@
+# ICAMS.shiny 0.0.3
+## Added
+* Added functionality to do signature attribution.
+
 # ICAMS.shiny 0.0.2
 ## Added
 * Added new *exported* functions for getting signature assignment
