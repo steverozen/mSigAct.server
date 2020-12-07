@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-future::plan(future::multisession)
+# future::plan(future::multisession)
 
 #' @import tibble
 #' @import promises
@@ -10,6 +10,8 @@ future::plan(future::multisession)
 app_server <- function(input, output, session) {
   # List the first level callModules here
   
+  addResourcePath(prefix = "results", directoryPath = tempdir())
+  
   fut <- NULL
   result_val <- reactiveVal()
   running <- reactiveVal(FALSE)
@@ -18,12 +20,14 @@ app_server <- function(input, output, session) {
   # Increase the file upload limit to 100MB
   options(shiny.maxRequestSize=100*1024^2)
   
-  plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
+  plotdata <- reactiveValues(cossim = NULL, spect = NULL, 
+                             reconstructed.catalog = NULL,
                              sig.universe = NULL, QP.best.MAP.exp = NULL)
   
-  hideTab(inputId = "panels", target = "showSpectraTab")
   
-  hideTab(inputId = "panels", target = "sigAttributionTab")
+  #hideTab(inputId = "panels", target = "showSpectraTab")
+  
+  #hideTab(inputId = "panels", target = "sigAttributionTab")
   
   # When user clicks the action link on Home page, direct user to the relevant tab
   observeEvent(input$linkToGenerateCatalogTab, {
@@ -69,10 +73,10 @@ app_server <- function(input, output, session) {
   # Download sample catalogs when user clicks the button
   output$downloadSampleSpectra <- downloadHandler(
     filename = function() {
-      "mSigAct-sample-spectra.zip"
+      "mSigAct-example-spectra.zip"
     },
     content = function(file) {
-      PrepareSampleSpectra(file)
+      PrepareExampleSpectra(file)
     })
 
   # Run analysis on sample Strelka SBS VCFs when user clicks the button
@@ -311,7 +315,7 @@ app_server <- function(input, output, session) {
                           border-color: #2e6da4"))
   }
   
-  observeEvent(input$preloadSpectra, {
+  observeEvent(input$preloadDBS78Spectra, {
     
     shinyWidgets::updatePickerInput(session = session,
                                     inputId = "ref.genome2",
@@ -319,7 +323,7 @@ app_server <- function(input, output, session) {
     shinyWidgets::updatePickerInput(session = session,
                                     inputId = "region2",
                                     selected = "genome")
-    catalog.path <<- system.file("extdata/BTSG_WGS_PCAWG.dbs.78.csv", 
+    catalog.path <<- system.file("extdata/DBS78-mSigAct-example-spectra.csv", 
                                  package = "ICAMS.shiny")
     input.catalog.type <<- "DBS78"
     
@@ -376,10 +380,25 @@ app_server <- function(input, output, session) {
       return()
     } else {
       req(input$ref.genome2, input$region2)
-      showTab(inputId = "panels", target = "showSpectraTab")
-      showTab(inputId = "panels", target = "sigAttributionTab")
+      shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                      selected = "showSpectraTab")
+    }
+  })
+  
+  observeEvent(input$sigAttributionFromCatalog, {
+    
+    if (TwoActionButtonsClicked(input) == FALSE) {
+      return()
+    } else if (showSBS192Catalog == FALSE) {
+      return()
+    } else {
+      req(input$ref.genome2, input$region2)
+      shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
+      shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                     selected = "sigAttributionTab")
     }
   })
 
@@ -768,6 +787,7 @@ app_server <- function(input, output, session) {
               paste0("reconstructed (cosine similarity = ", cossim, ")")
             reconstructed.catalog <- round(reconstructed.catalog0)
             
+            plotdata$cossim <<- cossim
             plotdata$spect <<- spect
             plotdata$reconstructed.catalog <<- reconstructed.catalog
             plotdata$sig.universe <<- sig.universe
@@ -822,6 +842,8 @@ app_server <- function(input, output, session) {
             
           }
           
+        } %...>% {
+          PrepareAttributionResults(input, output, file, plotdata)
         } %...>% result_val
       
       # Show notification on error or user interrupt

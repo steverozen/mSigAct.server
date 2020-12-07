@@ -1,9 +1,18 @@
+jscode <- "
+shinyjs.init = function() {
+  $('#panels li a[data-value=showSpectraTab]').hide();
+  $('#panels li a[data-value=sigAttributionTab]').hide();
+}"
+
+
 #' @import shiny
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-
+    
+    shinyjs::useShinyjs(),
+    shinyjs::extendShinyjs(text = jscode, functions = c()),
     navbarPage(title = "mSigAct", id = "panels",
       tabPanel(title = "Home", HomeUI()),
       tabPanel(title = "Generate spectrum catalogs from VCFs",
@@ -198,7 +207,7 @@ UploadSpectraUI <- function() {
              UploadSpectra(),
              splitLayout(
                cellWidths = c("40%", "60%"),
-               actionButton(inputId = "preloadSpectra", 
+               actionButton(inputId = "preloadDBS78Spectra", 
                             label = "Loaded example DBS78"),
                downloadButton(outputId = "downloadSampleSpectra",
                               label = "Download example spectra")
@@ -292,7 +301,6 @@ SignatureAttributionUI <- function() {
           #x7 <- uiOutput(outputId = "bookmarkButton2")
           #x9 <- uiOutput(outputId = "restoreResults")
           br(),
-          actionButton("generate", "Generate PDF"),
           x9 <- uiOutput(outputId = "attributionResults"),
       ),
 
@@ -301,7 +309,7 @@ SignatureAttributionUI <- function() {
         tabsetPanel(
           tabPanel(title = "tab 1", uiOutput("sigContributionPlot")),
           tabPanel(title = "tab 2", uiOutput("pdfview")),
-          tabPanel(title = "tab 3", "contents")
+          tabPanel(title = "tab 3", uiOutput("exposureTable"))
         )
       )
 
