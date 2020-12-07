@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-future::plan(future::multisession)
+#future::plan(future::multisession)
 
 #' @import tibble
 #' @import promises
@@ -788,8 +788,6 @@ app_server <- function(input, output, session) {
             sigs.presence.prop = sigs.prop,
             max.level = length(sigs.prop) - 1,
             p.thresh = 0.01,
-            eval_f = mSigAct::ObjFnBinomMaxLHRound,
-            eval_g_ineq = mSigAct::g_ineq_for_ObjFnBinomMaxLH2,
             m.opts = mSigAct::DefaultManyOpts(),
             max.mc.cores = 50,
             progress.monitor = updateProgress
