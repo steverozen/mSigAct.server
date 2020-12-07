@@ -7,7 +7,7 @@
 PlotListOfCatalogsToPdf(
   list.of.catalogs,
   file,
-  plot.SBS12,
+  plot.SBS12 = FALSE,
   cex = 0.8,
   grid = TRUE,
   upper = TRUE,

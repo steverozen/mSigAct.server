@@ -884,6 +884,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   return(list(retval = result$retval, ids = updated.ids))
 }
 
+#' @importFrom dplyr bind_rows
 #' @keywords internal
 PrepareAttributionResults <- 
   function (input, output, input.catalog.type, file, plotdata) {
@@ -901,7 +902,7 @@ PrepareAttributionResults <-
   
   list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
   
-  output.file.path <- tail(resourcePaths(), 1)
+  output.file.path <- utils::tail(resourcePaths(), 1)
   
   output.file1 <- paste0(output.file.path, "/mSigAct-", colnames(spect), 
                          input.catalog.type, "-attribution-plot.pdf")
@@ -913,7 +914,7 @@ PrepareAttributionResults <-
   tbl1 <- data.frame(count = colSums(spect), cosine.similarity = cossim)
   tbl2 <- data.frame(count = QP.best.MAP.exp$QP.best.MAP.exp)
   tbl <- dplyr::bind_rows(tbl1, tbl2)
-  write.csv(tbl, file = output.file2, na = "", row.names = FALSE)
+  utils::write.csv(tbl, file = output.file2, na = "", row.names = FALSE)
   
   src.file.path <- paste0("results", "/mSigAct-", colnames(spect), 
                           input.catalog.type, "-attribution-plot.pdf")

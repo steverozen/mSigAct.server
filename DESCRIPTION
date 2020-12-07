@@ -13,6 +13,7 @@ Depends:
     R (>= 3.5)
 Imports: config,
     data.table,
+    dplyr,
     future,
     golem,
     ICAMS,
@@ -29,7 +30,6 @@ Imports: config,
     shinyjs,
     shinyWidgets,
     stringi,
-    tibble,
     zip
 Remotes: github::steverozen/ICAMSxtra,
     github::steverozen/mSigAct,

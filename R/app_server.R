@@ -2,7 +2,7 @@
 # process will not work properly
 #future::plan(future::multisession)
 
-#' @import tibble
+#' @import mSigAct
 #' @import promises
 #' @import ipc
 #' @import shiny
@@ -816,7 +816,7 @@ app_server <- function(input, output, session) {
                                           sig.universe[ , MAP.best.exp$sig.id, 
                                                         drop = FALSE])
             QP.best.MAP.exp <-
-              tibble::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
+              dplyr::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
             
             r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
                                                  use.sig.names = TRUE)
