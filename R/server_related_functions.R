@@ -885,7 +885,8 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 }
 
 #' @keywords internal
-PrepareAttributionResults <- function (input, file, plotdata) {
+PrepareAttributionResults <- function (input, output, file, plotdata) {
+  cossim <- plotdata$cossim
   spect <- plotdata$spect
   QP.best.MAP.exp <- plotdata$QP.best.MAP.exp
   reconstructed.catalog <- plotdata$reconstructed.catalog
@@ -899,14 +900,34 @@ PrepareAttributionResults <- function (input, file, plotdata) {
   
   list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
   
-  output.file <- file.path(tempdir(), "result.pdf")
-  PlotListOfCatalogsToPdf(list.of.catalogs, file = output.file)
+  output.file.path <- tail(resourcePaths(), 1)
+  
+  output.file1 <- paste0(output.file.path, "/mSigAct-", colnames(spect), 
+                         "-attribution-plot.pdf")
+  PlotListOfCatalogsToPdf(list.of.catalogs, file = output.file1)
+  
+  output.file2 <- paste0(output.file.path, "/mSigAct-", colnames(spect),
+                         "-exposures.csv")
+  
+  tbl1 <- data.frame(count = colSums(spect), cosine.similarity = cossim)
+  tbl2 <- data.frame(count = QP.best.MAP.exp$QP.best.MAP.exp)
+  tbl <- dplyr::bind_rows(tbl1, tbl2)
+  write.csv(tbl, file = output.file2, na = "", row.names = FALSE)
+  
+  output$pdfview <- renderUI({
+    tags$iframe(style="height:600px; width:100%", src="results/attribution-plot.pdf")
+  })
+  output$exposureTable <- renderTable({
+    tbl
+  }, rownames = TRUE
+  )
+  
   #plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
   #                           sig.universe = NULL, QP.best.MAP.exp = NULL)
   
   #path <- system.file("extdata/mSigAct-sample-spectra.zip", 
   #                    package = "ICAMS.shiny")
-  file.copy(from = output.file, to = file)
+  #file.copy(from = output.file, to = file)
 }
 
 
@@ -1071,8 +1092,8 @@ PrepareSampleVCFs <- function(file) {
 #' @import zip
 #'
 #' @keywords internal
-PrepareSampleSpectra <- function(file) {
-  path <- system.file("extdata/mSigAct-sample-spectra.zip", 
+PrepareExampleSpectra <- function(file) {
+  path <- system.file("extdata/mSigAct-example-spectra.zip", 
                      package = "ICAMS.shiny")
   file.copy(from = path, to = file)
 }

@@ -205,15 +205,22 @@ UploadSpectraUI <- function() {
       # Add a file upload control for user to upload spectra file
       column(6, offset = 6,
              UploadSpectra(),
-             splitLayout(
-               cellWidths = c("40%", "60%"),
-               actionButton(inputId = "preloadDBS78Spectra", 
-                            label = "Loaded example DBS78"),
-               downloadButton(outputId = "downloadSampleSpectra",
-                              label = "Download example spectra")
+             downloadButton(outputId = "downloadSampleSpectra",
+                            label = "Download example spectra"),
+             rep_br(2),
+             textOutput(outputId = "exampleSpectraText"),
+             tags$head(tags$style("#exampleSpectraText{color: #337ab7")),
+             br(),
+             splitLayout(cellWidths = c("20%", "20%", "20%", "20%"),
+                         actionButton(inputId = "preloadSBS96Spectra", 
+                                      label = "SBS96"),
+                         actionButton(inputId = "preloadSBS192Spectra", 
+                                      label = "SBS192"),
+                         actionButton(inputId = "preloadDBS78Spectra", 
+                                      label = "DBS78"),
+                         actionButton(inputId = "preloadIDSpectra", 
+                                      label = "ID"))
              )
-             )
-      
     ),
     
     br(),

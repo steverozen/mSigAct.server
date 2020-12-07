@@ -24,10 +24,7 @@ app_server <- function(input, output, session) {
                              reconstructed.catalog = NULL,
                              sig.universe = NULL, QP.best.MAP.exp = NULL)
   
-  
-  #hideTab(inputId = "panels", target = "showSpectraTab")
-  
-  #hideTab(inputId = "panels", target = "sigAttributionTab")
+  output$exampleSpectraText <- renderText("Load example spectra")
   
   # When user clicks the action link on Home page, direct user to the relevant tab
   observeEvent(input$linkToGenerateCatalogTab, {
@@ -315,6 +312,38 @@ app_server <- function(input, output, session) {
                           border-color: #2e6da4"))
   }
   
+  observeEvent(input$preloadSBS96Spectra, {
+    
+    shinyWidgets::updatePickerInput(session = session,
+                                    inputId = "ref.genome2",
+                                    selected = "hg19")
+    shinyWidgets::updatePickerInput(session = session,
+                                    inputId = "region2",
+                                    selected = "genome")
+    catalog.path <<- system.file("extdata/SBS96-mSigAct-example-spectra.csv", 
+                                 package = "ICAMS.shiny")
+    input.catalog.type <<- "SBS96"
+    
+    ShowTwoButtons()
+    
+  })
+  
+  observeEvent(input$preloadSBS192Spectra, {
+    
+    shinyWidgets::updatePickerInput(session = session,
+                                    inputId = "ref.genome2",
+                                    selected = "hg19")
+    shinyWidgets::updatePickerInput(session = session,
+                                    inputId = "region2",
+                                    selected = "genome")
+    catalog.path <<- system.file("extdata/SBS192-mSigAct-example-spectra.csv", 
+                                 package = "ICAMS.shiny")
+    input.catalog.type <<- "SBS192"
+    
+    ShowTwoButtons()
+    
+  })
+  
   observeEvent(input$preloadDBS78Spectra, {
     
     shinyWidgets::updatePickerInput(session = session,
@@ -329,6 +358,22 @@ app_server <- function(input, output, session) {
     
     ShowTwoButtons()
 
+  })
+  
+  observeEvent(input$preloadIDSpectra, {
+    
+    shinyWidgets::updatePickerInput(session = session,
+                                    inputId = "ref.genome2",
+                                    selected = "hg19")
+    shinyWidgets::updatePickerInput(session = session,
+                                    inputId = "region2",
+                                    selected = "genome")
+    catalog.path <<- system.file("extdata/ID-mSigAct-example-spectra.csv", 
+                                 package = "ICAMS.shiny")
+    input.catalog.type <<- "ID"
+    
+    ShowTwoButtons()
+    
   })
   
   observeEvent(input$upload.spectra, {
