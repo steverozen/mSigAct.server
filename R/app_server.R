@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-# future::plan(future::multisession)
+future::plan(future::multisession)
 
 #' @import tibble
 #' @import promises

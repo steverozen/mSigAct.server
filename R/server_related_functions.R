@@ -1170,7 +1170,7 @@ if(getRversion() >= "2.15.1") {
 #' @keywords internal
 PlotListOfCatalogsToPdf <- function(list.of.catalogs, 
                                     file, 
-                                    plot.SBS12, 
+                                    plot.SBS12 = NULL, 
                                     cex     = 0.8,
                                     grid    = TRUE, 
                                     upper   = TRUE, 
