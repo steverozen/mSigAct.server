@@ -50,18 +50,19 @@ HomeUI <- function() {
     )),
 
 
-    h5( a(href = "https://tinyurl.com/rdzwnxd", "*VCF"),
+    h5(a(href = "https://tinyurl.com/rdzwnxd", "*VCF", target = "_blank"),
        " files contain one mutation per line, and are created ",
       "by variant callers such as ",
-      a(href = "https://github.com/Illumina/strelka", "Strelka"), " or ",
-      a(href = "https://github.com/broadgsa/gatk", "Mutect")),
+      a(href = "https://github.com/Illumina/strelka", "Strelka", target = "_blank"), 
+      " or ",
+      a(href = "https://github.com/broadgsa/gatk", "Mutect", target = "_blank")),
 
     # Add a link to the PCAWG7 paper about mutational signatures
     h5("For background see ",
       a(href = "https://doi.org/10.1038/s41586-020-1943-3",
-        "\"The repertoire of mutational signatures in human cancer\""),
+        "\"The repertoire of mutational signatures in human cancer\"", target = "_blank"),
       " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",
-      "COSMIC Mutational Signatures")),
+      "COSMIC Mutational Signatures", target = "_blank")),
 
     if (FALSE) {
       fixedRow(column(2, shinyhelper::helper(shiny::actionButton("go", "click me!"),
@@ -291,13 +292,17 @@ SignatureAttributionUI <- function() {
           #x7 <- uiOutput(outputId = "bookmarkButton2")
           #x9 <- uiOutput(outputId = "restoreResults")
           br(),
+          actionButton("generate", "Generate PDF"),
           x9 <- uiOutput(outputId = "attributionResults"),
       ),
 
       mainPanel(
         shinyjs::useShinyjs(),
-        uiOutput("sigContributionPlot")
-
+        tabsetPanel(
+          tabPanel(title = "tab 1", uiOutput("sigContributionPlot")),
+          tabPanel(title = "tab 2", uiOutput("pdfview")),
+          tabPanel(title = "tab 3", "contents")
+        )
       )
 
     )
