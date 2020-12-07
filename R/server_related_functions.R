@@ -885,7 +885,8 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 }
 
 #' @keywords internal
-PrepareAttributionResults <- function (input, output, file, plotdata) {
+PrepareAttributionResults <- 
+  function (input, output, input.catalog.type, file, plotdata) {
   cossim <- plotdata$cossim
   spect <- plotdata$spect
   QP.best.MAP.exp <- plotdata$QP.best.MAP.exp
@@ -903,19 +904,22 @@ PrepareAttributionResults <- function (input, output, file, plotdata) {
   output.file.path <- tail(resourcePaths(), 1)
   
   output.file1 <- paste0(output.file.path, "/mSigAct-", colnames(spect), 
-                         "-attribution-plot.pdf")
+                         input.catalog.type, "-attribution-plot.pdf")
   PlotListOfCatalogsToPdf(list.of.catalogs, file = output.file1)
   
   output.file2 <- paste0(output.file.path, "/mSigAct-", colnames(spect),
-                         "-exposures.csv")
+                         input.catalog.type, "-exposures.csv")
   
   tbl1 <- data.frame(count = colSums(spect), cosine.similarity = cossim)
   tbl2 <- data.frame(count = QP.best.MAP.exp$QP.best.MAP.exp)
   tbl <- dplyr::bind_rows(tbl1, tbl2)
   write.csv(tbl, file = output.file2, na = "", row.names = FALSE)
   
+  src.file.path <- paste0("results", "/mSigAct-", colnames(spect), 
+                          input.catalog.type, "-attribution-plot.pdf")
   output$pdfview <- renderUI({
-    tags$iframe(style="height:600px; width:100%", src="results/attribution-plot.pdf")
+    tags$iframe(style="height:600px; width:100%", 
+                src= src.file.path)
   })
   output$exposureTable <- renderTable({
     tbl

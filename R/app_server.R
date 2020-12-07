@@ -335,7 +335,7 @@ app_server <- function(input, output, session) {
                                     selected = "hg19")
     shinyWidgets::updatePickerInput(session = session,
                                     inputId = "region2",
-                                    selected = "genome")
+                                    selected = "transcript")
     catalog.path <<- system.file("extdata/SBS192-mSigAct-example-spectra.csv", 
                                  package = "ICAMS.shiny")
     input.catalog.type <<- "SBS192"
@@ -888,7 +888,8 @@ app_server <- function(input, output, session) {
           }
           
         } %...>% {
-          PrepareAttributionResults(input, output, file, plotdata)
+          PrepareAttributionResults(input, output, input.catalog.type, 
+                                    file, plotdata)
         } %...>% result_val
       
       # Show notification on error or user interrupt

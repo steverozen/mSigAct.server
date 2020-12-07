@@ -118,6 +118,7 @@ AddZipfileName <- function() {
             value = "mSigAct-catalogs-output")
 }
 
+
 #' @import shiny
 #' @keywords internal
 UploadVCFFiles <- function() {
@@ -132,6 +133,19 @@ UploadSpectra <- function() {
   div(
     fileInput(inputId = "upload.spectra", label = "Choose spectra file",
               accept = c(".csv", ".CSV")), style="color: #337ab7;")
+}
+
+#' @import shiny
+#' @keywords internal
+LoadExampleSpectra <- function() {
+  textOutput(outputId = "exampleSpectraText")
+  tags$head(tags$style("#exampleSpectraText{color: #337ab7;"))
+  
+  splitLayout(cellWidths = c("25%", "25%", "25%", "25%"),
+              actionButton(inputId = "preloadSBS96Spectra", label = "SBS96"),
+              actionButton(inputId = "preloadSBS192Spectra", label = "SBS192"),
+              actionButton(inputId = "preloadDBS78Spectra", label = "DBS78"),
+              actionButton(inputId = "preloadIDSpectra", label = "ID"))
 }
 
 #' @import shiny

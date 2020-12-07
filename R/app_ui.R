@@ -227,7 +227,7 @@ UploadSpectraUI <- function() {
 
     # Add a download button for user to download sample spectra to test
     fixedRow(column(6, offset = 6,
-                    splitLayout(cellWidths = c("25%", "75%"), 
+                    splitLayout(cellWidths = c("30%", "70%"), 
                                 uiOutput(outputId = "showSpectra"), 
                                 uiOutput(outputId = "sigAttribution"))
              )),
@@ -314,9 +314,9 @@ SignatureAttributionUI <- function() {
       mainPanel(
         shinyjs::useShinyjs(),
         tabsetPanel(
-          tabPanel(title = "tab 1", uiOutput("sigContributionPlot")),
-          tabPanel(title = "tab 2", uiOutput("pdfview")),
-          tabPanel(title = "tab 3", uiOutput("exposureTable"))
+          tabPanel(title = "Attribution plot", uiOutput("sigContributionPlot")),
+          tabPanel(title = "Attribution PDF plot", uiOutput("pdfview")),
+          tabPanel(title = "Attribution exposure", uiOutput("exposureTable"))
         )
       )
 
