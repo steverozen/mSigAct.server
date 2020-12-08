@@ -10,6 +10,4 @@ original.col.names <- colnames(cat1)
 artefacts.sigs.names <- c("SBS27", "SBS43", paste0("SBS", 45:60))
 new.col.names <- setdiff(original.col.names, artefacts.sigs.names)
 
-COSMICv3.genome.SBS96.sigs <- cat1[, new.col.names]
-
-usethis::use_data(COSMICv3.genome.SBS96.sigs, internal = TRUE, overwrite = TRUE)
+COSMIC.v3.genome.SBS96.sigs <- cat1[, new.col.names]
