@@ -896,6 +896,11 @@ PrepareAttributionResults <-
           tabPanel(title = "Attribution plot", uiOutput(outputId = "pdfview")))
     })
     
+    output$downloaResults <- renderUI({
+      downloadButton(outputId = "downloadAttributionResults", 
+                     label = "Download attribution results")
+    })
+    
   cossim <- plotdata$cossim
   spect <- plotdata$spect
   QP.best.MAP.exp <- plotdata$QP.best.MAP.exp
@@ -911,20 +916,31 @@ PrepareAttributionResults <-
   list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
   
   output.file.path <- utils::tail(resourcePaths(), 1)
-  table.file.name <- paste0("mSigAct-", colnames(spect), "-",
+  spect.name <- colnames(spect)
+  
+  # We cannot use "::" in the file path, otherwise zip::zipr will throw an error
+  spect.name <- gsub(pattern = "::", replacement = "-", spect.name)
+  
+  table.file.name <- paste0("mSigAct-", spect.name, "-",
                             input.catalog.type, "-exposures.csv")
-  pdf.file.name <- paste0("mSigAct-", colnames(spect), "-",
+  pdf.file.name <- paste0("mSigAct-", spect.name, "-",
                           input.catalog.type, "-attribution-plot.pdf")
+  results.file.name <- paste0("mSigAct-", spect.name, "-",
+                              input.catalog.type, "-attribution-results.zip")
+  
+  
   pdf.file.path <- paste0(output.file.path, "/", pdf.file.name)
   table.file.path <- paste0(output.file.path, "/", table.file.name)
   
-  PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
   
   tbl1 <- data.frame(names = colnames(spect), count = colSums(spect), 
                      cosine.similarity = cossim)
   tbl2 <- data.frame(names = QP.best.MAP.exp$sig.id, 
                      count = QP.best.MAP.exp$QP.best.MAP.exp)
   tbl <- dplyr::bind_rows(tbl1, tbl2)
+  
+  utils::write.csv(tbl, file = table.file.path, na = "", row.names = FALSE)
+  PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
   
   src.file.path <- paste0("results", "/", pdf.file.name)
   output$pdfview <- renderUI({
@@ -962,7 +978,19 @@ PrepareAttributionResults <-
   output$downloadExposureTable <- downloadHandler(
     filename = table.file.name,
     content = function(file) {
-      utils::write.csv(tbl, file = file, na = "", row.names = FALSE)
+      file.copy(from = table.file.path, to = file)
+    }
+  )
+  
+  file.names <- c(table.file.path, pdf.file.path)
+  
+  output$downloadAttributionResults <- downloadHandler(
+    filename = function() {
+      results.file.name
+    },
+    content = function(file) {
+      
+      zip::zipr(zipfile = file, files = file.names)
     }
   )
 
