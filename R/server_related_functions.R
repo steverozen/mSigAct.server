@@ -910,9 +910,10 @@ PrepareAttributionResults <-
   
   output.file2 <- paste0(output.file.path, "/mSigAct-", colnames(spect),
                          input.catalog.type, "-exposures.csv")
-  
-  tbl1 <- data.frame(count = colSums(spect), cosine.similarity = cossim)
-  tbl2 <- data.frame(count = QP.best.MAP.exp$QP.best.MAP.exp)
+  tbl1 <- data.frame(names = colnames(spect), count = colSums(spect), 
+                     cosine.similarity = cossim)
+  tbl2 <- data.frame(names = QP.best.MAP.exp$sig.id, 
+                     count = QP.best.MAP.exp$QP.best.MAP.exp)
   tbl <- dplyr::bind_rows(tbl1, tbl2)
   utils::write.csv(tbl, file = output.file2, na = "", row.names = FALSE)
   
@@ -922,10 +923,31 @@ PrepareAttributionResults <-
     tags$iframe(style="height:600px; width:100%", 
                 src= src.file.path)
   })
+  
+  if (input.catalog.type %in% c("SBS96", "SBS192")) {
+    SBS.sig.names <- tbl$names[-1]
+    urls <- COSMIC.v3.SBS.sig.links[SBS.sig.names, ]
+    refs <- 
+      paste0("<a href='",  urls, "' target='_blank'>", SBS.sig.names, "</a>")
+  } else if (input.catalog.type == "DBS78") {
+    DBS.sig.names <- tbl$names[-1]
+    urls <- COSMIC.v3.DBS.sig.links[DBS.sig.names, ]
+    refs <- 
+      paste0("<a href='",  urls, "' target='_blank'>", DBS.sig.names, "</a>")
+  } else if (input.catalog.type == "ID") {
+    ID.sig.names <- tbl$names[-1]
+    urls <- COSMIC.v3.ID.sig.links[ID.sig.names, ]
+    refs <- 
+      paste0("<a href='",  urls, "' target='_blank'>", ID.sig.names, "</a>")
+    
+  } 
+  
+  # Turns the names of signatures into HTML links
+  tbl$names[-1] <- refs
+  
   output$exposureTable <- renderTable({
     tbl
-  }, rownames = TRUE
-  )
+  }, sanitize.text.function = function(x) x, digits = 5)
   
   #plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
   #                           sig.universe = NULL, QP.best.MAP.exp = NULL)
