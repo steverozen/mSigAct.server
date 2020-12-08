@@ -888,6 +888,16 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 #' @keywords internal
 PrepareAttributionResults <- 
   function (input, output, input.catalog.type, file, plotdata) {
+    output$attributionResults <- renderUI({
+      #div(
+      #  id = "resultPage",
+        tabsetPanel(
+          tabPanel(title = "Attribution plot", uiOutput("pdfview")),
+          tabPanel(title = "Attribution counts", uiOutput("exposureTable"))
+        )
+     # )
+    })
+    
   cossim <- plotdata$cossim
   spect <- plotdata$spect
   QP.best.MAP.exp <- plotdata$QP.best.MAP.exp
@@ -948,6 +958,11 @@ PrepareAttributionResults <-
   output$exposureTable <- renderTable({
     tbl
   }, sanitize.text.function = function(x) x, digits = 5)
+  
+  # Show the new attribution results
+  shinyjs::show(id = "attributionResults")
+  
+  return(list(attribution.results = TRUE))
   
   #plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
   #                           sig.universe = NULL, QP.best.MAP.exp = NULL)

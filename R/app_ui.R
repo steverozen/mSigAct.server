@@ -308,16 +308,13 @@ SignatureAttributionUI <- function() {
           #x7 <- uiOutput(outputId = "bookmarkButton2")
           #x9 <- uiOutput(outputId = "restoreResults")
           br(),
-          x9 <- uiOutput(outputId = "attributionResults"),
+          x9 <- uiOutput(outputId = "downloaResults"),
       ),
 
       mainPanel(
         shinyjs::useShinyjs(),
-        tabsetPanel(
-          tabPanel(title = "Attribution plot", uiOutput("sigContributionPlot")),
-          tabPanel(title = "Attribution PDF plot", uiOutput("pdfview")),
-          tabPanel(title = "Attribution exposure", uiOutput("exposureTable"))
-        )
+        uiOutput(outputId = "attributionResults")
+
       )
 
     )

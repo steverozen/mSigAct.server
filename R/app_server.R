@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-#future::plan(future::multisession)
+future::plan(future::multisession)
 
 #' @import mSigAct
 #' @import promises
@@ -52,7 +52,7 @@ app_server <- function(input, output, session) {
   
   showSBS192Catalog <- TRUE
   
-  plot.names <- vector(mode = "character")
+  attribution.results <- FALSE
 
   # Create reactiveValues object
   # and set flag to 0 to prevent errors with adding NULL
@@ -719,11 +719,9 @@ app_server <- function(input, output, session) {
         return(NULL)
       running(TRUE)
       
-      
-      if (length(plot.names) > 0) {
-        for (i in 1:length(plot.names)) {
-          shinyjs::hide(id = plot.names[i])
-        }
+      # Hide the previous attribution results
+      if (attribution.results == TRUE) {
+        shinyjs::hide(id = "attributionResults")
       }
       
       spect <- catalog[, input$selectedSampleFromCatalogForAttribution, drop = FALSE]
@@ -797,9 +795,8 @@ app_server <- function(input, output, session) {
         }, seed = TRUE) %...>% {
           retval <- .
           
-          
           if (retval$success == FALSE || is.null(retval$success)) {
-            output$sigContributionPlot <- renderUI({
+            output$attributionResults <- renderUI({
               output$attributionMessage <- 
                 renderText(paste0("The algorithm could not find the optimal number of ", 
                                   "signatures that explain the spectrum. Please reduce the ", 
@@ -836,58 +833,10 @@ app_server <- function(input, output, session) {
             plotdata$sig.universe <<- sig.universe
             plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
             
-            max_plots <- nrow(QP.best.MAP.exp) + 2
-            output$sigContributionPlot <- renderUI({
-              plot_output_list <- lapply(1:max_plots, function(i) {
-                plotname <- paste("plot", i, sep="")
-                plot.names[i] <<- plotname
-                plotOutput(plotname)
-              })
-              
-              tagList(plot_output_list)
-            })
-            
-            for (i in 1:max_plots) {
-              # Need local so that each item gets its own number. Without it, the value
-              # of i in the renderPlot() will be the same across all instances, because
-              # of when the expression is evaluated.
-              local({
-                my_i <- i
-                plotname <- paste("plot", my_i, sep="")
-                
-                if (my_i == 1) {
-                  output[[plotname]] <- renderPlot(
-                    expr = ICAMS::PlotCatalog(spect)
-                    , width = 800, height = 260
-                  )
-                } else if (my_i == 2) {
-                  output[[plotname]] <- renderPlot(
-                    expr = ICAMS::PlotCatalog(reconstructed.catalog)
-                    , width = 800, height = 260
-                  )
-                } else {
-                  output[[plotname]] <- renderPlot({
-                    sig.name <- QP.best.MAP.exp$sig.id[my_i-2]
-                    sig.catalog <- sig.universe[, sig.name, drop = FALSE]
-                    colnames(sig.catalog) <- 
-                      paste0(sig.name, " (exposure = ", 
-                             round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
-                    ICAMS::PlotCatalog(sig.catalog)
-                    
-                  }, width = 800, height = 260)
-                }
-              })
-            }
-            
-            for (i in length(plot.names)) {
-              shinyjs::show(id = plot.names[i])
-            }
-            
-          }
-          
-        } %...>% {
-          PrepareAttributionResults(input, output, input.catalog.type, 
-                                    file, plotdata)
+            retval <- PrepareAttributionResults(input, output, input.catalog.type, 
+                                                file, plotdata)
+            attribution.results <<- retval$attribution.results
+        }
         } %...>% result_val
       
       # Show notification on error or user interrupt
@@ -1026,14 +975,14 @@ app_server <- function(input, output, session) {
   })
   
   observeEvent(input$submitAttributionOnTop, {
-    output$attributionResults <- renderUI({
+    output$downloadResults <- renderUI({
       downloadButton(outputId = 'downloadAttributionResults', 
                      label = 'Download attribution results')
     })
   })
   
   observeEvent(input$submitAttribution2, {
-    output$attributionResults <- renderUI({
+    output$downloadResults <- renderUI({
       downloadButton(outputId = 'downloadAttributionResults', 
                      label = 'Download attribution results')
     })
