@@ -889,13 +889,11 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 PrepareAttributionResults <- 
   function (input, output, input.catalog.type, file, plotdata) {
     output$attributionResults <- renderUI({
-      #div(
-      #  id = "resultPage",
         tabsetPanel(
-          tabPanel(title = "Attribution plot", uiOutput("pdfview")),
-          tabPanel(title = "Attribution counts", uiOutput("exposureTable"))
-        )
-     # )
+          tabPanel(title = "Attribution counts", 
+                   uiOutput(outputId = "exposureTable"),
+                   downloadButton(outputId = "downloadExposureTable")),
+          tabPanel(title = "Attribution plot", uiOutput(outputId = "pdfview")))
     })
     
   cossim <- plotdata$cossim
@@ -913,22 +911,22 @@ PrepareAttributionResults <-
   list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
   
   output.file.path <- utils::tail(resourcePaths(), 1)
+  table.file.name <- paste0("mSigAct-", colnames(spect), "-",
+                            input.catalog.type, "-exposures.csv")
+  pdf.file.name <- paste0("mSigAct-", colnames(spect), "-",
+                          input.catalog.type, "-attribution-plot.pdf")
+  pdf.file.path <- paste0(output.file.path, "/", pdf.file.name)
+  table.file.path <- paste0(output.file.path, "/", table.file.name)
   
-  output.file1 <- paste0(output.file.path, "/mSigAct-", colnames(spect), 
-                         input.catalog.type, "-attribution-plot.pdf")
-  PlotListOfCatalogsToPdf(list.of.catalogs, file = output.file1)
+  PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
   
-  output.file2 <- paste0(output.file.path, "/mSigAct-", colnames(spect),
-                         input.catalog.type, "-exposures.csv")
   tbl1 <- data.frame(names = colnames(spect), count = colSums(spect), 
                      cosine.similarity = cossim)
   tbl2 <- data.frame(names = QP.best.MAP.exp$sig.id, 
                      count = QP.best.MAP.exp$QP.best.MAP.exp)
   tbl <- dplyr::bind_rows(tbl1, tbl2)
-  utils::write.csv(tbl, file = output.file2, na = "", row.names = FALSE)
   
-  src.file.path <- paste0("results", "/mSigAct-", colnames(spect), 
-                          input.catalog.type, "-attribution-plot.pdf")
+  src.file.path <- paste0("results", "/", pdf.file.name)
   output$pdfview <- renderUI({
     tags$iframe(style="height:600px; width:100%", 
                 src= src.file.path)
@@ -953,12 +951,21 @@ PrepareAttributionResults <-
   } 
   
   # Turns the names of signatures into HTML links
-  tbl$names[-1] <- refs
+  tbl2 <- tbl
+  tbl2$names[-1] <- refs
   
   output$exposureTable <- renderTable({
-    tbl
+    tbl2
   }, sanitize.text.function = function(x) x, digits = 5)
   
+  
+  output$downloadExposureTable <- downloadHandler(
+    filename = table.file.name,
+    content = function(file) {
+      utils::write.csv(tbl, file = file, na = "", row.names = FALSE)
+    }
+  )
+
   # Show the new attribution results
   shinyjs::show(id = "attributionResults")
   
