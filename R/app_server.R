@@ -834,7 +834,7 @@ app_server <- function(input, output, session) {
             plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
             
             retval <- PrepareAttributionResults(input, output, input.catalog.type, 
-                                                file, plotdata)
+                                                plotdata)
             attribution.results <<- retval$attribution.results
         }
         } %...>% result_val
@@ -868,66 +868,22 @@ app_server <- function(input, output, session) {
   
   # Save extra values in state$values when we bookmark
   onBookmark(function(state) {
-    state$values$previousSpect <- plotdata$spect
-    state$values$previousReconstructed.catalog <- plotdata$reconstructed.catalog
-    state$values$previousSig.universe <- plotdata$sig.universe
-    state$values$previousQP.best.MAP.exp <- plotdata$QP.best.MAP.exp
+    state$values$previous.plotdata <- plotdata
+    state$values$previous.input.catalog.type <- input.catalog.type
   })
   
   # Read values from state$values when we restore
   onRestore(function(state) {
-    spect <- state$values$previousSpect
-    reconstructed.catalog <- state$values$previousReconstructed.catalog
-    sig.universe <- state$values$previousSig.universe
-    QP.best.MAP.exp <- state$values$previousQP.best.MAP.exp
+    shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
+    shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
     
-    #spect <- plotdata$spect
-    #reconstructed.catalog <- plotdata$reconstructed.catalog 
-    #sig.universe <- plotdata$sig.universe 
-    #QP.best.MAP.exp <- plotdata$QP.best.MAP.exp 
+    # Set the value of attribution.results to be TRUE, so when user submit
+    # analysis again, hide the attribution results page
+    attribution.results <<- TRUE
     
-    max_plots <- nrow(QP.best.MAP.exp) + 2
-    output$sigContributionPlot <- renderUI({
-      plot_output_list <- lapply(1:max_plots, function(i) {
-        plotname <- paste("plot", i, sep="")
-        plot.names[i] <<- plotname
-        plotOutput(plotname)
-      })
-      
-      tagList(plot_output_list)
-    })
-    
-    for (i in 1:max_plots) {
-      # Need local so that each item gets its own number. Without it, the value
-      # of i in the renderPlot() will be the same across all instances, because
-      # of when the expression is evaluated.
-      local({
-        my_i <- i
-        plotname <- paste("plot", my_i, sep="")
-        
-        if (my_i == 1) {
-          output[[plotname]] <- renderPlot(
-            expr = ICAMS::PlotCatalog(spect)
-            #width = 800, height = 200, 
-          )
-        } else if (my_i == 2) {
-          output[[plotname]] <- renderPlot(
-            expr = ICAMS::PlotCatalog(reconstructed.catalog)
-            #width = 800, height = 200)
-          )
-        } else {
-          output[[plotname]] <- renderPlot({
-            sig.name <- QP.best.MAP.exp$sig.id[my_i-2]
-            sig.catalog <- sig.universe[, sig.name, drop = FALSE]
-            colnames(sig.catalog) <- 
-              paste0(sig.name, " (exposure = ", 
-                     round(QP.best.MAP.exp$QP.best.MAP.exp[my_i-2]), ")")
-            ICAMS::PlotCatalog(sig.catalog)
-            
-          }) #width = 800, height = 200)
-        }
-      })
-    }
+    PrepareAttributionResults(input = input, output = output, 
+                              input.catalog.type = state$values$previous.input.catalog.type, 
+                              plotdata = state$values$previous.plotdata)
   })
   
   observeEvent(input$submitAttributionForVCF, {
@@ -956,21 +912,21 @@ app_server <- function(input, output, session) {
   observeEvent(input$submitAttributionForVCF, {
     output$bookmarkButton <- renderUI(
       bookmarkButton(label = "Save the session",
-                     title = "This application's state can be saved on the server for 12 hours.")
+                     title = "This application's state can be saved on the server for 7 days.")
     )
   })
   
   observeEvent(input$submitAttribution2, {
     output$bookmarkButton <- renderUI(
       bookmarkButton(label = "Save the session",
-                     title = "This application's state can be saved on the server for 12 hours.")
+                     title = "This application's state can be saved on the server for 7 days.")
     )
   })
   
   observeEvent(input$submitAttributionOnTop, {
     output$bookmarkButton <- renderUI(
       bookmarkButton(label = "Save the session",
-                     title = "This application's state can be saved on the server for 12 hours.")
+                     title = "This application's state can be saved on the server for 7 days.")
     )
   })
   
@@ -987,15 +943,6 @@ app_server <- function(input, output, session) {
                      label = 'Download attribution results')
     })
   })
-  
-  # Download attribution results when user clicks the button
-  output$downloadAttributionResults <- downloadHandler(
-    filename = function() {
-      "mSigAct-signature-attribution-results.pdf"
-    },
-    content = function(file) {
-      PrepareAttributionResults(input, file, plotdata)
-    })
   
   # When user clicks the "Remove notifications" button, all the previous
   # notifications(error, warning or message) will be removed

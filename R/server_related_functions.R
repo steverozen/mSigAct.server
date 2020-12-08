@@ -887,7 +887,7 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 #' @importFrom dplyr bind_rows
 #' @keywords internal
 PrepareAttributionResults <- 
-  function (input, output, input.catalog.type, file, plotdata) {
+  function (input, output, input.catalog.type, plotdata) {
     output$attributionResults <- renderUI({
         tabsetPanel(
           tabPanel(title = "Attribution counts", 
@@ -966,7 +966,7 @@ PrepareAttributionResults <-
     
   } 
   
-  # Turns the names of signatures into HTML links
+  # Convert the names of signatures into HTML links
   tbl2 <- tbl
   tbl2$names[-1] <- refs
   
@@ -989,7 +989,6 @@ PrepareAttributionResults <-
       results.file.name
     },
     content = function(file) {
-      
       zip::zipr(zipfile = file, files = file.names)
     }
   )
