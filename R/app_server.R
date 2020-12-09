@@ -301,13 +301,13 @@ app_server <- function(input, output, session) {
     output$showSpectra <- renderUI(
       actionButton(inputId = "showSpectraFromCatalog", label = "Show spectra",
                    style="color: #fff; background-color: #337ab7;
-                          border-color: #2e6da4")
+                          border-color: #2e6da4;")
     )
     output$sigAttribution <- renderUI(
       actionButton(inputId = "sigAttributionFromCatalog", 
                    label = "Signature attribution",
                    style="color: #fff; background-color: #337ab7;
-                          border-color: #2e6da4"))
+                          border-color: #2e6da4;"))
   }
   
   observeEvent(input$preloadSBS96Spectra, {
@@ -611,7 +611,7 @@ app_server <- function(input, output, session) {
           
           sample.names <- colnames(catalog)
           selectInput(inputId = "selectedSampleFromCatalogForAttribution",
-                      label = "Select the sample from uploaded catalog",
+                      label = "Select the sample from uploaded spectra",
                       choices = sample.names)
         }
       )
@@ -640,6 +640,7 @@ app_server <- function(input, output, session) {
 
   observeEvent(input$selectedCancerType, {
     if (input$selectedCancerType != "Unknown") {
+      
       output$chooseSigSubsetForSampleFromCatalog <- renderUI(
         {
           sig1 <- PCAWG7::signature[["genome"]]
@@ -656,11 +657,17 @@ app_server <- function(input, output, session) {
             selected.sig.universe0 <- colnames(tmp)
             
             # Exclude possible artifact signatures
-            # possible.artifacts <- mSigAct::PossibleArtifacts()
-            possible.artifacts <- NULL
+            possible.artifacts <- mSigAct::PossibleArtifacts()
             
-            selected.sig.universe <- 
+            selected.sig.universe1 <- 
               setdiff(selected.sig.universe0, possible.artifacts)
+            sig.universe <- setdiff(sig.universe, possible.artifacts)
+            
+            # Exclude rare signatures
+            rare.sigs <- mSigAct::RareSignatures()
+            selected.sig.universe <-
+              setdiff(selected.sig.universe1, rare.sigs)
+            sig.universe <- setdiff(sig.universe, rare.sigs)
           }
           
           selectInput(inputId = "selectedSigSubset2",
@@ -683,7 +690,7 @@ app_server <- function(input, output, session) {
       {
         actionButton(inputId = "submitAttributionOnTop", label = "Analyze",
                      style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4")
+                              border-color: #2e6da4;padding:4px; ")
       }
     )
     
@@ -691,7 +698,7 @@ app_server <- function(input, output, session) {
       {
         actionButton(inputId = "submitAttribution2", label = "Analyze",
                      style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4")
+                              border-color: #2e6da4;padding:4px; ")
       }
     )
   })
@@ -730,18 +737,14 @@ app_server <- function(input, output, session) {
       if (catalog.type == "SBS192") {
         sig.universe <- 
           PCAWG7::signature[["genome"]][[catalog.type]][, input$selectedSigSubset2]
-        sigs.prop <- 
-          PCAWG7::exposure.stats$PCAWG[["SBS96"]][[cancer.type]][colnames(sig.universe), ]
       } else {
         sig.universe <- 
           PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
-        sigs.prop <- 
-          PCAWG7::exposure.stats$PCAWG[[catalog.type]][[cancer.type]][colnames(sig.universe), ]
       }
       
-      sig.names <- rownames(sigs.prop)
-      sigs.prop <- unlist(sigs.prop[ , 2])
-      names(sigs.prop) <- sig.names
+      sigs.prop <- mSigAct::ExposureProportions(mutation.type = catalog.type,
+                                                cancer.type = cancer.type,
+                                                all.sigs = sig.universe)
       
       if (FALSE) {
         QP.exposure <- 
@@ -768,12 +771,6 @@ app_server <- function(input, output, session) {
           # Create a callback function to update progress. Each time this is called, it
           # will increase the progress by that value and update the detail
           updateProgress <- function(value = NULL, detail = NULL) {
-            
-            # TODO: Need to change the callback function in mSigAct::MAPAssignActivityInternal
-            # each.level.callback.fn(
-            # value = 1/max.level - 0.01,
-            # detail = paste0("Testing removal of subsets of ", df, " signatures (",
-            #                 length(subsets2), " subsets)"))
             progress$inc(amount = value, detail = detail)
             interruptor$execInterrupts()
           }
@@ -792,6 +789,8 @@ app_server <- function(input, output, session) {
           return(retval)
         }, seed = TRUE) %...>% {
           retval <- .
+          
+          plotdata$retval <<- retval
           
           if (retval$success == FALSE || is.null(retval$success)) {
             output$attributionResults <- renderUI({
@@ -850,6 +849,16 @@ app_server <- function(input, output, session) {
         progress$close()
         running(FALSE) # Declare done with run
       })
+      
+      if (input.catalog.type == "SBS96") {
+      output$sigTestButton2 <- renderUI(
+        { #tags$head(tags$style(make_css(list('.btn', 'white-space', 'pre-wrap'))))
+          actionButton(inputId = "submitSigTest2", 
+                       label = "Check for artifacts/rare signatures",
+                       style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4;padding:4px; ")
+        })
+      }
       
       # Return something other than the future so we don't block the UI
       NULL
@@ -940,6 +949,35 @@ app_server <- function(input, output, session) {
       downloadButton(outputId = 'downloadAttributionResults', 
                      label = 'Download attribution results')
     })
+  })
+  
+  # Show modal when button is clicked.
+  observeEvent(input$submitSigTest2, {
+    showModal(ui =  modalDialog(
+      selectInput(inputId = "selectedArtifact",
+                  label = "Select artifact signature to test",
+                  choices = c("None", mSigAct::PossibleArtifacts())),
+      
+      selectInput(inputId = "selectedRareSig",
+                  label = "Select rare signature to test",
+                  choices = c("None", mSigAct::RareSignatures())),
+      
+      
+      footer = tagList(
+        modalButton(label = "Cancel"),
+        actionButton(inputId = "testSigPresence", label = "Test")
+      )))
+    
+  })
+  
+  observeEvent(input$testSigPresence, {
+    browser()
+    foo <- plotdata
+    
+    
+    mSigAct::SignaturePresenceTest1(spectrum = plotdata$spect,
+                                    )
+    
   })
   
   # When user clicks the "Remove notifications" button, all the previous
