@@ -643,9 +643,12 @@ app_server <- function(input, output, session) {
       
       output$chooseSigSubsetForSampleFromCatalog <- renderUI(
         {
-          sig1 <- PCAWG7::signature[["genome"]]
-          sig2 <- sig1[[input$selectedCatalogType]]
-          sig.universe <- colnames(sig2)
+          if (input$selectedCatalogType == "SBS96") {
+            sig.universe <- colnames(COSMIC.v3.genome.SBS96.sigs)
+          } else {
+            sig.universe <- 
+              colnames(PCAWG7::signature[["genome"]][[input$selectedCatalogType]])
+          }
           
           if (input$selectedCancerType == "Unknown") {
             selected.sig.universe <- NULL
@@ -661,13 +664,11 @@ app_server <- function(input, output, session) {
             
             selected.sig.universe1 <- 
               setdiff(selected.sig.universe0, possible.artifacts)
-            sig.universe <- setdiff(sig.universe, possible.artifacts)
             
             # Exclude rare signatures
             rare.sigs <- mSigAct::RareSignatures()
             selected.sig.universe <-
               setdiff(selected.sig.universe1, rare.sigs)
-            sig.universe <- setdiff(sig.universe, rare.sigs)
           }
           
           selectInput(inputId = "selectedSigSubset2",
@@ -743,10 +744,13 @@ app_server <- function(input, output, session) {
       
       if (catalog.type == "SBS192") {
         sig.universe <- 
-          PCAWG7::signature[["genome"]][[catalog.type]][, input$selectedSigSubset2]
+          PCAWG7::signature[["genome"]][[catalog.type]][, input$selectedSigSubset2, drop = FALSE]
+      } else if (catalog.type == "SBS96") {
+        sig.universe <- 
+          COSMIC.v3.genome.SBS96.sigs[, input$selectedSigSubset2, drop = FALSE]
       } else {
         sig.universe <- 
-          PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2]
+          PCAWG7::signature[[region]][[catalog.type]][, input$selectedSigSubset2, drop = FALSE]
       }
       
       sigs.prop <- mSigAct::ExposureProportions(mutation.type = catalog.type,
@@ -972,39 +976,28 @@ app_server <- function(input, output, session) {
       
       footer = tagList(
         modalButton(label = "Close"),
-        actionButton(inputId = "testSigPresence", label = "Test")
+        actionButton(inputId = "testSigPresence", label = "Test",
+                     style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4")
       )))
     
   })
   
   observeEvent(input$testSigPresence, {
+    #hideTab(inputId = "attributionTabSet", target = "sigPresenceTestTab")
     removeTab(inputId = "attributionTabSet", target = "sigPresenceTestTab")
-    
     withProgress(message = "Testing in progress", value = 0, detail="0%", {
+      
+      if (input$selectedArtifact == "None" && input$selectedRareSig == "None") {
+        showNotification(ui = "Error:", 
+                         action = "No signature selected for testing",
+                         type = "error")
+        return()
+      } 
+      
       sigs <- plotdata$sig.universe
       map.sigs.names <- plotdata$QP.best.MAP.exp$sig.id
-      
       map.sigs <- sigs[, map.sigs.names, drop = FALSE]
-      artifact.sig.to.test <- 
-        COSMIC.v3.genome.SBS96.sigs[, input$selectedArtifact, drop = FALSE]
-      rare.sig.to.test <- 
-        COSMIC.v3.genome.SBS96.sigs[, input$selectedRareSig, drop = FALSE]
-      artifact.sigs <- cbind(artifact.sig.to.test, map.sigs)
-      rare.sigs <- cbind(rare.sig.to.test, map.sigs)
-      
-      incProgress(0.1, detail = "Testing the artifact signature")
-      artifact.sig.test <- 
-        mSigAct::SignaturePresenceTest1(spectrum = plotdata$spect,
-                                        sigs = artifact.sigs,
-                                        target.sig.index = 1,
-                                        m.opts = mSigAct::DefaultManyOpts())
-      incProgress(0.4, detail = "Testing the rare signature")
-      rare.sig.test <-
-        mSigAct::SignaturePresenceTest1(spectrum = plotdata$spect,
-                                        sigs = rare.sigs,
-                                        target.sig.index = 1,
-                                        m.opts = mSigAct::DefaultManyOpts())
-      incProgress(0.4, detail = "Preparing output")
       
       ConvertTextToLinks <- function(text, urls) {
         urls1 <- urls[text, ]
@@ -1013,48 +1006,100 @@ app_server <- function(input, output, session) {
         return(refs)
       }
       
-      artifact.sig.refs.model1 <- ConvertTextToLinks(text = colnames(artifact.sigs), 
-                                                     urls = COSMIC.v3.SBS.sig.links)
       map.sig.refs <- ConvertTextToLinks(text = map.sigs.names, 
                                          urls = COSMIC.v3.SBS.sig.links)
-      rare.sig.refs.model1 <- ConvertTextToLinks(text = colnames(rare.sigs), 
-                                                 urls = COSMIC.v3.SBS.sig.links)
       
-      artifact.sig.test.model1 <- 
-        data.frame(artifact.signature.presence.test = 
-                     paste(artifact.sig.refs.model1, collapse = ","), 
-                   log.likelihood = artifact.sig.test$with,
-                   test.statistic = artifact.sig.test$statistic,
-                   p.value = artifact.sig.test$chisq.p)
-      artifact.sig.test.model2 <-
-        data.frame(artifact.signature.presence.test = 
-                     paste(map.sig.refs, collapse = ","), 
-                   log.likelihood = artifact.sig.test$without)
+      if (input$selectedArtifact != "None") {
+        
+        shinyjs::hide(id = "artifactSigTest")
+        shinyjs::hide(id = "rareSigTest")
+        artifact.sig.to.test <- 
+          COSMIC.v3.genome.SBS96.sigs[, input$selectedArtifact, drop = FALSE]
+        artifact.sigs <- cbind(artifact.sig.to.test, map.sigs)
+        incProgress(0.1, detail = "Testing the artifact signature")
+        artifact.sig.test <- 
+          mSigAct::SignaturePresenceTest1(spectrum = plotdata$spect,
+                                          sigs = artifact.sigs,
+                                          target.sig.index = 1,
+                                          m.opts = mSigAct::DefaultManyOpts())
+        artifact.sig.refs.model1 <- ConvertTextToLinks(text = colnames(artifact.sigs), 
+                                                       urls = COSMIC.v3.SBS.sig.links)
+        
+        # Change the first URL link to red color
+        artifact.sig.refs.model1[1] <- 
+          gsub(pattern = "target='_blank'", 
+               replacement = "target='_blank' style = 'color: red'",
+               x = artifact.sig.refs.model1[1])
+        
+        artifact.sig.test.model1 <- 
+          data.frame(artifact.signature.presence.test = 
+                       paste(artifact.sig.refs.model1, collapse = ","), 
+                     log.likelihood = artifact.sig.test$with,
+                     test.statistic = artifact.sig.test$statistic,
+                     p.value = artifact.sig.test$chisq.p)
+        artifact.sig.test.model2 <-
+          data.frame(artifact.signature.presence.test = 
+                       paste(map.sig.refs, collapse = ","), 
+                     log.likelihood = artifact.sig.test$without)
+        
+        artifact.sig.test.output <- dplyr::bind_rows(artifact.sig.test.model1,
+                                                     artifact.sig.test.model2)
+        incProgress(0.4, detail = "Testing the rare signature")
+      }
       
-      artifact.sig.test.output <- dplyr::bind_rows(artifact.sig.test.model1,
-                                                   artifact.sig.test.model2)
+      if (input$selectedRareSig != "None") {
+        shinyjs::hide(id = "artifactSigTest")
+        shinyjs::hide(id = "rareSigTest")
+        rare.sig.to.test <- 
+          COSMIC.v3.genome.SBS96.sigs[, input$selectedRareSig, drop = FALSE]
+        rare.sigs <- cbind(rare.sig.to.test, map.sigs)
+        rare.sig.test <-
+          mSigAct::SignaturePresenceTest1(spectrum = plotdata$spect,
+                                          sigs = rare.sigs,
+                                          target.sig.index = 1,
+                                          m.opts = mSigAct::DefaultManyOpts())
+        
+        incProgress(0.4, detail = "Preparing output")
+        rare.sig.refs.model1 <- ConvertTextToLinks(text = colnames(rare.sigs), 
+                                                   urls = COSMIC.v3.SBS.sig.links)
+        rare.sig.refs.model1[1] <- 
+          gsub(pattern = "target='_blank'", 
+               replacement = "target='_blank' style = 'color: red'",
+               x = rare.sig.refs.model1[1])
+        
+        rare.sig.test.model1 <- 
+          data.frame(rare.signature.presence.test = 
+                       paste(rare.sig.refs.model1, collapse = ","), 
+                     log.likelihood = rare.sig.test$with,
+                     test.statistic = rare.sig.test$statistic,
+                     p.value = rare.sig.test$chisq.p)
+        rare.sig.test.model2 <-
+          data.frame(rare.signature.presence.test = 
+                       paste(map.sig.refs, collapse = ","), 
+                     log.likelihood = rare.sig.test$without)
+        
+        rare.sig.test.output <- dplyr::bind_rows(rare.sig.test.model1,
+                                                 rare.sig.test.model2)
+      }
       
-      rare.sig.test.model1 <- 
-        data.frame(rare.signature.presence.test = 
-                     paste(rare.sig.refs.model1, collapse = ","), 
-                   log.likelihood = rare.sig.test$with,
-                   test.statistic = rare.sig.test$statistic,
-                   p.value = rare.sig.test$chisq.p)
-      rare.sig.test.model2 <-
-        data.frame(rare.signature.presence.test = 
-                     paste(map.sig.refs, collapse = ","), 
-                   log.likelihood = rare.sig.test$without)
+      #incProgress(0.4, detail = "Preparing output")
       
-      rare.sig.test.output <- dplyr::bind_rows(rare.sig.test.model1,
-                                               rare.sig.test.model2)
+      if (exists("artifact.sig.test.output")) {
+        output$artifactSigTest <- renderTable({
+          artifact.sig.test.output
+        }, sanitize.text.function = function(x) x, digits = 5)
+      } else {
+        output$artifactSigTest <- NULL
+      }
       
-      output$artifactSigTest <- renderTable({
-        artifact.sig.test.output
-      }, sanitize.text.function = function(x) x, digits = 5)
-      
-      output$rareSigTest <- renderTable({
-        rare.sig.test.output
-      }, sanitize.text.function = function(x) x, digits = 5)
+      if (exists("rare.sig.test.output")) {
+        output$rareSigTest <- renderTable({
+          rare.sig.test.output
+        }, sanitize.text.function = function(x) x, digits = 5)
+      } else {
+        output$rareSigTest <- NULL
+      }
+
       
       appendTab(inputId = "attributionTabSet", 
                 tab = tabPanel(title = "Signature presence test", 
@@ -1063,7 +1108,9 @@ app_server <- function(input, output, session) {
                                uiOutput(outputId = "rareSigTest"),
                                value = "sigPresenceTestTab"), 
                 select = TRUE)
-      incProgress(0.1, detail = "Output is ready")
+      
+      setProgress(value = 1, detail = "Output is ready")
+      #incProgress(0.1, detail = "Output is ready")
     })
     
     

@@ -301,6 +301,7 @@ SignatureAttributionUI <- function() {
           splitLayout(cellWidths = c("25%", "75%"),
                       uiOutput(outputId = "analyzeButton2"),
                       uiOutput(outputId = "sigTestButton2")),
+          
           br(),
           uiOutput(outputId = "cancelButton"),
           #actionButton(inputId = "cancel", label = "Cancel"),
