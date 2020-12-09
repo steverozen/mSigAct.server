@@ -298,7 +298,9 @@ SignatureAttributionUI <- function() {
           y4 <- uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog"),
 
           x5 <- uiOutput(outputId = "analyzeButtonForVCF"),
-          y6 <- uiOutput(outputId = "analyzeButton2"),
+          splitLayout(cellWidths = c("25%", "75%"),
+                      uiOutput(outputId = "analyzeButton2"),
+                      uiOutput(outputId = "sigTestButton2")),
           br(),
           uiOutput(outputId = "cancelButton"),
           #actionButton(inputId = "cancel", label = "Cancel"),

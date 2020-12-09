@@ -889,11 +889,13 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
 PrepareAttributionResults <- 
   function (input, output, input.catalog.type, plotdata) {
     output$attributionResults <- renderUI({
-        tabsetPanel(
+        tabsetPanel(id = "attributionTabSet",
           tabPanel(title = "Attribution counts", 
                    uiOutput(outputId = "exposureTable"),
-                   downloadButton(outputId = "downloadExposureTable")),
-          tabPanel(title = "Attribution plot", uiOutput(outputId = "pdfview")))
+                   downloadButton(outputId = "downloadExposureTable"),
+                   value = "attributionCountsTab"),
+          tabPanel(title = "Attribution plot", uiOutput(outputId = "pdfview"),
+                   value = "attributionPdfTab"))
     })
     
     output$downloaResults <- renderUI({

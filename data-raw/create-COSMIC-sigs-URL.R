@@ -1,5 +1,5 @@
 
-COSMIC.v3.SBS.sig.names <- COSMIC.v3.genome.SBS96.sigs
+COSMIC.v3.SBS.sig.names <- colnames(COSMIC.v3.genome.SBS96.sigs)
   #c(colnames(COSMICv3.genome.SBS96.sigs), mSigAct::PossibleArtifacts())
 COSMIC.v3.SBS.sig.urls <- 
   paste0("https://cancer.sanger.ac.uk/cosmic/signatures/SBS/", 
