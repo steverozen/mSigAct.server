@@ -719,6 +719,13 @@ app_server <- function(input, output, session) {
         return()
       }
       
+      if(length(input$selectedSigSubset2) == 0) {
+        showNotification(ui = "Error:", 
+                         action = "No signatures selected for attribution analysis",
+                         type = "error")
+        return()
+      }
+      
       #Don't do anything if in the middle of a run
       if(running())
         return(NULL)
