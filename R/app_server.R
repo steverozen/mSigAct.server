@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-future::plan(future::multisession)
+#future::plan(future::multisession)
 
 #' @import mSigAct
 #' @import promises
@@ -23,8 +23,6 @@ app_server <- function(input, output, session) {
   plotdata <- reactiveValues(cossim = NULL, spect = NULL, 
                              reconstructed.catalog = NULL,
                              sig.universe = NULL, QP.best.MAP.exp = NULL)
-  
-  output$exampleSpectraText <- renderText("Load example spectra")
   
   # When user clicks the action link on Home page, direct user to the relevant tab
   observeEvent(input$linkToGenerateCatalogTab, {
