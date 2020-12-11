@@ -32,6 +32,7 @@ app_ui <- function(request) {
                             tabPanel(title = "Attribution counts", 
                                      value = "attributionCountsBest"),
                             tabPanel(title = "Attribution plot", 
+                                     uiOutput(outputId = "pdfview2"),
                                      value = "attributionPlotBest"),
                             tabPanel(title = "Signature presence test",
                                      value = "sigPresenceTestBest")

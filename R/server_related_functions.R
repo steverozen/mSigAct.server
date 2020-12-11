@@ -946,7 +946,12 @@ PrepareAttributionResults <-
   
   src.file.path <- paste0("results", "/", pdf.file.name)
   output$pdfview <- renderUI({
-    tags$iframe(style="height:600px; width:100%", 
+    tags$iframe(style="height:1000px; width:100%;scrolling=yes", 
+                src= src.file.path)
+  })
+  
+  output$pdfview2 <- renderUI({
+    tags$iframe(style="height:1000px; width:100%;scrolling=yes", 
                 src= src.file.path)
   })
   
