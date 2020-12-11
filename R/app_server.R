@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-future::plan(future::multisession)
+#future::plan(future::multisession)
 
 #' @import mSigAct
 #' @import promises
@@ -616,11 +616,50 @@ app_server <- function(input, output, session) {
         }
       )
       
+      output$selectSampleFromCatalogForAttribution2 <- renderUI(
+        { 
+          catalog <<- ICAMS::ReadCatalog(file = catalog.path,
+                                         ref.genome = input$ref.genome2,
+                                         region = input$region2)
+          
+          if (nrow(catalog) == 96) {
+            input.catalog.type <<- "SBS96"
+          } else if (nrow(catalog) == 192) {
+            input.catalog.type <<- "SBS192"
+          } else if (nrow(catalog) == 1536) {
+            input.catalog.type <<- "SBS1536"
+          } else if (nrow(catalog) == 78) {
+            input.catalog.type <<- "DBS78"
+          } else if (nrow(catalog) == 136) {
+            input.catalog.type <<- "DBS136"
+          } else if (nrow(catalog) == 144) {
+            input.catalog.type <<- "DBS144"
+          } else if (nrow(catalog) == 83) {
+            input.catalog.type <<- "ID"
+          }
+          
+          sample.names <- colnames(catalog)
+          selectInput(inputId = "selectedSampleFromCatalogForAttribution2",
+                      label = "Select the sample from uploaded spectra",
+                      choices = sample.names)
+        }
+      )
+      
       output$selectCancerType <- renderUI(
         {
           cancer.types <-
             c("Unknown", colnames(CancerTypeToExposureStatData()))
           selectInput(inputId = "selectedCancerType",
+                      label = "Select the cancer type",
+                      choices = cancer.types)
+        }
+      )
+      
+      output$selectCancerType2 <- renderUI(
+        {
+          cancer.types <-
+            c("Unknown", colnames(CancerTypeToExposureStatData()))
+          selectInput(inputId = "selectedCancerType2",
                       label = "Select the cancer type",
                       choices = cancer.types)
         }
@@ -633,6 +672,12 @@ app_server <- function(input, output, session) {
                       label = "Select the catalog type",
                       choices = catalog.type,
                       selected = input.catalog.type)
+        }
+      )
+      
+      output$uploadedCatalogType <- renderUI(
+        {
+            p(tags$b("Uploaded catalog type: "), input.catalog.type)
         }
       )
     })
@@ -685,7 +730,77 @@ app_server <- function(input, output, session) {
     }
     
   })
-
+  
+  
+  observeEvent(input$selectedCancerType2, {
+    if (input$selectedCancerType2 != "Unknown") {
+      
+      output$chooseSigSubsetForSampleFromCatalog2 <- renderUI(
+        {
+          if (input.catalog.type == "SBS96") {
+            sig.universe <- colnames(COSMIC.v3.genome.SBS96.sigs)
+          } else {
+            sig.universe <- 
+              colnames(PCAWG7::signature[["genome"]][[input.catalog.type]])
+          }
+          
+          if (input$selectedCancerType2 == "Unknown") {
+            selected.sig.universe <- NULL
+          } else {
+            tmp <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType2,
+                                         tumor.cohort = "PCAWG",
+                                         sig.type = input.catalog.type,
+                                         region = "genome")
+            selected.sig.universe0 <- colnames(tmp)
+            
+            # Exclude possible artifact signatures
+            possible.artifacts <- mSigAct::PossibleArtifacts()
+            
+            selected.sig.universe1 <- 
+              setdiff(selected.sig.universe0, possible.artifacts)
+            
+            # Exclude rare signatures
+            rare.sigs <- mSigAct::RareSignatures()
+            selected.sig.universe <-
+              setdiff(selected.sig.universe1, rare.sigs)
+          }
+          
+          tagList(
+            checkboxGroupInput(inputId = "preselectedSigs",
+                               label = paste0("These signatures were preselected based ",  
+                                              "on cancer type."),
+                               choiceNames = 
+                                 list(p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS1.tt", 
+                                          "SBS1"), " proposed etilology: Age"),
+                                      p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS2.tt", 
+                                          "SBS2"), " proposed etilology: Apobec"),
+                                      p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS3.tt", 
+                                          "SBS3"), " proposed etilology: BRCA1 / BRCA2")),
+                               choiceValues = list("SBS1", "SBS2", "SBS3"),
+                               selected = c("SBS1", "SBS2", "SBS3")
+            ),
+            
+            if (FALSE) {
+              selectInput(inputId = "selectedSigSubset3",
+                          label = paste0("These signatures were preselected based ",  
+                                         "on cancer type. Move your cursor to click one ",
+                                         "signature and press Backspace key to exclude ", 
+                                         "the signature. Click the empty space inside ",
+                                         "the box below to add new signature."),
+                          choices = sig.universe,
+                          selected = selected.sig.universe,
+                          multiple = TRUE)
+            }
+            
+          )
+            
+          
+        }
+      )
+    }
+    
+  })
+  
   observeEvent(input$selectedSigSubset2, {
     output$analyzeButtonOnTop <- renderUI(
       {
@@ -786,6 +901,9 @@ app_server <- function(input, output, session) {
             interruptor$execInterrupts()
           }
           
+          AdjustNumberOfCores <- 
+            getFromNamespace(x = "Adj.mc.cores", ns = "mSigAct")
+          
           retval <- mSigAct::MAPAssignActivity1(
             spect = spect,
             sigs = sig.universe,
@@ -793,7 +911,7 @@ app_server <- function(input, output, session) {
             max.level = length(sigs.prop) - 1,
             p.thresh = 0.01,
             m.opts = mSigAct::DefaultManyOpts(),
-            max.mc.cores = 50,
+            max.mc.cores = AdjustNumberOfCores(50),
             progress.monitor = updateProgress
           )
           

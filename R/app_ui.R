@@ -23,6 +23,40 @@ app_ui <- function(request) {
                value = "showSpectraTab"),
       tabPanel(title = "Signature attributions", SignatureAttributionUI(), 
                value = "sigAttributionTab"),
+      tabPanel(title = "Signature attributions2", SignatureAttributionUI2(), 
+               value = "sigAttributionTab2"),
+      navbarMenu(title = "AttributionResults",
+                 tabPanel(title = "Best Results",
+                          p("Best result"),
+                          tabsetPanel(
+                            tabPanel(title = "Attribution counts", 
+                                     value = "attributionCountsBest"),
+                            tabPanel(title = "Attribution plot", 
+                                     value = "attributionPlotBest"),
+                            tabPanel(title = "Signature presence test",
+                                     value = "sigPresenceTestBest")
+                          ), value = "bestResult"),
+                 tabPanel(title = "Second best result",
+                          p("Second best result"),
+                          tabsetPanel(
+                            tabPanel(title = "Attribution counts", 
+                                     value = "attributionCountsSecond"),
+                            tabPanel(title = "Attribution plot", 
+                                     value = "attributionPlotSecond"),
+                            tabPanel(title = "Signature presence test",
+                                     value = "sigPresenceTestSecond")
+                          ), value = "secondBestResult"),
+                 tabPanel(title = "Third best result",
+                          p("Third best result"),
+                          tabsetPanel(
+                            tabPanel(title = "Attribution counts", 
+                                     value = "attributionCountsThird"),
+                            tabPanel(title = "Attribution plot", 
+                                     value = "attributionPlotThird"),
+                            tabPanel(title = "Signature presence test",
+                                     value = "sigPresenceTestThird")
+                          ), value = "thirdBestResult")
+      ),
       position = "fixed-top"),
     
     # Add padding because navbar pinned at the top
@@ -320,6 +354,18 @@ SignatureAttributionUI <- function() {
       )
 
     )
+  )
+}
+
+#' @import shiny
+SignatureAttributionUI2 <- function() {
+  fixedPage(
+    uiOutput(outputId = "selectSampleFromCatalogForAttribution2"),
+    uiOutput(outputId = "selectCancerType2"),
+    uiOutput(outputId = "uploadedCatalogType"),
+    uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog2")
+                         
+      
   )
 }
 
