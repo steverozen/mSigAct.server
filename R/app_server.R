@@ -640,7 +640,7 @@ app_server <- function(input, output, session) {
           
           sample.names <- colnames(catalog)
           selectInput(inputId = "selectedSampleFromCatalogForAttribution2",
-                      label = "Select the sample from uploaded spectra",
+                      label = "Select sample from uploaded spectra",
                       choices = sample.names)
         }
       )
@@ -660,7 +660,7 @@ app_server <- function(input, output, session) {
           cancer.types <-
             c("Unknown", colnames(CancerTypeToExposureStatData()))
           selectInput(inputId = "selectedCancerType2",
-                      label = "Select the cancer type",
+                      label = "Select cancer type",
                       choices = cancer.types)
         }
       )
@@ -677,7 +677,7 @@ app_server <- function(input, output, session) {
       
       output$uploadedCatalogType <- renderUI(
         {
-            p(tags$b("Uploaded catalog type: "), input.catalog.type)
+            p(tags$b("Mutation type: "), input.catalog.type)
         }
       )
     })
@@ -771,11 +771,11 @@ app_server <- function(input, output, session) {
                                               "on cancer type."),
                                choiceNames = 
                                  list(p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS1.tt", 
-                                          "SBS1"), " proposed etilology: Age"),
+                                          "SBS1"), " etiology: Age"),
                                       p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS2.tt", 
-                                          "SBS2"), " proposed etilology: Apobec"),
+                                          "SBS2"), " etiology: APOBEC"),
                                       p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS3.tt", 
-                                          "SBS3"), " proposed etilology: BRCA1 / BRCA2")),
+                                          "SBS3"), " etiology: BRCA1 / BRCA2")),
                                choiceValues = list("SBS1", "SBS2", "SBS3"),
                                selected = c("SBS1", "SBS2", "SBS3")
             ),
