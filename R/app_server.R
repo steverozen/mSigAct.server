@@ -746,18 +746,44 @@ app_server <- function(input, output, session) {
                               border-color: #2e6da4;padding:4px; ")
       )
       
-      dat <- data.frame(
-        name = c('<a href="http://rstudio.com">SBS1</a>', '<a href="http://rstudio.com">SBS2</a>'),
-        spectrum = c('<img src="SBS96/SBS1.png" height="52"></img>',
-                     '<img src="SBS96/SBS2.png" height="52"></img>'),
-        proposed.aetiology = c('Spontaneous deamination of 5-methylcytosine (clock-like signature)',
-                               'Activity of APOBEC family of cytidine deaminases')
-      )
-      
-      rownames(dat) <- c("SBS1", "SBS2")
-      
-      output$mytable <- DT::renderDataTable({
+      if (input.catalog.type == "SBS96") {
+        dat <- data.frame(
+          name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
+                        rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
+          spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.png"',
+                            ' height="52"></img>'),
+          proposed.aetiology = SBS.aetiology)
+        } else if (input.catalog.type == "SBS192") {
+          dat <- data.frame(
+            name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
+                          rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
+            spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.png"',
+                              ' height="52"></img>'),
+            proposed.aetiology = SBS.aetiology)
+        } else if (input.catalog.type == "DBS78") {
+          dat <- data.frame(
+            name = paste0("<a href='", COSMIC.v3.DBS.sig.links, "' target='_blank'>", 
+                          rownames(COSMIC.v3.DBS.sig.links),  "</a>"), 
+            spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.png"',
+                              ' height="52"></img>'),
+            proposed.aetiology = DBS.aetiology)
+        } else if (input.catalog.type == "ID") {
+          dat <- data.frame(
+            name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
+                          rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
+            spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.png"',
+                              ' height="52"></img>'),
+            proposed.aetiology = ID.aetiology)
+        } else {
+          dat <- data.frame(
+            name = character(), 
+            spectrum = character(),
+            proposed.aetiology = character())
+        }
         
+        #rownames(dat) <- names(COSMIC.v3.SBS.sig.links)
+          
+      output$mytable <- DT::renderDataTable({
         DT::datatable(dat[input$preselectedSigs, ], escape = FALSE, rownames = FALSE) # HERE)
       })
     }
