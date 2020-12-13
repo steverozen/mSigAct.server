@@ -1,34 +1,27 @@
-library(shiny)
 ui <- fluidPage(
-  
-  
-  titlePanel("Old Faithful Geyser Data"),
-  
-  tabsetPanel(               
-    tabPanel("Tab 1", h1("First tab") ),
-    tabPanel("Tab2",
-             sidebarLayout(
-               sidebarPanel(width = 3, sliderInput("bins",
-                                                   "Number of bins:",
-                                                   min = 1,
-                                                   max = 50,
-                                                   value = 30)
-               ),
-               
-               mainPanel(
-                 plotOutput("distPlot")
-               )
-             )
-    )
-  )
+  checkboxGroupInput(inputId = "preselectedSigs",
+                     label = HTML('<p>Select metadata <a href=https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/12-2010.1>permacomparisons</a></p>'),
+                     choiceNames = foo1,
+                     choiceValues = list("SBS2", "SBS3"),
+                     selected = c("SBS2", "SBS3")
+  ),
+  textOutput("txt")
 )
-server <- function(input, output) {
-  
-  output$distPlot <- renderPlot({
-    x    <- faithful[, 2] 
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
+
+server <- function(input, output, session) {
+  output$txt <- renderText({
+    icons <- paste(input$icons, collapse = ", ")
+    paste("You chose", icons)
   })
 }
-shinyApp(ui = ui, server = server)
+
+shinyApp(ui, server)
+
+
+if (FALSE) {
+  f1 <- function(){
+    shinydashboard::box(title = "SBS1", solidHeader = TRUE,
+                        "Propsed aetiology: Spontaneous deamination of 5-methylcytosine (clock-like signature)",
+                        img(height = 94, width = 500,src = "www/SBS1.PNG"))
+  }
+}

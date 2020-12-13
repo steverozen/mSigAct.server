@@ -768,14 +768,14 @@ app_server <- function(input, output, session) {
           tagList(
             checkboxGroupInput(inputId = "preselectedSigs",
                                label = paste0("These signatures were preselected based ",  
-                                              "on cancer type."),
+                                              "on cancer type"),
                                choiceNames = 
-                                 list(p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS1.tt", 
-                                          "SBS1"), " etiology: Age"),
-                                      p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS2.tt", 
-                                          "SBS2"), " etiology: APOBEC"),
-                                      p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS3.tt", 
-                                          "SBS3"), " etiology: BRCA1 / BRCA2")),
+                                 list(p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS1.tt", target = "_blank",
+                                          "SBS1"), " etiology: Spontaneous deamination of 5-methylcytosine (clock-like signature)"),
+                                      p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS2.tt", target = "_blank", 
+                                          "SBS2"), " etiology: Activity of APOBEC family of cytidine deaminases"),
+                                      p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS3.tt", target = "_blank",
+                                          "SBS3"), " etiology: Defective homologous recombination DNA damage repair")),
                                choiceValues = list("SBS1", "SBS2", "SBS3"),
                                selected = c("SBS1", "SBS2", "SBS3")
             ),
