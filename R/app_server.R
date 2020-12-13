@@ -765,19 +765,25 @@ app_server <- function(input, output, session) {
               setdiff(selected.sig.universe1, rare.sigs)
           }
           
+          if (input.catalog.type %in% c("SBS96", "SBS192")) {
+            tmp <- unname(SBS.aetiology.HTML[selected.sig.universe])
+            choice.names <- lapply(tmp, FUN = HTML)
+          } else if (input.catalog.type == "DBS78") {
+            tmp <- unname(DBS.aetiology.HTML[selected.sig.universe])
+            choice.names <- lapply(tmp, FUN = HTML)
+          } else if (input.catalog.type == "ID") {
+            tmp <- unname(ID.aetiology.HTML[selected.sig.universe])
+            choice.names <- lapply(tmp, FUN = HTML)
+          }
+          
+          choice.values <- unname(sapply(selected.sig.universe, FUN = list))
           tagList(
             checkboxGroupInput(inputId = "preselectedSigs",
                                label = paste0("These signatures were preselected based ",  
                                               "on cancer type"),
-                               choiceNames = 
-                                 list(p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS1.tt", target = "_blank",
-                                          "SBS1"), " etiology: Spontaneous deamination of 5-methylcytosine (clock-like signature)"),
-                                      p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS2.tt", target = "_blank", 
-                                          "SBS2"), " etiology: Activity of APOBEC family of cytidine deaminases"),
-                                      p(a(href = "https://cancer.sanger.ac.uk/cosmic/signatures/SBS/SBS3.tt", target = "_blank",
-                                          "SBS3"), " etiology: Defective homologous recombination DNA damage repair")),
-                               choiceValues = list("SBS1", "SBS2", "SBS3"),
-                               selected = c("SBS1", "SBS2", "SBS3")
+                               choiceNames = choice.names,
+                               choiceValues = choice.values,
+                               selected = selected.sig.universe
             ),
             
             if (FALSE) {
