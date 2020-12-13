@@ -65,7 +65,6 @@ app_ui <- function(request) {
   )
 }
 
-#' @import shinyhelper
 #' @import shiny
 HomeUI <- function() {
   # List the first level UI elements here
@@ -107,15 +106,6 @@ HomeUI <- function() {
         "\"The repertoire of mutational signatures in human cancer\"", target = "_blank"),
       " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",
       "COSMIC Mutational Signatures", target = "_blank")),
-
-    if (FALSE) {
-      fixedRow(column(2, shinyhelper::helper(shiny::actionButton("go", "click me!"),
-                                             icon = "question-circle",
-                                             colour = "grey",
-                                             type = "inline",
-                                             content = "ClickHelp")))
-    },
-
 
     # Add an overview picture about the Shiny interface
     img(src = "www/rozen-mut-sig-collage.png", width = "601", height = "430"),
@@ -372,6 +362,8 @@ SignatureAttributionUI2 <- function() {
         uiOutput(outputId = "addSig2")),
       
       mainPanel(
+        # Must use DT::dataTableOutput instead of dataTableOutput,
+        # otherwise, the data table will not show up
         DT::dataTableOutput(outputId = "mytable")
       )
     )
@@ -386,7 +378,19 @@ golem_add_external_resources <- function(){
   )
   
   addResourcePath(
-    'SBS', system.file('app/SBS', package = 'ICAMS.shiny')
+    'SBS96', system.file('app/SBS96', package = 'ICAMS.shiny')
+  )
+  
+  addResourcePath(
+    'SBS192', system.file('app/SBS192', package = 'ICAMS.shiny')
+  )
+  
+  addResourcePath(
+    'DBS78', system.file('app/DBS78', package = 'ICAMS.shiny')
+  )
+  
+  addResourcePath(
+    'ID', system.file('app/ID', package = 'ICAMS.shiny')
   )
 
   tags$head(

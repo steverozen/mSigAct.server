@@ -748,8 +748,8 @@ app_server <- function(input, output, session) {
       
       dat <- data.frame(
         name = c('<a href="http://rstudio.com">SBS1</a>', '<a href="http://rstudio.com">SBS2</a>'),
-        spectrum = c('<img src="SBS/SBS1.png" height="52"></img>',
-                     '<img src="SBS/SBS2.png" height="52"></img>'),
+        spectrum = c('<img src="SBS96/SBS1.png" height="52"></img>',
+                     '<img src="SBS96/SBS2.png" height="52"></img>'),
         proposed.aetiology = c('Spontaneous deamination of 5-methylcytosine (clock-like signature)',
                                'Activity of APOBEC family of cytidine deaminases')
       )

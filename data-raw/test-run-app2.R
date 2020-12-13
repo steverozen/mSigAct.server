@@ -1,33 +1,28 @@
+library(shiny)
+library(shinyWidgets)
+
+managers <- c('Ram', 'Vijay','Arun','Aswin')
+dept <- c('A','B','C','D')
+details <- data.frame("Managers" = managers, "Department" = dept, stringsAsFactors = F)
+
 ui <- fluidPage(
-  checkboxGroupInput(inputId = "preselectedSigs",
-                                    label = paste0("These signatures were preselected based ",  
-                                                   "on cancer type."),
-                                    choiceNames = 
-                                      list(HTML('<img height="94" width="500" src="www/SBS1.PNG"/>'),
-                                           HTML('<img height="94" width="500" src="www/SBS2.PNG"/>'),
-                                           shinydashboard::box("SBS1",
-                                                               img(height = 94, width = 500,src = "www/SBS1.PNG")),
-                                           shinydashboard::box(
-                                             title = "Inputs", solidHeader = TRUE,
-                                             "Box content here", br(), "More box content",
-                                             sliderInput("slider", "Slider input:", 1, 100, 50),
-                                             textInput("text", "Text input:")
-                                           )),
-                                    choiceValues = list("SBS1", "SBS2", "SBS3", "SBS4"),
-                                    selected = c("SBS1", "SBS2", "SBS3", "SBS4")
-                                    
-  )
- 
-  ,
-  textOutput("txt")
+  pickerInput(
+    'manager', 'Manager',
+    choices = managers ,
+    c('Ram', 'Vijay','Arun','Aswin'),
+    options = list(
+      `actions-box` = TRUE),
+    multiple = TRUE
+  ),
+  uiOutput('picker2')
 )
 
 server <- function(input, output, session) {
-  output$txt <- renderText({
-    icons <- paste(input$icons, collapse = ", ")
-    paste("You chose", icons)
+  output$picker2 <- renderUI({
+    choices = details$Department[details$Managers %in% input$manager]
+    pickerInput('dept', 'Department', choices = choices, choices, options = list(
+      `actions-box` = TRUE), multiple = TRUE)
   })
 }
 
 shinyApp(ui, server)
-

@@ -6,6 +6,8 @@
 
 * Added data table to show the thumbnail of signatures and aetiology information.
 
+* Added thumbnail pictures for SBS96, SBS192, DBS78 and ID.
+
 <br>
 
 # ICAMS.shiny 0.0.3

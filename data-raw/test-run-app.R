@@ -1,27 +1,38 @@
-ui <- fluidPage(
-  checkboxGroupInput(inputId = "preselectedSigs",
-                     label = HTML('<p>Select metadata <a href=https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/12-2010.1>permacomparisons</a></p>'),
-                     choiceNames = foo1,
-                     choiceValues = list("SBS2", "SBS3"),
-                     selected = c("SBS2", "SBS3")
-  ),
-  textOutput("txt")
-)
-
-server <- function(input, output, session) {
-  output$txt <- renderText({
-    icons <- paste(input$icons, collapse = ", ")
-    paste("You chose", icons)
+library(shiny)
+mymtcars = mtcars
+mymtcars$id = 1:nrow(mtcars)
+runApp(
+  list(ui = pageWithSidebar(
+    headerPanel('Examples of DataTables'),
+    sidebarPanel(
+      shinyWidgets::pickerInput(inputId = 'selectedSig', label = 'Selected signatures', 
+                         choices = c("SBS1", "SBS2"),
+                         selected = c("SBS1", "SBS2"),
+                         options = list(
+                           `actions-box` = TRUE), 
+                         multiple = TRUE),
+      textInput("collection_txt",label="Foo")
+    ),
+    mainPanel(
+      dataTableOutput("mytable")
+    )
+  )
+  , server = function(input, output, session) {
+    
+    dat <- data.frame(
+      name = c('<a href="http://rstudio.com">SBS1</a>', '<a href="http://rstudio.com">SBS2</a>'),
+      spectrum = c('<img src="SBS/SBS1.png" height="52"></img>',
+               '<img src="SBS/SBS2.png" height="52"></img>'),
+      proposed.aetiology = c('Spontaneous deamination of 5-methylcytosine (clock-like signature)',
+                    'Activity of APOBEC family of cytidine deaminases')
+    )
+    
+    rownames(dat) <- c("SBS1", "SBS2")
+    
+    
+    output$mytable <- DT::renderDataTable({
+      
+      DT::datatable(dat[input$selectedSig, ], escape = FALSE, rownames = FALSE) # HERE)
   })
-}
-
-shinyApp(ui, server)
-
-
-if (FALSE) {
-  f1 <- function(){
-    shinydashboard::box(title = "SBS1", solidHeader = TRUE,
-                        "Propsed aetiology: Spontaneous deamination of 5-methylcytosine (clock-like signature)",
-                        img(height = 94, width = 500,src = "www/SBS1.PNG"))
-  }
-}
+  })
+)
