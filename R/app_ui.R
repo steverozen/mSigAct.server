@@ -118,8 +118,7 @@ HomeUI <- function() {
 
 
     # Add an overview picture about the Shiny interface
-    img(src = "www/rozen-mut-sig-collage.png", width = "601", height = "430")
-
+    img(src = "www/rozen-mut-sig-collage.png", width = "601", height = "430"),
   )
 }
 
@@ -361,12 +360,21 @@ SignatureAttributionUI <- function() {
 #' @import shiny
 SignatureAttributionUI2 <- function() {
   fixedPage(
-    uiOutput(outputId = "selectSampleFromCatalogForAttribution2"),
-    uiOutput(outputId = "selectCancerType2"),
-    uiOutput(outputId = "uploadedCatalogType"),
-    uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog2")
-                         
+    sidebarLayout(
+      sidebarPanel(
+        uiOutput(outputId = "selectSampleFromCatalogForAttribution2"),
+        uiOutput(outputId = "selectCancerType2"),
+        uiOutput(outputId = "uploadedCatalogType"),
+        uiOutput(outputId = "addSig1"),
+        br(),
+        uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog2"),
+        #br(),
+        uiOutput(outputId = "addSig2")),
       
+      mainPanel(
+        DT::dataTableOutput(outputId = "mytable")
+      )
+    )
   )
 }
 
@@ -375,6 +383,10 @@ golem_add_external_resources <- function(){
 
   addResourcePath(
     'www', system.file('app/www', package = 'ICAMS.shiny')
+  )
+  
+  addResourcePath(
+    'SBS', system.file('app/SBS', package = 'ICAMS.shiny')
   )
 
   tags$head(

@@ -46,7 +46,7 @@ app_server <- function(input, output, session) {
   # Create a variable which can be used to store the uploaded catalog later
   catalog <- NA
   
-  catalog.path <- input.catalog.type <- NA
+  choose.more.sigs <- catalog.path <- input.catalog.type <- NA
   
   showSBS192Catalog <- TRUE
   
@@ -682,56 +682,6 @@ app_server <- function(input, output, session) {
       )
     })
 
-
-  observeEvent(input$selectedCancerType, {
-    if (input$selectedCancerType != "Unknown") {
-      
-      output$chooseSigSubsetForSampleFromCatalog <- renderUI(
-        {
-          if (input$selectedCatalogType == "SBS96") {
-            sig.universe <- colnames(COSMIC.v3.genome.SBS96.sigs)
-          } else {
-            sig.universe <- 
-              colnames(PCAWG7::signature[["genome"]][[input$selectedCatalogType]])
-          }
-          
-          if (input$selectedCancerType == "Unknown") {
-            selected.sig.universe <- NULL
-          } else {
-            tmp <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType,
-                                         tumor.cohort = "PCAWG",
-                                         sig.type = input$selectedCatalogType,
-                                         region = "genome")
-            selected.sig.universe0 <- colnames(tmp)
-            
-            # Exclude possible artifact signatures
-            possible.artifacts <- mSigAct::PossibleArtifacts()
-            
-            selected.sig.universe1 <- 
-              setdiff(selected.sig.universe0, possible.artifacts)
-            
-            # Exclude rare signatures
-            rare.sigs <- mSigAct::RareSignatures()
-            selected.sig.universe <-
-              setdiff(selected.sig.universe1, rare.sigs)
-          }
-          
-          selectInput(inputId = "selectedSigSubset2",
-                      label = paste0("These signatures were preselected based ",  
-                                     "on cancer type. Move your cursor to click one ",
-                                     "signature and press Backspace key to exclude ", 
-                                     "the signature. Click the empty space inside ",
-                                     "the box below to add new signature."),
-                      choices = sig.universe,
-                      selected = selected.sig.universe,
-                      multiple = TRUE)
-        }
-      )
-    }
-    
-  })
-  
-  
   observeEvent(input$selectedCancerType2, {
     if (input$selectedCancerType2 != "Unknown") {
       
@@ -765,47 +715,78 @@ app_server <- function(input, output, session) {
               setdiff(selected.sig.universe1, rare.sigs)
           }
           
-          if (input.catalog.type %in% c("SBS96", "SBS192")) {
-            tmp <- unname(SBS.aetiology.HTML[selected.sig.universe])
-            choice.names <- lapply(tmp, FUN = HTML)
-          } else if (input.catalog.type == "DBS78") {
-            tmp <- unname(DBS.aetiology.HTML[selected.sig.universe])
-            choice.names <- lapply(tmp, FUN = HTML)
-          } else if (input.catalog.type == "ID") {
-            tmp <- unname(ID.aetiology.HTML[selected.sig.universe])
-            choice.names <- lapply(tmp, FUN = HTML)
-          }
+          choose.more.sigs <<- setdiff(sig.universe, selected.sig.universe)
           
-          choice.values <- unname(sapply(selected.sig.universe, FUN = list))
-          tagList(
-            checkboxGroupInput(inputId = "preselectedSigs",
-                               label = paste0("These signatures were preselected based ",  
-                                              "on cancer type"),
-                               choiceNames = choice.names,
-                               choiceValues = choice.values,
-                               selected = selected.sig.universe
-            ),
-            
-            if (FALSE) {
-              selectInput(inputId = "selectedSigSubset3",
-                          label = paste0("These signatures were preselected based ",  
-                                         "on cancer type. Move your cursor to click one ",
-                                         "signature and press Backspace key to exclude ", 
-                                         "the signature. Click the empty space inside ",
-                                         "the box below to add new signature."),
-                          choices = sig.universe,
-                          selected = selected.sig.universe,
-                          multiple = TRUE)
-            }
-            
+          shinyWidgets::pickerInput (inputId = "preselectedSigs",
+                                     label = paste0("These signatures were preselected based ",  
+                                                    "on cancer type"),
+                                     choices = selected.sig.universe,
+                                     selected = selected.sig.universe,
+                                     options = shinyWidgets::pickerOptions(
+                                       actionsBox = TRUE,
+                                       dropupAuto = FALSE
+                                     ), 
+                                     multiple = TRUE
           )
+          
+          
             
           
         }
       )
+      output$addSig1 <- renderUI(
+        actionButton(inputId = "addMoreSigs1", label = "Add more signatures",
+                     style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4;padding:4px; ")
+      )
+      
+      output$addSig2 <- renderUI(
+        actionButton(inputId = "addMoreSigs2", label = "Add more signatures",
+                     style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4;padding:4px; ")
+      )
+      
+      dat <- data.frame(
+        name = c('<a href="http://rstudio.com">SBS1</a>', '<a href="http://rstudio.com">SBS2</a>'),
+        spectrum = c('<img src="SBS/SBS1.png" height="52"></img>',
+                     '<img src="SBS/SBS2.png" height="52"></img>'),
+        proposed.aetiology = c('Spontaneous deamination of 5-methylcytosine (clock-like signature)',
+                               'Activity of APOBEC family of cytidine deaminases')
+      )
+      
+      rownames(dat) <- c("SBS1", "SBS2")
+      
+      output$mytable <- DT::renderDataTable({
+        
+        DT::datatable(dat[input$preselectedSigs, ], escape = FALSE, rownames = FALSE) # HERE)
+      })
     }
     
   })
+  
+  observeEvent(input$addMoreSigs1, {
+    output$chooseMoreSigs <- renderUI({
+      if (input.catalog.type %in% c("SBS96", "SBS192")) {
+        tmp <- unname(SBS.aetiology.HTML[choose.more.sigs])
+        choice.names <- lapply(tmp, FUN = HTML)
+      } else if (input.catalog.type == "DBS78") {
+        tmp <- unname(DBS.aetiology.HTML[choose.more.sigs])
+        choice.names <- lapply(tmp, FUN = HTML)
+      } else if (input.catalog.type == "ID") {
+        tmp <- unname(ID.aetiology.HTML[choose.more.sigs])
+        choice.names <- lapply(tmp, FUN = HTML)
+      }
+        
+      choice.values <- unname(sapply(choose.more.sigs, FUN = list))
+      tagList(
+        checkboxGroupInput(inputId = "selectMoreSigs",
+                           label = "Choose more signatures",  
+                           choiceNames = choice.names,
+                           choiceValues = choice.values)
+        )  
+    })
+  })
+  
   
   observeEvent(input$selectedSigSubset2, {
     output$analyzeButtonOnTop <- renderUI(

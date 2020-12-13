@@ -2,6 +2,10 @@
 ## Added
 * Added signature presence test for **SBS96** artifact and rare signatures.
 
+* Added new internal data containing the signatures aetiology information.
+
+* Added data table to show the thumbnail of signatures and aetiology information.
+
 <br>
 
 # ICAMS.shiny 0.0.3
