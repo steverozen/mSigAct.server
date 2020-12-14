@@ -1,16 +1,18 @@
-Package: ICAMS.shiny
-Title: An Amazing Shiny App
+Package: mSigAct.server
+Title: Shiny server for analyzing mutational signature activities
 Version: 0.0.4
-Author: Author
-Maintainer: Author <your@email.com>
-Description: What the package does (one paragraph).
+Author: Nanhai Jiang, Steven G. Rozen
+Maintainer: Nanhai Jiang <jiangnanhai@hotmail.com>
+Description: Shiny server for analyzing mutational signature activities; 
+    uses mSigAct (https://github.com/steverozen/mSigAct), 
+ICAMS (https://cran.r-project.org/package=ICAMS), and related functionality.
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Language: en-US
 biocViews:
 Depends: 
-    R (>= 3.5)
+    R (>= 4.0)
 Imports: config,
     data.table,
     dplyr,
