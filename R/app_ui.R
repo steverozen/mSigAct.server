@@ -2,6 +2,8 @@ jscode <- "
 shinyjs.init = function() {
   $('#panels li a[data-value=showSpectraTab]').hide();
   $('#panels li a[data-value=sigAttributionTab]').hide();
+  $('#panels li a[data-value=sigAttributionTab2]').hide();
+  $('#panels li a[data-value=attributionResultsTab]').hide();
 }"
 
 #' @import shiny
@@ -22,9 +24,10 @@ app_ui <- function(request) {
                value = "showSpectraTab"),
       tabPanel(title = "Signature attributions", SignatureAttributionUI(), 
                value = "sigAttributionTab"),
-      tabPanel(title = "Signature attributions2", SignatureAttributionUI2(), 
+      tabPanel(title = "Signature attributions", SignatureAttributionUI2(), 
                value = "sigAttributionTab2"),
-      tabPanel(title = "Results", AttributionResultsUI()),
+      tabPanel(title = "Results", AttributionResultsUI(),
+               value = "attributionResultsTab"),
       position = "fixed-top"),
     
     # Add padding because navbar pinned at the top

@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-future::plan(future::multisession)
+#future::plan(future::multisession)
 
 #' @import mSigAct
 #' @import promises
@@ -427,7 +427,7 @@ app_server <- function(input, output, session) {
     } else {
       req(input$ref.genome2, input$region2)
       shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                      selected = "showSpectraTab")
     }
@@ -442,9 +442,9 @@ app_server <- function(input, output, session) {
     } else {
       req(input$ref.genome2, input$region2)
       shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                     selected = "sigAttributionTab")
+                                     selected = "sigAttributionTab2")
     }
   })
 
@@ -502,7 +502,7 @@ app_server <- function(input, output, session) {
   # When user clicks the action button on Show spectra page, direct user to the relevant tab
   observeEvent(input$clickToSigAttribution, {
     shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                   selected = "sigAttributionTab")
+                                   selected = "sigAttributionTab2")
   })
 
   # When user submit new catalog for analysis, remove the previous plots
@@ -1201,7 +1201,7 @@ app_server <- function(input, output, session) {
   # Read values from state$values when we restore
   onRestore(function(state) {
     shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
-    shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
+    shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
     
     # Set the value of attribution.results to be TRUE, so when user submit
     # analysis again, hide the attribution results page
