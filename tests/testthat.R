@@ -1,4 +1,4 @@
 library(testthat)
-library(ICAMS.shiny)
+library(mSigAct.server)
 
-test_check("ICAMS.shiny")
+test_check("mSigAct.server")

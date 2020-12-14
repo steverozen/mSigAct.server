@@ -9,7 +9,7 @@
 ## Add information about the package that will contain your app
 
 golem::fill_desc(
-  pkg_name = "ICAMS.shiny", # The Name of the package containing the App 
+  pkg_name = "mSigAct.server", # The Name of the package containing the App 
   pkg_title = "PKG_TITLE", # The Title of the package containing the App 
   pkg_description = "PKG_DESC.", # The Description of the package containing the App 
   author_first_name = "AUTHOR_FIRST", # Your First Name

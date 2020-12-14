@@ -5,7 +5,7 @@
 #' 
 #' @noRd
 app_sys <- function(...){
-  system.file(..., package = "ICAMS.shiny")
+  system.file(..., package = "mSigAct.server")
 }
 
 

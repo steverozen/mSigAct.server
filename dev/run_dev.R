@@ -9,4 +9,4 @@ golem::detach_all_attached()
 golem::document_and_reload()
 
 # Run the application
-ICAMS.shiny::run_app()
+mSigAct.server::run_app()

@@ -31,7 +31,7 @@ golem::add_css_file( "custom" )
 # 3. Documentation
 
 ## 3.1 Vignette
-usethis::use_vignette("ICAMS.shiny")
+usethis::use_vignette("mSigAct.server")
 devtools::build_vignettes()
 
 ## 3.2 Code coverage

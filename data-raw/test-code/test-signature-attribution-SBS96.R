@@ -1,6 +1,6 @@
 catSBS96.1 <- PCAWG7::spectra$PCAWG$SBS96[, 1, drop = FALSE]
 my.sig.SBS96 <- 
-  ICAMS.shiny::CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
+  mSigAct.server::CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
                         sig.type = "SBS96", region = "genome")
 library(mSigAct)
 packageVersion("mSigAct")

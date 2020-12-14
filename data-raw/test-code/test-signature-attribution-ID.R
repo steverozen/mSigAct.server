@@ -1,6 +1,6 @@
 catID.1 <- PCAWG7::spectra$PCAWG$ID[, 1, drop = FALSE]
 my.sig.ID <- 
-  ICAMS.shiny::CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
+  mSigAct.server::CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", tumor.cohort = "PCAWG",
                                      sig.type = "ID", region = "genome")
 library(mSigAct)
 start.time.ID <- Sys.time()

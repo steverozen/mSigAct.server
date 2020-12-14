@@ -1,3 +1,3 @@
-library(ICAMS.shiny)
+library(mSigAct.server)
 
-ICAMS.shinyApp()
+mSigAct.server::run_app()

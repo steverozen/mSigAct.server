@@ -10,4 +10,4 @@
 options(shiny.maxRequestSize = 100*1024^2)
 pkgload::load_all(export_all = FALSE,helpers = FALSE,attach_testthat = FALSE)
 options( "golem.app.prod" = TRUE)
-ICAMS.shiny:::run_app() # add parameters here (if any)
+mSigAct.server:::run_app() # add parameters here (if any)

@@ -31,18 +31,18 @@ exposures.SBS96 <- GetExposureAndPlotToPdf(catalog = catSBS96.1,
 
 my.catalog <- PCAWG7::spectra$PCAWG$SBS96[, 1, drop = FALSE]
 my.sig.universe <- 
-  ICAMS.shiny::CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", 
+  mSigAct.server::CancerTypeToSigSubset(cancer.type = "Biliary-AdenoCA", 
                                      tumor.cohort = "PCAWG",
                                      sig.type = "SBS96", 
                                      region = "genome")
 my.exposures <- 
-  ICAMS.shiny::GetExposureWithConfidence(catalog = my.catalog,
+  mSigAct.server::GetExposureWithConfidence(catalog = my.catalog,
                                          sig.universe = my.sig.universe,
                                          num.of.bootstrap.replicates = 1000,
                                          method = decomposeQP,
                                          conf.int = 0.95)
 my.exposures1 <- 
-  ICAMS.shiny::GetExposureAndPlotToPdf(catalog = my.catalog,
+  mSigAct.server::GetExposureAndPlotToPdf(catalog = my.catalog,
                                        file = "D:/test.pdf",
                                        sig.universe = my.sig.universe,
                                        num.of.bootstrap.replicates = 1000,
