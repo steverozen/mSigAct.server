@@ -14,7 +14,7 @@ v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/li
 
 <!-- badges: end -->
 
-Shiny server for analyzing mutational signature data; uses
+Shiny server for analyzing mutational signature activities; uses
 [mSigAct](https://github.com/steverozen/mSigAct),
 [ICAMS](https://cran.r-project.org/package=ICAMS), and related
 functionality.
