@@ -797,11 +797,15 @@ app_server <- function(input, output, session) {
     )
   })
   
-  observeEvent(input$selectedMoreSigs, {
+  sigsForAttribution <- reactive({
     sigs.to.show <- c(input$preselectedSigs, input$selectedMoreSigs)
-    correct.order <- intersect(rownames(COSMIC.v3.SBS.sig.links), sigs.to.show)
+    sigs.in.correct.order <- intersect(rownames(COSMIC.v3.SBS.sig.links), sigs.to.show)
+    return(sigs.in.correct.order)
+  })
+  
+  observeEvent(sigsForAttribution(), {
     output$mytable <- DT::renderDataTable({
-      DT::datatable(dat[correct.order, ], escape = FALSE, rownames = FALSE) 
+      DT::datatable(dat[sigsForAttribution(), ], escape = FALSE, rownames = FALSE) 
     })
     output$analysisButton <- renderUI({
       actionButton(inputId = "startAnalysis", label = "Analyze",
@@ -830,7 +834,7 @@ app_server <- function(input, output, session) {
     )
   })
   
-  # Synchronous programming code starts here
+  # Asynchronous programming code starts here
   submitAttribution <- reactive({
     list(input$submitAttributionOnTop, input$submitAttribution2)
   })
