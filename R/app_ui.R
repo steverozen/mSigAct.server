@@ -382,23 +382,23 @@ SignatureAttributionUI2 <- function() {
 golem_add_external_resources <- function(){
 
   addResourcePath(
-    'www', system.file('app/www', package = 'ICAMS.shiny')
+    'www', system.file('app/www', package = 'mSigAct.server')
   )
   
   addResourcePath(
-    'SBS96', system.file('app/SBS96', package = 'ICAMS.shiny')
+    'SBS96', system.file('app/SBS96', package = 'mSigAct.server')
   )
   
   addResourcePath(
-    'SBS192', system.file('app/SBS192', package = 'ICAMS.shiny')
+    'SBS192', system.file('app/SBS192', package = 'mSigAct.server')
   )
   
   addResourcePath(
-    'DBS78', system.file('app/DBS78', package = 'ICAMS.shiny')
+    'DBS78', system.file('app/DBS78', package = 'mSigAct.server')
   )
   
   addResourcePath(
-    'ID', system.file('app/ID', package = 'ICAMS.shiny')
+    'ID', system.file('app/ID', package = 'mSigAct.server')
   )
 
   tags$head(

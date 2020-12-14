@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-#future::plan(future::multisession)
+future::plan(future::multisession)
 
 #' @import mSigAct
 #' @import promises
@@ -322,7 +322,7 @@ app_server <- function(input, output, session) {
                                     inputId = "region2",
                                     selected = "genome")
     catalog.path <<- system.file("extdata/SBS96-mSigAct-example-spectra.csv", 
-                                 package = "ICAMS.shiny")
+                                 package = "mSigAct.server")
     input.catalog.type <<- "SBS96"
     
     ShowTwoButtons()
@@ -338,7 +338,7 @@ app_server <- function(input, output, session) {
                                     inputId = "region2",
                                     selected = "transcript")
     catalog.path <<- system.file("extdata/SBS192-mSigAct-example-spectra.csv", 
-                                 package = "ICAMS.shiny")
+                                 package = "mSigAct.server")
     input.catalog.type <<- "SBS192"
     
     ShowTwoButtons()
@@ -354,7 +354,7 @@ app_server <- function(input, output, session) {
                                     inputId = "region2",
                                     selected = "genome")
     catalog.path <<- system.file("extdata/DBS78-mSigAct-example-spectra.csv", 
-                                 package = "ICAMS.shiny")
+                                 package = "mSigAct.server")
     input.catalog.type <<- "DBS78"
     
     ShowTwoButtons()
@@ -370,7 +370,7 @@ app_server <- function(input, output, session) {
                                     inputId = "region2",
                                     selected = "genome")
     catalog.path <<- system.file("extdata/ID-mSigAct-example-spectra.csv", 
-                                 package = "ICAMS.shiny")
+                                 package = "mSigAct.server")
     input.catalog.type <<- "ID"
     
     ShowTwoButtons()

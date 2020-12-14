@@ -1009,7 +1009,7 @@ PrepareAttributionResults <-
   #                           sig.universe = NULL, QP.best.MAP.exp = NULL)
   
   #path <- system.file("extdata/mSigAct-sample-spectra.zip", 
-  #                    package = "ICAMS.shiny")
+  #                    package = "mSigAct.server")
   #file.copy(from = output.file, to = file)
 }
 
@@ -1133,7 +1133,7 @@ PrepareAttributionResults2 <-
     #                           sig.universe = NULL, QP.best.MAP.exp = NULL)
     
     #path <- system.file("extdata/mSigAct-sample-spectra.zip", 
-    #                    package = "ICAMS.shiny")
+    #                    package = "mSigAct.server")
     #file.copy(from = output.file, to = file)
   }
 
@@ -1300,7 +1300,7 @@ PrepareSampleVCFs <- function(file) {
 #' @keywords internal
 PrepareExampleSpectra <- function(file) {
   path <- system.file("extdata/mSigAct-example-spectra.zip", 
-                     package = "ICAMS.shiny")
+                     package = "mSigAct.server")
   file.copy(from = path, to = file)
 }
 
