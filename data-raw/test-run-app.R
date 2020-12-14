@@ -1,27 +1,25 @@
-library(shiny)
-library(shinydashboard)
+require(shiny)
+library(DT)
 
-#rm(list=ls)
-
-######/ UI Side/######
-
-header <- dashboardHeader(title = "Test")
-sidebar <- dashboardSidebar(
-  sidebarMenu(
-    menuItem("First Tab",tabName = "FTab", icon = icon("globe")),
-    menuItem("Second Tab",tabName = "STab", icon = icon("star"))
-  ),
-  selectInput("navSel", "Selection:", c("b","c"))
+shinyUI(
+  DT::dataTableOutput('mytable')
 )
-body <- dashboardBody()
 
-ui <- dashboardPage(header, sidebar, body)
+# Server.R
+library(shiny)
+library(DT)
 
 
-######/ SERVER Side/######
+dat <- data.frame(
+  country = c('USA', 'China'),
+  flag = c('<img src="test.png" height="52"></img>',
+           '<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/200px-Flag_of_the_People%27s_Republic_of_China.svg.png" height="52"></img>'
+  )
+)
 
-server <- function(input, output, session) {
-  
-}
-
-shinyApp(ui, server)
+shinyServer(function(input, output){
+  output$mytable <- DT::renderDataTable({
+    
+    DT::datatable(dat, escape = FALSE) # HERE
+  })
+})

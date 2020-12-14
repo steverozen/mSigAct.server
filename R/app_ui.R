@@ -4,8 +4,6 @@ shinyjs.init = function() {
   $('#panels li a[data-value=sigAttributionTab]').hide();
 }"
 
-library(shinydashboard)
-
 #' @import shiny
 app_ui <- function(request) {
   tagList(
@@ -26,16 +24,7 @@ app_ui <- function(request) {
                value = "sigAttributionTab"),
       tabPanel(title = "Signature attributions2", SignatureAttributionUI2(), 
                value = "sigAttributionTab2"),
-      tabPanel(title = "Results", #AttributionResultsUI(),
-               shinydashboard::dashboardPage(
-                 shinydashboard::dashboardHeader(disable = TRUE),
-                 shinydashboard::dashboardSidebar(),
-                 shinydashboard::dashboardBody(
-                   #tags$script(HTML("$('body').addClass('fixed');"))
-                 ))
-               
-               )
-      ,
+      tabPanel(title = "Results", AttributionResultsUI()),
       position = "fixed-top"),
     
     # Add padding because navbar pinned at the top
@@ -45,53 +34,42 @@ app_ui <- function(request) {
 
 #' @import shiny
 AttributionResultsUI <- function() {
-  
-  renderUI({
-    shinydashboard::dashboardPage(
-      shinydashboard::dashboardHeader(),
-      shinydashboard::dashboardSidebar(),
-      shinydashboard::dashboardBody())
-  })
-    
-  
-  if (FALSE) {
-    fixedPage(
-      navlistPanel(id = "navlistResults",
-                   tabPanel(title = "Best result",
-                            p("Best result"),
-                            tabsetPanel(
-                              tabPanel(title = "Attribution counts", 
-                                       value = "attributionCountsBest",
-                                       uiOutput(outputId = "exposureTable")),
-                              tabPanel(title = "Attribution plot", 
-                                       value = "attributionPlotBest",
-                                       uiOutput(outputId = "pdfview2")),
-                              tabPanel(title = "Signature presence test",
-                                       value = "sigPresenceTestBest")
-                            ), value = "bestResult"),
-                   tabPanel(title = "Second best result",
-                            p("Second best result"),
-                            tabsetPanel(
-                              tabPanel(title = "Attribution counts", 
-                                       value = "attributionCountsSecond"),
-                              tabPanel(title = "Attribution plot", 
-                                       value = "attributionPlotSecond"),
-                              tabPanel(title = "Signature presence test",
-                                       value = "sigPresenceTestSecond")
-                            ), value = "secondBestResult"),
-                   tabPanel(title = "Third best result",
-                            p("Third best result"),
-                            tabsetPanel(
-                              tabPanel(title = "Attribution counts", 
-                                       value = "attributionCountsThird"),
-                              tabPanel(title = "Attribution plot", 
-                                       value = "attributionPlotThird"),
-                              tabPanel(title = "Signature presence test",
-                                       value = "sigPresenceTestThird")
-                            ), value = "thirdBestResult"),
-                   widths = c(2, 10), fluid = FALSE)
-    )
-  }
+  fixedPage(
+    navlistPanel(id = "navlistResults",
+                 tabPanel(title = "Best result",
+                          p("Best result"),
+                          tabsetPanel(
+                            tabPanel(title = "Attribution counts", 
+                                     value = "attributionCountsBest",
+                                     uiOutput(outputId = "exposureTable")),
+                            tabPanel(title = "Attribution plot", 
+                                     value = "attributionPlotBest",
+                                     uiOutput(outputId = "pdfview2")),
+                            tabPanel(title = "Signature presence test",
+                                     value = "sigPresenceTestBest")
+                          ), value = "bestResult"),
+                 tabPanel(title = "Second best result",
+                          p("Second best result"),
+                          tabsetPanel(
+                            tabPanel(title = "Attribution counts", 
+                                     value = "attributionCountsSecond"),
+                            tabPanel(title = "Attribution plot", 
+                                     value = "attributionPlotSecond"),
+                            tabPanel(title = "Signature presence test",
+                                     value = "sigPresenceTestSecond")
+                          ), value = "secondBestResult"),
+                 tabPanel(title = "Third best result",
+                          p("Third best result"),
+                          tabsetPanel(
+                            tabPanel(title = "Attribution counts", 
+                                     value = "attributionCountsThird"),
+                            tabPanel(title = "Attribution plot", 
+                                     value = "attributionPlotThird"),
+                            tabPanel(title = "Signature presence test",
+                                     value = "sigPresenceTestThird")
+                          ), value = "thirdBestResult"),
+                 widths = c(2, 10), fluid = FALSE)
+  )
   
 }
 
