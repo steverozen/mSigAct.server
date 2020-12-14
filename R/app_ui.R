@@ -358,7 +358,8 @@ SignatureAttributionUI2 <- function() {
         uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog2"),
         uiOutput(outputId = "addSig"),
         br(),
-        uiOutput(outputId = "chooseMoreSigs")),
+        uiOutput(outputId = "chooseMoreSigs"),
+        uiOutput(outputId = "analysisButton")),
       
       mainPanel(
         # Must use DT::dataTableOutput instead of dataTableOutput,

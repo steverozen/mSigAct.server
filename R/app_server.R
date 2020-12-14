@@ -800,9 +800,15 @@ app_server <- function(input, output, session) {
   observeEvent(input$selectedMoreSigs, {
     sigs.to.show <- c(input$preselectedSigs, input$selectedMoreSigs)
     correct.order <- intersect(rownames(COSMIC.v3.SBS.sig.links), sigs.to.show)
-    output$mytable <<- DT::renderDataTable({
+    output$mytable <- DT::renderDataTable({
       DT::datatable(dat[correct.order, ], escape = FALSE, rownames = FALSE) 
     })
+    output$analysisButton <- renderUI({
+      actionButton(inputId = "startAnalysis", label = "Analyze",
+                   style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4;padding:4px; ")
+    })
+    
   })
   
   
