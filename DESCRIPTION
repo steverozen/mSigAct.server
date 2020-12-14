@@ -5,7 +5,7 @@ Author: Nanhai Jiang, Steven G. Rozen
 Maintainer: Nanhai Jiang <jiangnanhai@hotmail.com>
 Description: Shiny server for analyzing mutational signature activities; 
     uses mSigAct (https://github.com/steverozen/mSigAct), 
-ICAMS (https://cran.r-project.org/package=ICAMS), and related functionality.
+    ICAMS (https://cran.r-project.org/package=ICAMS), and related functionality.
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
