@@ -1,28 +1,29 @@
 library(shiny)
-library(shinyWidgets)
+library(shinydashboard)
+library(shinyjs)
 
-managers <- c('Ram', 'Vijay','Arun','Aswin')
-dept <- c('A','B','C','D')
-details <- data.frame("Managers" = managers, "Department" = dept, stringsAsFactors = F)
-
-ui <- fluidPage(
-  pickerInput(
-    'manager', 'Manager',
-    choices = managers ,
-    c('Ram', 'Vijay','Arun','Aswin'),
-    options = list(
-      `actions-box` = TRUE),
-    multiple = TRUE
-  ),
-  uiOutput('picker2')
+ui <- dashboardPage(
+  dashboardHeader(),
+  dashboardSidebar(),
+  dashboardBody(
+    # initialize shinyjs
+    shinyjs::useShinyjs(),
+    # add custom JS code
+    extendShinyjs(text = "shinyjs.hidehead = function(parm){
+                                    $('header').css('display', parm);
+                                }"),
+    actionButton("button","hide header"),
+    actionButton("button2","show header")
+  )
 )
 
-server <- function(input, output, session) {
-  output$picker2 <- renderUI({
-    choices = details$Department[details$Managers %in% input$manager]
-    pickerInput('dept', 'Department', choices = choices, choices, options = list(
-      `actions-box` = TRUE), multiple = TRUE)
+server <- function(input, output) {
+  observeEvent(input$button, {
+    js$hidehead('none')           
+  })
+  observeEvent(input$button2, {
+    js$hidehead('')           
   })
 }
 
-shinyApp(ui, server)
+shinyApp(ui, server) 

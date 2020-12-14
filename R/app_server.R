@@ -799,7 +799,20 @@ app_server <- function(input, output, session) {
   
   sigsForAttribution <- reactive({
     sigs.to.show <- c(input$preselectedSigs, input$selectedMoreSigs)
-    sigs.in.correct.order <- intersect(rownames(COSMIC.v3.SBS.sig.links), sigs.to.show)
+    if (is.na(input.catalog.type)) {
+      return()
+    }
+    
+    if (input.catalog.type %in% c("SBS96", "SBS192")) {
+      sigs.in.correct.order <- intersect(rownames(COSMIC.v3.SBS.sig.links), sigs.to.show)
+    } else if (input.catalog.type == "DBS78") {
+      sigs.in.correct.order <- intersect(rownames(COSMIC.v3.DBS.sig.links), sigs.to.show)
+    } else if (input.catalog.type == "ID") {
+      sigs.in.correct.order <- intersect(rownames(COSMIC.v3.ID.sig.links), sigs.to.show)
+    } else {
+      return()
+    }
+    
     return(sigs.in.correct.order)
   })
   
@@ -815,6 +828,168 @@ app_server <- function(input, output, session) {
     
   })
   
+  observeEvent(input$startAnalysis, {
+    
+    if(length(sigsForAttribution()) == 0) {
+      showNotification(ui = "Error:", 
+                       action = "No signatures selected for attribution analysis",
+                       type = "error")
+      return()
+    }
+    
+    #Don't do anything if in the middle of a run
+    if(running())
+      return(NULL)
+    running(TRUE)
+    
+    # Hide the previous attribution results
+    if (attribution.results == TRUE) {
+      shinyjs::hide(id = "attributionResults")
+    }
+    
+    spect <- catalog[, input$selectedSampleFromCatalogForAttribution2, drop = FALSE]
+    catalog.type <- input.catalog.type
+    cancer.type <- input$selectedCancerType2
+    region <- input$region2
+    
+    if (catalog.type == "SBS192") {
+      sig.universe <- 
+        PCAWG7::signature[["genome"]][[catalog.type]][, sigsForAttribution(), drop = FALSE]
+    } else if (catalog.type == "SBS96") {
+      sig.universe <- 
+        COSMIC.v3.genome.SBS96.sigs[, sigsForAttribution(), drop = FALSE]
+    } else {
+      sig.universe <- 
+        PCAWG7::signature[[region]][[catalog.type]][, sigsForAttribution(), drop = FALSE]
+    }
+    
+    sigs.prop <- mSigAct::ExposureProportions(mutation.type = catalog.type,
+                                              cancer.type = cancer.type,
+                                              all.sigs = sig.universe)
+    
+    if (FALSE) {
+      QP.exposure <- 
+        GetExposureWithConfidence(catalog = spect,
+                                  sig.universe = sig.universe,
+                                  num.of.bootstrap.replicates = 10000,
+                                  method = decomposeQP,
+                                  conf.int = 0.95)
+      updated.sig.universe <- sig.universe[ , rownames(QP.exposure)]
+      updated.sigs.prop <- sigs.prop[rownames(QP.exposure)]
+    }
+    
+    # Create a Progress object
+    progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
+                                       message = "Analysis in progress",
+                                       detail = "This may take a while...")
+    result_val(NULL)
+    
+    fut <- future::future(
+      {
+        # Close the progress when this reactive exits (even if there's an error)
+        # on.exit(progress$close())
+        
+        # Create a callback function to update progress. Each time this is called, it
+        # will increase the progress by that value and update the detail
+        updateProgress <- function(value = NULL, detail = NULL) {
+          progress$inc(amount = value, detail = detail)
+          interruptor$execInterrupts()
+        }
+        
+        AdjustNumberOfCores <- 
+          getFromNamespace(x = "Adj.mc.cores", ns = "mSigAct")
+        
+        retval <- mSigAct::MAPAssignActivity1(
+          spect = spect,
+          sigs = sig.universe,
+          sigs.presence.prop = sigs.prop,
+          max.level = length(sigs.prop) - 1,
+          p.thresh = 0.01,
+          m.opts = mSigAct::DefaultManyOpts(),
+          max.mc.cores = AdjustNumberOfCores(50),
+          progress.monitor = updateProgress
+        )
+        
+        return(retval)
+      }, seed = TRUE) %...>% {
+        retval <- .
+        
+        plotdata$retval <<- retval
+        
+        if (retval$success == FALSE || is.null(retval$success)) {
+          output$attributionResults <- renderUI({
+            output$attributionMessage <- 
+              renderText(paste0("The algorithm could not find the optimal number of ", 
+                                "signatures that explain the spectrum. Please reduce the ", 
+                                "number of signatures used."))
+            tagList(
+              textOutput(outputId = "attributionMessage")
+            )
+          })
+        } else {
+          MAP.best.exp <- retval$MAP
+          
+          QP.exp <- 
+            mSigAct::OptimizeExposureQP(spect, 
+                                        sig.universe[ , MAP.best.exp$sig.id, 
+                                                      drop = FALSE])
+          QP.best.MAP.exp <-
+            dplyr::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
+          
+          r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
+                                               use.sig.names = TRUE)
+          reconstructed.catalog0 <- 
+            as.catalog(r.qp, ref.genome = input$ref.genome2, 
+                       region = input$region2)
+          
+          cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
+          
+          colnames(reconstructed.catalog0) <- 
+            paste0("reconstructed (cosine similarity = ", cossim, ")")
+          reconstructed.catalog <- round(reconstructed.catalog0)
+          
+          plotdata$cossim <<- cossim
+          plotdata$spect <<- spect
+          plotdata$reconstructed.catalog <<- reconstructed.catalog
+          plotdata$sig.universe <<- sig.universe
+          plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
+          
+          retval <- PrepareAttributionResults2(input, output, session, 
+                                               input.catalog.type, 
+                                               plotdata)
+          attribution.results <<- retval$attribution.results
+        }
+      } %...>% result_val
+    
+    # Show notification on error or user interrupt
+    fut <- promises::catch(fut,
+                           function(e){
+                             result_val(NULL)
+                             print(e$message)
+                             showNotification(e$message)
+                           })
+    
+    # When done with analysis, remove progress bar
+    fut <- promises::finally(fut, function(){
+      progress$close()
+      running(FALSE) # Declare done with run
+    })
+    
+    if (FALSE) {
+      if (input.catalog.type == "SBS96") {
+        output$sigTestButton2 <- renderUI(
+          { #tags$head(tags$style(make_css(list('.btn', 'white-space', 'pre-wrap'))))
+            actionButton(inputId = "submitSigTest2", 
+                         label = "Check for artifacts/rare signatures",
+                         style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4;padding:4px; ")
+          })
+      }
+    }
+    
+    # Return something other than the future so we don't block the UI
+    NULL
+  })
   
   observeEvent(input$selectedSigSubset2, {
     output$analyzeButtonOnTop <- renderUI(

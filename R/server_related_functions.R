@@ -1013,6 +1013,129 @@ PrepareAttributionResults <-
   #file.copy(from = output.file, to = file)
 }
 
+#' @importFrom dplyr bind_rows
+#' @keywords internal
+PrepareAttributionResults2 <- 
+  function (input, output, session, input.catalog.type, plotdata) {
+    
+    output$downloaBestResults <- renderUI({
+      downloadButton(outputId = "downloadBestResults", 
+                     label = "Download best results")
+    })
+    
+    cossim <- plotdata$cossim
+    spect <- plotdata$spect
+    QP.best.MAP.exp <- plotdata$QP.best.MAP.exp
+    reconstructed.catalog <- plotdata$reconstructed.catalog
+    sig.universe <- plotdata$sig.universe
+    
+    sigs.names <- QP.best.MAP.exp$sig.id
+    sigs <- sig.universe[, sigs.names, drop = FALSE]
+    colnames(sigs) <- 
+      paste0(colnames(sigs), " (exposure = ", 
+             round(QP.best.MAP.exp$QP.best.MAP.exp), ")")
+    
+    list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
+    
+    output.file.path <- resourcePaths()["results"]
+    spect.name <- colnames(spect)
+    
+    # We cannot use "::" in the file path, otherwise zip::zipr will throw an error
+    spect.name <- gsub(pattern = "::", replacement = "-", spect.name)
+    
+    table.file.name <- paste0("mSigAct-", spect.name, "-",
+                              input.catalog.type, "-exposures.csv")
+    pdf.file.name <- paste0("mSigAct-", spect.name, "-",
+                            input.catalog.type, "-attribution-plot.pdf")
+    results.file.name <- paste0("mSigAct-", spect.name, "-",
+                                input.catalog.type, "-attribution-results.zip")
+    
+    
+    pdf.file.path <- paste0(output.file.path, "/", pdf.file.name)
+    table.file.path <- paste0(output.file.path, "/", table.file.name)
+    
+    
+    tbl1 <- data.frame(names = colnames(spect), count = colSums(spect), 
+                       cosine.similarity = cossim)
+    tbl2 <- data.frame(names = QP.best.MAP.exp$sig.id, 
+                       count = QP.best.MAP.exp$QP.best.MAP.exp)
+    tbl <- dplyr::bind_rows(tbl1, tbl2)
+    utils::write.csv(tbl, file = table.file.path, na = "", row.names = FALSE)
+    PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
+    
+    src.file.path <- paste0("results", "/", pdf.file.name)
+    output$pdfview <- renderUI({
+      tags$iframe(style="height:1000px; width:100%;scrolling=yes", 
+                  src= src.file.path)
+    })
+    
+    output$pdfview2 <- renderUI({
+      tags$iframe(style="height:1000px; width:100%;scrolling=yes", 
+                  src= src.file.path)
+    })
+    
+    if (input.catalog.type %in% c("SBS96", "SBS192")) {
+      SBS.sig.names <- tbl$names[-1]
+      urls <- COSMIC.v3.SBS.sig.links[SBS.sig.names, ]
+      refs <- 
+        paste0("<a href='",  urls, "' target='_blank'>", SBS.sig.names, "</a>")
+    } else if (input.catalog.type == "DBS78") {
+      DBS.sig.names <- tbl$names[-1]
+      urls <- COSMIC.v3.DBS.sig.links[DBS.sig.names, ]
+      refs <- 
+        paste0("<a href='",  urls, "' target='_blank'>", DBS.sig.names, "</a>")
+    } else if (input.catalog.type == "ID") {
+      ID.sig.names <- tbl$names[-1]
+      urls <- COSMIC.v3.ID.sig.links[ID.sig.names, ]
+      refs <- 
+        paste0("<a href='",  urls, "' target='_blank'>", ID.sig.names, "</a>")
+      
+    } 
+    
+    # Convert the names of signatures into HTML links
+    tbl2 <- tbl
+    tbl2$names[-1] <- refs
+    
+    output$exposureTable <- renderTable({
+      tbl2
+    }, sanitize.text.function = function(x) x, digits = 5)
+    
+    
+    output$downloadExposureTable <- downloadHandler(
+      filename = table.file.name,
+      content = function(file) {
+        file.copy(from = table.file.path, to = file)
+      }
+    )
+    
+    file.names <- c(table.file.path, pdf.file.path)
+    
+    output$downloadAttributionResults <- downloadHandler(
+      filename = function() {
+        results.file.name
+      },
+      content = function(file) {
+        zip::zipr(zipfile = file, files = file.names)
+      }
+    )
+    
+    # Show the new attribution results
+    shinyjs::show(id = "attributionResults")
+    
+    shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                   selected = "attributionResultsTab")
+    
+    return(list(attribution.results = TRUE))
+    
+    
+    
+    #plotdata <- reactiveValues(spect = NULL, reconstructed.catalog = NULL,
+    #                           sig.universe = NULL, QP.best.MAP.exp = NULL)
+    
+    #path <- system.file("extdata/mSigAct-sample-spectra.zip", 
+    #                    package = "ICAMS.shiny")
+    #file.copy(from = output.file, to = file)
+  }
 
 #' This function generates a zip archive from Strelka ID VCF files.
 #'
