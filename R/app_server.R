@@ -51,6 +51,9 @@ app_server <- function(input, output, session) {
   showSBS192Catalog <- TRUE
   
   attribution.results <- FALSE
+  
+  dat <- data.frame(name = character(), spectrum = character(), 
+                    proposed.aetiology = character())
 
   # Create reactiveValues object
   # and set flag to 0 to prevent errors with adding NULL
@@ -734,54 +737,43 @@ app_server <- function(input, output, session) {
           
         }
       )
-      output$addSig1 <- renderUI(
-        actionButton(inputId = "addMoreSigs1", label = "Add more signatures",
-                     style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4;padding:4px; ")
-      )
-      
-      output$addSig2 <- renderUI(
-        actionButton(inputId = "addMoreSigs2", label = "Add more signatures",
+      output$addSig <- renderUI(
+        actionButton(inputId = "addMoreSigs", label = "Add more signatures",
                      style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4;padding:4px; ")
       )
       
       if (input.catalog.type == "SBS96") {
-        dat <- data.frame(
+        dat <<- data.frame(
           name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
                         rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
           spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.png"',
                             ' height="52"></img>'),
           proposed.aetiology = SBS.aetiology)
         } else if (input.catalog.type == "SBS192") {
-          dat <- data.frame(
+          dat <<- data.frame(
             name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
                           rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
             spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.png"',
                               ' height="52"></img>'),
             proposed.aetiology = SBS.aetiology)
         } else if (input.catalog.type == "DBS78") {
-          dat <- data.frame(
+          dat <<- data.frame(
             name = paste0("<a href='", COSMIC.v3.DBS.sig.links, "' target='_blank'>", 
                           rownames(COSMIC.v3.DBS.sig.links),  "</a>"), 
             spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.png"',
                               ' height="52"></img>'),
             proposed.aetiology = DBS.aetiology)
         } else if (input.catalog.type == "ID") {
-          dat <- data.frame(
+          dat <<- data.frame(
             name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
                           rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
             spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.png"',
                               ' height="52"></img>'),
             proposed.aetiology = ID.aetiology)
-        } else {
-          dat <- data.frame(
-            name = character(), 
-            spectrum = character(),
-            proposed.aetiology = character())
-        }
+        } 
         
-        #rownames(dat) <- names(COSMIC.v3.SBS.sig.links)
+      #rownames(dat) <- names(COSMIC.v3.SBS.sig.links)
           
       output$mytable <- DT::renderDataTable({
         DT::datatable(dat[input$preselectedSigs, ], escape = FALSE, rownames = FALSE) # HERE)
@@ -790,26 +782,26 @@ app_server <- function(input, output, session) {
     
   })
   
-  observeEvent(input$addMoreSigs1, {
-    output$chooseMoreSigs <- renderUI({
-      if (input.catalog.type %in% c("SBS96", "SBS192")) {
-        tmp <- unname(SBS.aetiology.HTML[choose.more.sigs])
-        choice.names <- lapply(tmp, FUN = HTML)
-      } else if (input.catalog.type == "DBS78") {
-        tmp <- unname(DBS.aetiology.HTML[choose.more.sigs])
-        choice.names <- lapply(tmp, FUN = HTML)
-      } else if (input.catalog.type == "ID") {
-        tmp <- unname(ID.aetiology.HTML[choose.more.sigs])
-        choice.names <- lapply(tmp, FUN = HTML)
+  observeEvent(input$addMoreSigs, {
+    output$chooseMoreSigs <- renderUI(
+      {
+        shinyWidgets::pickerInput(inputId = "selectedMoreSigs",
+                                  label = "Choose more signatures",  
+                                  choices = choose.more.sigs,
+                                  options = shinyWidgets::pickerOptions(
+                                    actionsBox = TRUE,
+                                    dropupAuto = FALSE
+                                  ), 
+                                  multiple = TRUE)
       }
-        
-      choice.values <- unname(sapply(choose.more.sigs, FUN = list))
-      tagList(
-        checkboxGroupInput(inputId = "selectMoreSigs",
-                           label = "Choose more signatures",  
-                           choiceNames = choice.names,
-                           choiceValues = choice.values)
-        )  
+    )
+  })
+  
+  observeEvent(input$selectedMoreSigs, {
+    sigs.to.show <- c(input$preselectedSigs, input$selectedMoreSigs)
+    correct.order <- intersect(rownames(COSMIC.v3.SBS.sig.links), sigs.to.show)
+    output$mytable <<- DT::renderDataTable({
+      DT::datatable(dat[correct.order, ], escape = FALSE, rownames = FALSE) 
     })
   })
   
