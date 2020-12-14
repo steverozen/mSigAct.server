@@ -25,7 +25,6 @@ app_ui <- function(request) {
       tabPanel(title = "Signature attributions2", SignatureAttributionUI2(), 
                value = "sigAttributionTab2"),
       tabPanel(title = "Results", AttributionResultsUI()),
-      tabPanel(title = "README", includeMarkdown(path = "README.md")),
       position = "fixed-top"),
     
     # Add padding because navbar pinned at the top
