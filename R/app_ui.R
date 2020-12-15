@@ -28,11 +28,26 @@ app_ui <- function(request) {
                value = "sigAttributionTab2"),
       tabPanel(title = "Results", AttributionResultsUI(),
                value = "attributionResultsTab"),
+      tabPanel(title = "Tutorial", TutorialUI(),
+               value = "tutorialTab"),
       position = "fixed-top"),
     
     # Add padding because navbar pinned at the top
     tags$style(type="text/css", "body {padding-top: 70px;}"),
   )
+}
+
+#' @import shiny
+TutorialUI <- function() {
+  
+    fixedPage(
+      tabsetPanel(id = "helpPages",
+                  tabPanel(title = "General guide",
+                           includeMarkdown(path = "top.help.md")),
+                  tabPanel(title = "Guide to generating catalogs"),
+                  tabPanel(title = "Guide to signature attribution"))
+    )
+  
 }
 
 #' @import shiny

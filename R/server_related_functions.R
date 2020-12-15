@@ -1057,7 +1057,6 @@ PrepareAttributionResults2 <-
       table.file.path <- paste0(output.file.path, "/", table.file.name)
       png.file.path <- paste0(output.file.path, "/", png.file.name)
       
-      browser()
       tbl1 <- data.frame(name = colnames(spect), count = colSums(spect), 
                          cosine.similarity = cossim)
       tbl2 <- data.frame(name = QP.best.MAP.exp$sig.id, 
