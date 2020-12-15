@@ -10,8 +10,6 @@ future::plan(future::multisession)
 app_server <- function(input, output, session) {
   # List the first level callModules here
   
-  addResourcePath(prefix = "results", directoryPath = tempdir())
-  
   fut <- NULL
   result_val <- reactiveVal()
   running <- reactiveVal(FALSE)

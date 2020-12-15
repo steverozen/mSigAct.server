@@ -1018,6 +1018,7 @@ PrepareAttributionResults <-
 PrepareAttributionResults2 <- 
   function (input, output, session, input.catalog.type, plotdata) {
     
+    #browser()
     output$downloaBestResults <- renderUI({
       downloadButton(outputId = "downloadBestResults", 
                      label = "Download best results")

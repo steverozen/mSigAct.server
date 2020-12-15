@@ -31,7 +31,7 @@ app_ui <- function(request) {
       position = "fixed-top"),
     
     # Add padding because navbar pinned at the top
-    tags$style(type="text/css", "body {padding-top: 70px;}")
+    tags$style(type="text/css", "body {padding-top: 70px;}"),
   )
 }
 
@@ -384,32 +384,36 @@ SignatureAttributionUI2 <- function() {
 
 #' @import shiny
 golem_add_external_resources <- function(){
-
-  addResourcePath(
-    'www', system.file('app/www', package = 'mSigAct.server')
-  )
+  addResourcePath(prefix = "www", directoryPath = 
+                    system.file("app/www", package = "mSigAct.server"))
+  addResourcePath(prefix = "SBS96", directoryPath = 
+                    system.file("app/SBS96", package = "mSigAct.server"))
+  addResourcePath(prefix = "SBS192", directoryPath = 
+                    system.file("app/SBS192", package = "mSigAct.server"))
+  addResourcePath(prefix = "DBS78", directoryPath = 
+                    system.file("app/DBS78", package = "mSigAct.server"))
+  addResourcePath(prefix = "ID", directoryPath = 
+                    system.file("app/ID", package = "mSigAct.server"))
+  addResourcePath(prefix = "results", directoryPath = tempdir())
   
-  addResourcePath(
-    'SBS96', system.file('app/SBS96', package = 'mSigAct.server')
-  )
-  
-  addResourcePath(
-    'SBS192', system.file('app/SBS192', package = 'mSigAct.server')
-  )
-  
-  addResourcePath(
-    'DBS78', system.file('app/DBS78', package = 'mSigAct.server')
-  )
-  
-  addResourcePath(
-    'ID', system.file('app/ID', package = 'mSigAct.server')
-  )
-
   tags$head(
-    golem::activate_js()
+    golem::activate_js(),
     # Add here all the external resources
     # If you have a custom.css in the inst/app/www
     # Or for example, you can add shinyalert::useShinyalert() here
     #tags$link(rel="stylesheet", type="text/css", href="www/custom.css")
+    
+    # adjust size of progress bar and center it
+    tags$style(
+      HTML(".shiny-notification {
+              height: 100px;
+              width: 800px;
+              position:fixed;
+              top: calc(50% - 50px);;
+              left: calc(50% - 400px);;
+            }
+           "
+      )
+    )
   )
 }
