@@ -20,7 +20,9 @@ app_server <- function(input, output, session) {
   
   plotdata <- reactiveValues(cossim = NULL, spect = NULL, 
                              reconstructed.catalog = NULL,
-                             sig.universe = NULL, QP.best.MAP.exp = NULL)
+                             sig.universe = NULL, 
+                             QP.best.MAP.exp = NULL,
+                             dat = NULL)
   
   # When user clicks the action link on Home page, direct user to the relevant tab
   observeEvent(input$linkToGenerateCatalogTab, {
@@ -815,9 +817,15 @@ app_server <- function(input, output, session) {
   })
   
   observeEvent(sigsForAttribution(), {
+    
+    plotdata$dat <<- dat[sigsForAttribution(), ]
+                                   
     output$mytable <- DT::renderDataTable({
-      DT::datatable(dat[sigsForAttribution(), ], escape = FALSE, rownames = FALSE) 
+      DT::datatable(dat[sigsForAttribution(), ], escape = FALSE, rownames = FALSE,
+                    options = list(lengthMenu = c(25, 50, 75), 
+                                   pageLength = 25)) 
     })
+                                  
     output$analysisButton <- renderUI({
       actionButton(inputId = "startAnalysis", label = "Analyze",
                    style= "color: #fff; background-color: #337ab7;

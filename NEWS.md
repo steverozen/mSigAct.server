@@ -1,3 +1,9 @@
+# ICAMS.shiny 0.0.4.90**
+## Added
+* Added thumbnail pictures for signature attribution results.
+
+<br>
+
 # ICAMS.shiny 0.0.4
 ## Added
 * Added signature presence test for **SBS96** artifact and rare signatures.

@@ -38,43 +38,14 @@ app_ui <- function(request) {
 #' @import shiny
 AttributionResultsUI <- function() {
   fixedPage(
-    navlistPanel(id = "navlistResults",
-                 tabPanel(title = "Best result",
-                          tabsetPanel(
-                            tabPanel(title = "Attribution counts", 
-                                     value = "attributionCountsBest",
-                                     uiOutput(outputId = "exposureTable")),
-                            tabPanel(title = "Attribution plot", 
-                                     value = "attributionPlotBest",
-                                     uiOutput(outputId = "pdfview"))),
-                            #tabPanel(title = "Signature presence test",
-                            #         value = "sigPresenceTestBest")
-                           value = "bestResult"),
-                 tabPanel(title = "Second best result",
-                          tabsetPanel(
-                            tabPanel(title = "Attribution counts", 
-                                     value = "attributionCountsSecond",
-                                     uiOutput(outputId = "exposureTable2")),
-                            tabPanel(title = "Attribution plot", 
-                                     value = "attributionPlotSecond",
-                                     uiOutput(outputId = "pdfview2"))),
-                            #tabPanel(title = "Signature presence test",
-                            #         value = "sigPresenceTestSecond")
-                          value = "secondBestResult"),
-                 tabPanel(title = "Third best result",
-                          tabsetPanel(
-                            tabPanel(title = "Attribution counts", 
-                                     value = "attributionCountsThird",
-                                     uiOutput(outputId = "exposureTable3")),
-                            tabPanel(title = "Attribution plot", 
-                                     value = "attributionPlotThird",
-                                     uiOutput(outputId = "pdfview3"))),
-                            #tabPanel(title = "Signature presence test",
-                            #         value = "sigPresenceTestThird")
-                          value = "thirdBestResult"),
-                 widths = c(2, 10), fluid = FALSE)
+    tabsetPanel(id = "tabSetPanelresults",
+      tabPanel(title = "Attribution counts", 
+               value = "attributionCountsBest",
+               DT::dataTableOutput(outputId = "exposureTable")),
+      tabPanel(title = "Attribution plot", 
+               value = "attributionPlotBest",
+               uiOutput(outputId = "pdfview"))),
   )
-  
 }
 
 #' @import shiny
