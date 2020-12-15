@@ -40,37 +40,38 @@ AttributionResultsUI <- function() {
   fixedPage(
     navlistPanel(id = "navlistResults",
                  tabPanel(title = "Best result",
-                          p("Best result"),
                           tabsetPanel(
                             tabPanel(title = "Attribution counts", 
                                      value = "attributionCountsBest",
                                      uiOutput(outputId = "exposureTable")),
                             tabPanel(title = "Attribution plot", 
                                      value = "attributionPlotBest",
-                                     uiOutput(outputId = "pdfview2")),
-                            tabPanel(title = "Signature presence test",
-                                     value = "sigPresenceTestBest")
-                          ), value = "bestResult"),
+                                     uiOutput(outputId = "pdfview"))),
+                            #tabPanel(title = "Signature presence test",
+                            #         value = "sigPresenceTestBest")
+                           value = "bestResult"),
                  tabPanel(title = "Second best result",
-                          p("Second best result"),
                           tabsetPanel(
                             tabPanel(title = "Attribution counts", 
-                                     value = "attributionCountsSecond"),
+                                     value = "attributionCountsSecond",
+                                     uiOutput(outputId = "exposureTable2")),
                             tabPanel(title = "Attribution plot", 
-                                     value = "attributionPlotSecond"),
-                            tabPanel(title = "Signature presence test",
-                                     value = "sigPresenceTestSecond")
-                          ), value = "secondBestResult"),
+                                     value = "attributionPlotSecond",
+                                     uiOutput(outputId = "pdfview2"))),
+                            #tabPanel(title = "Signature presence test",
+                            #         value = "sigPresenceTestSecond")
+                          value = "secondBestResult"),
                  tabPanel(title = "Third best result",
-                          p("Third best result"),
                           tabsetPanel(
                             tabPanel(title = "Attribution counts", 
-                                     value = "attributionCountsThird"),
+                                     value = "attributionCountsThird",
+                                     uiOutput(outputId = "exposureTable3")),
                             tabPanel(title = "Attribution plot", 
-                                     value = "attributionPlotThird"),
-                            tabPanel(title = "Signature presence test",
-                                     value = "sigPresenceTestThird")
-                          ), value = "thirdBestResult"),
+                                     value = "attributionPlotThird",
+                                     uiOutput(outputId = "pdfview3"))),
+                            #tabPanel(title = "Signature presence test",
+                            #         value = "sigPresenceTestThird")
+                          value = "thirdBestResult"),
                  widths = c(2, 10), fluid = FALSE)
   )
   

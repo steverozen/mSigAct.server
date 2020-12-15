@@ -1120,7 +1120,7 @@ PrepareAttributionResults2 <-
     )
     
     # Show the new attribution results
-    shinyjs::show(id = "attributionResults")
+    shinyjs::show(selector = '#panels li a[data-value=attributionResultsTab]')
     
     shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                    selected = "attributionResultsTab")
