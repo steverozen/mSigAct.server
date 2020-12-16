@@ -117,12 +117,12 @@ UploadVCFUI <- function() {
     # Add the first row of control widgets
     fixedRow(
       # Add radio buttons for user to specify the type of VCF files
-      column(6, AddVCFType()),
+      column(6, AddVariantCaller()),
 
       # Add a conditional panel for user to specify the column names in
       # Mutect VCFs which contain the tumor sample information (if needed)
       column(6, conditionalPanel(
-        condition = "input.vcftype == 'mutect'",
+        condition = "input.variantCaller == 'unknown'",
         AddTumorColNames()))
     ),
 
