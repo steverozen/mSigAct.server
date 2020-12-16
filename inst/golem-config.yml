@@ -1,6 +1,6 @@
 default:
-  golem_name: ICAMS.shiny
-  golem_version: 0.0.0.9002
+  golem_name: mSigAct.server
+  golem_version: 0.0.4.9002
   app_prod: no
 production:
   app_prod: yes

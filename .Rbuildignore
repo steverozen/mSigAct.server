@@ -11,3 +11,4 @@ $run_dev.*
 ^appveyor\.yml$
 ^\.github$
 .*\.Rmd$
+^top\.help\.md$
