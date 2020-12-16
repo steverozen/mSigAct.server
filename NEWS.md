@@ -2,6 +2,8 @@
 ## Added
 * Added thumbnail pictures for signature attribution results.
 
+* Enabled process VCFs with unknown variant caller.
+
 ## Changed
 * Create new temporary directory each time when user generate catalogs and do
 signature attribution.

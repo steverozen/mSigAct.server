@@ -123,7 +123,7 @@ UploadVCFUI <- function() {
       # Mutect VCFs which contain the tumor sample information (if needed)
       column(6, conditionalPanel(
         condition = "input.variantCaller == 'unknown'",
-        AddTumorColNames()))
+        MergeSBSsAsDBSOption()))
     ),
 
     # Add the next row of control widgets
@@ -391,7 +391,8 @@ golem_add_external_resources <- function(){
     # Or for example, you can add shinyalert::useShinyalert() here
     #tags$link(rel="stylesheet", type="text/css", href="www/custom.css")
     
-    # adjust size of progress bar and center it
+    #includeCSS(path = "inst/app/www/style.css")
+    
     tags$style(
       HTML(".shiny-notification {
               height: 100px;
