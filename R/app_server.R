@@ -46,6 +46,8 @@ app_server <- function(input, output, session) {
   # Create a variable which can be used to store the uploaded catalog later
   catalog <- NA
   
+  list.of.catalogs <- NA
+  
   choose.more.sigs <- catalog.path <- input.catalog.type <- NA
   
   showSBS192Catalog <- TRUE
@@ -131,10 +133,100 @@ app_server <- function(input, output, session) {
       ids <<- result$ids
       ids$error <- append(ids$error, old.error.ids)
       
-      counts.catalog <- retval$counts
-      density.catalog <- retval$density
+      list.of.catalogs <<- retval$counts
+      #density.catalog <- retval$density
       # When the downloadHandler function runs, increment rv$downloadFlag
       #rv$downloadFlag <- rv$downloadFlag + 1
+      
+      output$showSpectraFromVCF <- renderUI({
+        actionButton(inputId = "showSpectraOfVCF", label = "Show spectra",
+                     style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4;padding:4px; ")
+      })
+      
+      output$sigAttributionFromVCF <- renderUI({
+        actionButton(inputId = "sigAttributionOfVCF", label = "Signature attribution",
+                     style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4;padding:4px; ")
+      })
+      
+      output$selectSampleFromUploadedVCF <- renderUI(
+        {
+          sample.names <- colnames(list.of.catalogs[[1]])
+          radioButtons(inputId = "sampleNameFromUploadedVCF",
+                       label = "Select sample from uploaded VCF",
+                       choices = sample.names,
+                       selected = character(0))
+        }
+      )
+    })
+  
+  observeEvent(input$showSpectraOfVCF, {
+    shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
+    if (input.catalog.type %in% c("SBS96", "SBS192", "DBS78", "ID")) {
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+    }
+    shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                   selected = "showSpectraTab")
+  })
+  
+  observeEvent(input$sampleNameFromUploadedVCF, {
+    output$spectraPlotFromVCF <- renderUI (
+      {
+        output$SBS96plot <- renderPlot({
+          catSBS96 <-
+            list.of.catalogs$catSBS96[, input$sampleNameFromUploadedVCF, drop = FALSE]
+          PlotCatalog(catSBS96)
+        }, width = )
+        
+        
+        output$SBS192plot <- renderPlot({
+          catSBS192 <-
+            list.of.catalogs$catSBS192[, input$sampleNameFromUploadedVCF, drop = FALSE]
+          PlotCatalog(catSBS192)
+        })
+        
+        output$SBS1536plot <- renderPlot({
+          catSBS1536 <-
+            list.of.catalogs$catSBS1536[, input$sampleNameFromUploadedVCF, drop = FALSE]
+          PlotCatalog(catSBS1536)
+        })
+        
+        output$DBS78plot <- renderPlot({
+          catDBS78 <-
+            list.of.catalogs$catDBS78[, input$sampleNameFromUploadedVCF, drop = FALSE]
+          PlotCatalog(catDBS78)
+        })
+        
+        output$DBS136plot <- renderPlot({
+          catDBS136 <-
+            list.of.catalogs$catDBS136[, input$sampleNameFromUploadedVCF, drop = FALSE]
+          PlotCatalog(catDBS136)
+        })
+        
+        output$DBS144plot <- renderPlot({
+          catDBS144 <-
+            list.of.catalogs$catDBS144[, input$sampleNameFromUploadedVCF, drop = FALSE]
+          PlotCatalog(catDBS144)
+        })
+        
+        output$IDplot <- renderPlot({
+          catID <-
+            list.of.catalogs$catID[, input$sampleNameFromUploadedVCF, drop = FALSE]
+          PlotCatalog(catID)
+        })
+        
+        tabsetPanel(type = "tabs",
+                    tabPanel("SBS96", plotOutput("SBS96plot")),
+                    tabPanel("SBS192", plotOutput("SBS192plot")),
+                    tabPanel("SBS1536", plotOutput("SBS1536plot")),
+                    tabPanel("DBS78", plotOutput("DBS78plot")),
+                    tabPanel("DBS136", plotOutput("DBS136plot")),
+                    tabPanel("DBS144", plotOutput("DBS144plot")),
+                    tabPanel("ID", plotOutput("IDplot"))
+        )
+      })
+
     })
   
   ShowTwoButtons <- function() {
@@ -264,7 +356,9 @@ app_server <- function(input, output, session) {
     } else {
       req(input$ref.genome2, input$region2)
       shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+      if (input.catalog.type %in% c("SBS96", "SBS192", "DBS78", "ID")) {
+        shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+      }
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                      selected = "showSpectraTab")
     }
@@ -278,6 +372,13 @@ app_server <- function(input, output, session) {
       return()
     } else {
       req(input$ref.genome2, input$region2)
+      if (!input.catalog.type %in% c("SBS96", "SBS192", "DBS78", "ID")) {
+        showNotification(ui = "Error:", 
+                         action = paste0("Can only do signature attribution ", 
+                                         "for SBS96, SBS192, DBS78 and ID"),
+                         type = "error")
+        return()
+      }
       shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
       shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
@@ -327,10 +428,14 @@ app_server <- function(input, output, session) {
                          label = "Select spectrum to view",
                          choices = sample.names,
                          selected = character(0)),
-            actionButton(inputId = "clickToSigAttribution",
-                         label = "Signature attribution",
-                         style= "color: #fff; background-color: #337ab7;
+            
+            if (input.catalog.type %in% c("SBS96", "SBS192", "DBS78", "ID")) {
+              actionButton(inputId = "clickToSigAttribution",
+                           label = "Signature attribution",
+                           style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4")
+            }
+            
           )
         }
       )
@@ -338,6 +443,7 @@ app_server <- function(input, output, session) {
   
   # When user clicks the action button on Show spectra page, direct user to the relevant tab
   observeEvent(input$clickToSigAttribution, {
+    shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
     shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                    selected = "sigAttributionTab2")
   })
@@ -523,10 +629,18 @@ app_server <- function(input, output, session) {
     })
 
   observeEvent(input$selectedCancerType2, {
+    if (!input.catalog.type %in% c("SBS96", "SBS192", "DBS78", "ID")) {
+      showNotification(ui = "Error:", 
+                       action = paste0("Can only do signature attribution ", 
+                                       "for SBS96, SBS192, DBS78 and ID"),
+                       type = "error")
+      return()
+    }
+    
     if (input$selectedCancerType2 != "Unknown") {
-      
       output$chooseSigSubsetForSampleFromCatalog2 <- renderUI(
-        {
+        { 
+          
           if (input.catalog.type == "SBS96") {
             sig.universe <- colnames(COSMIC.v3.genome.SBS96.sigs)
           } else {
@@ -556,7 +670,6 @@ app_server <- function(input, output, session) {
           }
           
           choose.more.sigs <<- setdiff(sig.universe, selected.sig.universe)
-          
           shinyWidgets::pickerInput (inputId = "preselectedSigs",
                                      label = paste0("These signatures were preselected based ",  
                                                     "on cancer type"),
