@@ -18,7 +18,7 @@ app_ui <- function(request) {
       tabPanel(title = "Home", HomeUI()),
       tabPanel(title = "Generate spectrum catalogs from VCFs",
                UploadVCFUI(), value = "generateCatalogTab"),
-      tabPanel(title = "Upload spectra", UploadSpectraUI(), 
+      tabPanel(title = "Signature attribution", UploadSpectraUI(), 
                value = "uploadSpectraTab"),
       tabPanel(title = "Show spectra", ShowSpectraUI(), 
                value = "showSpectraTab"),
@@ -39,12 +39,12 @@ app_ui <- function(request) {
 
 #' @import shiny
 TutorialUI <- function() {
-  general.guide.path <- system.file("tutorial/top.help.md", 
-                                    package = "mSigAct.server")
+  #general.guide.path <- system.file("tutorial/top.help.md", 
+  #                                  package = "mSigAct.server")
   fixedPage(
     tabsetPanel(id = "helpPages",
                 tabPanel(title = "General guide",
-                         includeMarkdown(path = general.guide.path)),
+                         includeMarkdown(path = "top.help.md")),
                 tabPanel(title = "Guide to generating catalogs"),
                 tabPanel(title = "Guide to signature attribution"))
   )
