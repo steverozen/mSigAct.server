@@ -214,11 +214,11 @@ AssignNumberOfAsterisks <- getFromNamespace("AssignNumberOfAsterisks", "ICAMS")
 #'
 #' @keywords internal
 AddRunInformation <-
-  function(files, vcf.names, zipfile.name, vcftype, ref.genome,
+  function(files, tmpdir, vcf.names, zipfile.name, vcftype, ref.genome,
            region, mutation.loads, strand.bias.statistics) {
 
     run.info <-
-      file(description = file.path(tempdir(), "run-information.txt"), open = "w")
+      file(description = file.path(tmpdir, "run-information.txt"), open = "w")
 
     # Add the header information
     time.info <- strftime(Sys.time(), usetz = TRUE) # Get time zone information
@@ -539,10 +539,12 @@ GenerateZipFileFromMutectVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
   }
-
+  
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
   output.file <- ifelse(base.filename == "",
-                        paste0(tempdir(), .Platform$file.sep),
-                        file.path(tempdir(), paste0(base.filename, ".")))
+                        paste0(tmpdir, .Platform$file.sep),
+                        file.path(tmpdir, paste0(base.filename, ".")))
 
   for (name in names(catalogs)) {
     WriteCatalog(catalogs[[name]],
@@ -588,10 +590,10 @@ GenerateZipFileFromMutectVCFs <- function(files,
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
 
-  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "mutect",
+  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "mutect",
                     ref.genome, region, mutation.loads, strand.bias.statistics)
 
-  file.names <- list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$",
+  file.names <- list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
                            full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
@@ -743,10 +745,12 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
 
   # Transform the counts catalogs to density catalogs
   catalogs.density <- TransCountsCatalogToDensity(catalogs)
-
+  
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
   output.file <- ifelse(base.filename == "",
-                        paste0(tempdir(), .Platform$file.sep),
-                        file.path(tempdir(), paste0(base.filename, ".")))
+                        paste0(tmpdir, .Platform$file.sep),
+                        file.path(tmpdir, paste0(base.filename, ".")))
 
   if (is.function(updateProgress)) {
     updateProgress(value = 0.3, detail = "writing catalogs to CSV files")
@@ -793,11 +797,11 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
-  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "strelka.sbs",
+  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "strelka.sbs",
                     ref.genome, region, mutation.loads, strand.bias.statistics)
 
   file.names <-
-    list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$",
+    list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
                full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
@@ -1195,10 +1199,12 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
     getFromNamespace("GetMutationLoadsFromStrelkaIDVCFs", "ICAMS")
   mutation.loads <- GetMutationLoadsFromStrelkaIDVCFs(list)
   strand.bias.statistics<- NULL
-
+  
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
   output.file <- ifelse(base.filename == "",
-                        paste0(tempdir(), .Platform$file.sep),
-                        file.path(tempdir(), paste0(base.filename, ".")))
+                        paste0(tmpdir, .Platform$file.sep),
+                        file.path(tmpdir, paste0(base.filename, ".")))
 
   if (is.function(updateProgress)) {
     updateProgress(value = 0.4, detail = "writing catalog to CSV file")
@@ -1213,10 +1219,10 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
-  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "strelka.id",
+  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "strelka.id",
                     ref.genome, region, mutation.loads, strand.bias.statistics)
 
-  file.names <- list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$",
+  file.names <- list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
                            full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)

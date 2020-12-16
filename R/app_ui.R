@@ -380,7 +380,9 @@ golem_add_external_resources <- function(){
                     system.file("app/DBS78", package = "mSigAct.server"))
   addResourcePath(prefix = "ID", directoryPath = 
                     system.file("app/ID", package = "mSigAct.server"))
-  addResourcePath(prefix = "results", directoryPath = tempdir())
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  addResourcePath(prefix = "results", directoryPath = tmpdir)
   
   tags$head(
     golem::activate_js(),

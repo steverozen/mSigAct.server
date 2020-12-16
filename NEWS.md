@@ -2,6 +2,10 @@
 ## Added
 * Added thumbnail pictures for signature attribution results.
 
+## Changed
+* Create new temporary directory each time when user generate catalogs and do
+signature attribution.
+
 <br>
 
 # ICAMS.shiny 0.0.4
