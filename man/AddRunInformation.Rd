@@ -7,6 +7,7 @@ files.}
 \usage{
 AddRunInformation(
   files,
+  tmpdir,
   vcf.names,
   zipfile.name,
   vcftype,

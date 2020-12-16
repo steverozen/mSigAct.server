@@ -112,190 +112,27 @@ app_server <- function(input, output, session) {
   output$download <- downloadHandler(
 
     filename = function() {
-      
       errors <- CheckInputsForVCF(input)
       ids$error <<- append(ids$error, AddErrorMessage(errors))
       paste0(input$zipfile.name, ".zip")
     },
 
     content = function(file) {
-      if (input$vcftype == "strelka.sbs") {
-        # Generate a zip archive from Strelka SBS VCFs and
-        # update the notification ids for errors, warnings
-        # and messages
-
-        result <- ProcessStrelkaSBSVCFs(input, output, file, ids)
-        retval <<- result$retval
-        old.error.ids <- ids$error
-        ids <<- result$ids
-        ids$error <- append(ids$error, old.error.ids)
-
-        counts.catalog <- retval$counts
-        density.catalog <- retval$density
-
-        if (FALSE) {
-          # When the downloadHandler function runs, increment rv$downloadFlag
-          rv$downloadFlag <- rv$downloadFlag + 1
-
-          if(rv$downloadFlag > 0){  # trigger event whenever the value of rv$downloadFlag changes
-            output$SBS96plot <- NULL
-            output$SBS192plot <- NULL
-            output$SBS1536plot <- NULL
-            output$DBS78plot <- NULL
-            output$DBS136plot <- NULL
-            output$DBS144plot <- NULL
-            output$IDplot <- NULL
-          }
+      req(input$variantCaller, input$ref.genome, input$region, input$vcf.files)
+      if (input$variantCaller == "unknown") {
+        if (is.null(input$mergeSBS)) {
+          return()
         }
-
-
-        output$selectSampleFromUploadedVCF <- renderUI(
-          {
-
-            sample.names <- colnames(counts.catalog[[1]])
-            radioButtons(inputId = "sampleNameFromUploadedVCF",
-                         label = "Select the sample from uploaded VCF",
-                         choices = sample.names,
-                         selected = character(0))
-          }
-        )
-
-        output$spectraPlotFromVCF <- renderUI(
-          {
-            
-            tabsetPanel(type = "tabs",
-                        tabPanel("SBS96", plotOutput("SBS96plot")),
-                        tabPanel("SBS192", plotOutput("SBS192plot")),
-                        tabPanel("SBS1536", plotOutput("SBS1536plot")),
-                        tabPanel("DBS78", plotOutput("DBS78plot")),
-                        tabPanel("DBS136", plotOutput("DBS136plot")),
-                        tabPanel("DBS144", plotOutput("DBS144plot")),
-                        tabPanel("ID", plotOutput("IDplot"))
-            )
-          }
-        )
-
-        observeEvent(input$sampleNameFromUploadedVCF, {
-          output$SBS96plot <- renderPlot({
-            catSBS96 <-
-              counts.catalog$catSBS96[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            PlotCatalog(catSBS96)
-          })
-
-
-          output$SBS192plot <- renderPlot({
-            catSBS192 <-
-              counts.catalog$catSBS192[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            PlotCatalog(catSBS192)
-          })
-
-          output$SBS1536plot <- renderPlot({
-            catSBS1536 <-
-              counts.catalog$catSBS1536[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            PlotCatalog(catSBS1536)
-          })
-
-          output$DBS78plot <- renderPlot({
-            catDBS78 <-
-              counts.catalog$catDBS78[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            PlotCatalog(catDBS78)
-          })
-
-          output$DBS136plot <- renderPlot({
-            catDBS136 <-
-              counts.catalog$catDBS136[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            PlotCatalog(catDBS136)
-          })
-
-          output$DBS144plot <- renderPlot({
-            catDBS144 <-
-              counts.catalog$catDBS144[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            PlotCatalog(catDBS144)
-          })
-
-        })
-
-        output$selectSampleFromVCFForAttribution <- renderUI(
-          {
-
-            sample.names <- colnames(counts.catalog[[1]])
-            selectInput(inputId = "selectedSampleFromVCFForAttribution",
-                        label = "Select the sample from uploaded VCF",
-                        choices = sample.names)
-          }
-        )
-
-        observeEvent(input$selectedSampleFromVCFForAttribution, {
-          output$selectCancerType <- renderUI(
-            {
-              cancer.types <-
-                c(colnames(CancerTypeToExposureStatData()), "Unknown")
-              selectInput(inputId = "selectedCancerType",
-                          label = "Select the cancer type",
-                          choices = cancer.types,
-                          selected = "Biliary-AdenoCA")
-            }
-          )
-        })
-
-        observeEvent(input$selectedSampleFromVCFForAttribution, {
-        output$choosecatalogtype <- renderUI(
-          {
-            catalog.type <- c("SBS96", "SBS192", "DBS78", "ID")
-            selectInput(inputId = "selectedCatalogType",
-                        label = "Select the catalog type",
-                        choices = catalog.type,
-                        selected = input.catalog.type)
-          }
-        )
-        })
-
-        observeEvent(input$selectedSampleFromVCFForAttribution, {
-          output$chooseSigSubsetForSampleFromVCF <- renderUI(
-            {
-              sig1 <- PCAWG7::signature[["genome"]]
-              sig2 <- sig1[[input$selectedCatalogType]]
-              sig.universe <- colnames(sig2)
-
-
-              foo <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType,
-                                           tumor.cohort = "PCAWG",
-                                           sig.type = input$selectedCatalogType,
-                                           region = "genome")
-              selected.sig.universe <- colnames(foo)
-              selectInput(inputId = "selectedSigSubset1",
-                          label = paste0("These signatures were preselected based ",  
-                                         "on cancer type. Move your cursor to click one ",
-                                         "signature and press Backspace key to exclude ", 
-                                         "the signature. Click the empty space inside ",
-                                         "the box below to add new signature."),
-                          choices = sig.universe,
-                          selected = selected.sig.universe,
-                          multiple = TRUE)
-            }
-          )
-        }
-        )
-
-        observeEvent(input$selectedSampleFromVCFForAttribution, {
-          output$analyzeButtonForVCF <- renderUI(
-            {
-              actionButton(inputId = "submitAttributionForVCF", label = "Analyze",
-                           style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4")
-            }
-          )
-        })
-      } else if (input$vcftype == "strelka.id") {
-        old.error.ids <- ids$error
-        ids <<- ProcessStrelkaIDVCFs(input, output, file, ids)
-        ids$error <- append(ids$error, old.error.ids)
-      } else if (input$vcftype == "mutect") {
-        old.error.ids <- ids$error
-        ids <<- ProcessMutectVCFs(input, output, file, ids)
-        ids$error <- append(ids$error, old.error.ids)
       }
-
+      
+      result <- ProcessVCFs(input, output, file, ids)
+      retval <<- result$retval
+      old.error.ids <- ids$error
+      ids <<- result$ids
+      ids$error <- append(ids$error, old.error.ids)
+      
+      counts.catalog <- retval$counts
+      density.catalog <- retval$density
       # When the downloadHandler function runs, increment rv$downloadFlag
       #rv$downloadFlag <- rv$downloadFlag + 1
     })

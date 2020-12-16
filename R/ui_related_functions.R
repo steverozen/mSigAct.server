@@ -14,7 +14,14 @@ AddVariantCaller <- function() {
                selected = character(0))
 }
 
-
+MergeSBSsAsDBSOption <- function() {
+  radioButtons(inputId = "mergeSBS", 
+               label = h5(strong("Merge adjacent SBSs as DBS"), 
+                          style = "color: #337ab7"),
+               choiceNames = list("yes", "no"),
+               choiceValues = list("yes", "no"),
+               selected = character(0))
+}
 
 
 #' @import shiny
