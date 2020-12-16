@@ -39,15 +39,15 @@ app_ui <- function(request) {
 
 #' @import shiny
 TutorialUI <- function() {
-  
-    fixedPage(
-      tabsetPanel(id = "helpPages",
-                  tabPanel(title = "General guide",
-                           includeMarkdown(path = "top.help.md")),
-                  tabPanel(title = "Guide to generating catalogs"),
-                  tabPanel(title = "Guide to signature attribution"))
-    )
-  
+  general.guide.path <- system.file("tutorial/top.help.md", 
+                                    package = "mSigAct.server")
+  fixedPage(
+    tabsetPanel(id = "helpPages",
+                tabPanel(title = "General guide",
+                         includeMarkdown(path = general.guide.path)),
+                tabPanel(title = "Guide to generating catalogs"),
+                tabPanel(title = "Guide to signature attribution"))
+  )
 }
 
 #' @import shiny

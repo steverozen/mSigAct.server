@@ -1,7 +1,6 @@
 context("golem tests")
 
 library(golem)
-library(ICAMS)
 
 test_that("app ui", {
   ui <- app_ui()

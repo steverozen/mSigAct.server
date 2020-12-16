@@ -1101,9 +1101,9 @@ PrepareAttributionResults2 <-
       stopifnot(setequal(order.name, rownames(dt)))
       dt0 <- dt[order.name, ]
       
-      png(filename=png.file.path, width = 1539, height = 276)
+      grDevices::png(filename=png.file.path, width = 1539, height = 276)
       ICAMS::PlotCatalog(spect)
-      dev.off()
+      grDevices::dev.off()
       
       tbl1$spectrum <- paste0('<img src="results/', png.file.name, '" height="52"></img>')
       dt1 <- dplyr::bind_rows(tbl1, dt0)
