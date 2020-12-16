@@ -28,53 +28,39 @@ app_ui <- function(request) {
                value = "sigAttributionTab2"),
       tabPanel(title = "Results", AttributionResultsUI(),
                value = "attributionResultsTab"),
+      tabPanel(title = "Tutorial", TutorialUI(),
+               value = "tutorialTab"),
       position = "fixed-top"),
     
     # Add padding because navbar pinned at the top
-    tags$style(type="text/css", "body {padding-top: 70px;}")
+    tags$style(type="text/css", "body {padding-top: 70px;}"),
+  )
+}
+
+#' @import shiny
+TutorialUI <- function() {
+  general.guide.path <- system.file("tutorial/top.help.md", 
+                                    package = "mSigAct.server")
+  fixedPage(
+    tabsetPanel(id = "helpPages",
+                tabPanel(title = "General guide",
+                         includeMarkdown(path = general.guide.path)),
+                tabPanel(title = "Guide to generating catalogs"),
+                tabPanel(title = "Guide to signature attribution"))
   )
 }
 
 #' @import shiny
 AttributionResultsUI <- function() {
   fixedPage(
-    navlistPanel(id = "navlistResults",
-                 tabPanel(title = "Best result",
-                          tabsetPanel(
-                            tabPanel(title = "Attribution counts", 
-                                     value = "attributionCountsBest",
-                                     uiOutput(outputId = "exposureTable")),
-                            tabPanel(title = "Attribution plot", 
-                                     value = "attributionPlotBest",
-                                     uiOutput(outputId = "pdfview"))),
-                            #tabPanel(title = "Signature presence test",
-                            #         value = "sigPresenceTestBest")
-                           value = "bestResult"),
-                 tabPanel(title = "Second best result",
-                          tabsetPanel(
-                            tabPanel(title = "Attribution counts", 
-                                     value = "attributionCountsSecond",
-                                     uiOutput(outputId = "exposureTable2")),
-                            tabPanel(title = "Attribution plot", 
-                                     value = "attributionPlotSecond",
-                                     uiOutput(outputId = "pdfview2"))),
-                            #tabPanel(title = "Signature presence test",
-                            #         value = "sigPresenceTestSecond")
-                          value = "secondBestResult"),
-                 tabPanel(title = "Third best result",
-                          tabsetPanel(
-                            tabPanel(title = "Attribution counts", 
-                                     value = "attributionCountsThird",
-                                     uiOutput(outputId = "exposureTable3")),
-                            tabPanel(title = "Attribution plot", 
-                                     value = "attributionPlotThird",
-                                     uiOutput(outputId = "pdfview3"))),
-                            #tabPanel(title = "Signature presence test",
-                            #         value = "sigPresenceTestThird")
-                          value = "thirdBestResult"),
-                 widths = c(2, 10), fluid = FALSE)
+    tabsetPanel(id = "tabSetPanelresults",
+      tabPanel(title = "Attribution counts", 
+               value = "attributionCountsBest",
+               DT::dataTableOutput(outputId = "exposureTable")),
+      tabPanel(title = "Attribution plot", 
+               value = "attributionPlotBest",
+               uiOutput(outputId = "pdfview"))),
   )
-  
 }
 
 #' @import shiny
@@ -384,32 +370,36 @@ SignatureAttributionUI2 <- function() {
 
 #' @import shiny
 golem_add_external_resources <- function(){
-
-  addResourcePath(
-    'www', system.file('app/www', package = 'mSigAct.server')
-  )
+  addResourcePath(prefix = "www", directoryPath = 
+                    system.file("app/www", package = "mSigAct.server"))
+  addResourcePath(prefix = "SBS96", directoryPath = 
+                    system.file("app/SBS96", package = "mSigAct.server"))
+  addResourcePath(prefix = "SBS192", directoryPath = 
+                    system.file("app/SBS192", package = "mSigAct.server"))
+  addResourcePath(prefix = "DBS78", directoryPath = 
+                    system.file("app/DBS78", package = "mSigAct.server"))
+  addResourcePath(prefix = "ID", directoryPath = 
+                    system.file("app/ID", package = "mSigAct.server"))
+  addResourcePath(prefix = "results", directoryPath = tempdir())
   
-  addResourcePath(
-    'SBS96', system.file('app/SBS96', package = 'mSigAct.server')
-  )
-  
-  addResourcePath(
-    'SBS192', system.file('app/SBS192', package = 'mSigAct.server')
-  )
-  
-  addResourcePath(
-    'DBS78', system.file('app/DBS78', package = 'mSigAct.server')
-  )
-  
-  addResourcePath(
-    'ID', system.file('app/ID', package = 'mSigAct.server')
-  )
-
   tags$head(
-    golem::activate_js()
+    golem::activate_js(),
     # Add here all the external resources
     # If you have a custom.css in the inst/app/www
     # Or for example, you can add shinyalert::useShinyalert() here
     #tags$link(rel="stylesheet", type="text/css", href="www/custom.css")
+    
+    # adjust size of progress bar and center it
+    tags$style(
+      HTML(".shiny-notification {
+              height: 100px;
+              width: 800px;
+              position:fixed;
+              top: calc(50% - 50px);;
+              left: calc(50% - 400px);;
+            }
+           "
+      )
+    )
   )
 }

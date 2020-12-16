@@ -2,7 +2,7 @@
 title: "Guide to the [mSigAct web server](https://msigact.ai)"
 author: "Steve Rozen and Nanhai Jiang"
 output:
-  html_document
+  md_document
 ---
 
 ```{r setup, include=FALSE}
