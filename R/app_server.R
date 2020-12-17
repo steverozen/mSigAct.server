@@ -64,7 +64,18 @@ app_server <- function(input, output, session) {
     #######################################################################
     # Functions related to UploadVCFUI(), the first tab
     #######################################################################
-    # When user uploads VCF files, then show the action button to ge
+    # When user uploads VCF files, then show the action button "Generate catalogs"
+    observeEvent(input$vcf.files, {
+      output$downloadZipFile  <- renderUI({
+        MyDownloadButton(
+          outputId = "download",
+          label = "Create catalogs",
+          style="color: #fff;
+                   background-color: #337ab7;
+                   border-color: #2e6da4;padding:4px;")
+      })
+    }) 
+   
     
     
     

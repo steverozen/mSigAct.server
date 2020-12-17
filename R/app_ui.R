@@ -134,15 +134,13 @@ UploadVCFUI <- function() {
       fluidRow(
         column(6, UploadVCFFiles()),
         column(
-          6, MyDownloadButton(
-            outputId = "download",
-            label = "Create catalogs",
-            style="color: #fff;
-                   background-color: #337ab7;
-                   border-color: #2e6da4;padding:4px;"),
+          6, 
+          uiOutput(outputId = "downloadZipFile"),
+          br(),
           uiOutput(outputId = "showSpectraFromVCF"),
+          br(),
           uiOutput(outputId = "sigAttributionFromVCF"))
-      )), # end sidbarPanel
+      ), width = 6), # end sidbarPanel
       
     mainPanel = mainPanel(
     # Add the next row of control widgets
@@ -162,35 +160,26 @@ UploadVCFUI <- function() {
       column(6, AddZipfileName())
       ),
 
-
+    br(),
     # Add a download button for user to download VCF files to test
     fixedRow(column(6,
-                    downloadButton(outputId = "downloadsampleVCFs",
-                                   label = "Download example VCFs"),
-                    offset = 6)),
-    br(),
-
-    # Add a button for user to run analysis on example Strelka SBS VCFs
-    fixedRow(column(6,
-                    MyDownloadButton(outputId = "runstrelkasbsvcfs",
-                                     label =
-                                       paste0("Example analysis on  ",
-                                              "Strelka VCFs")),
-                    offset = 6)),
-
-    # Add one line break
-    br(),
-
-    # Add a button for user to run analysis on example Mutect VCFs
-    fixedRow(column(6,
-                    MyDownloadButton(outputId = "runmutectvcfs",
-                                     label =
-                                       paste0("Example analysis on ",
-                                              "Mutect VCFs")),
-                    offset = 6)),
-
-    verbatimTextOutput(outputId = "testoutput")
-  ))
+                    wellPanel(
+                      h5(strong("Example data and analysis", style = "color: #337ab7")),
+                      br(),
+                      downloadButton(outputId = "downloadsampleVCFs",
+                                     label = "Download example VCFs"),
+                      rep_br(2),
+                      MyDownloadButton(outputId = "runstrelkasbsvcfs",
+                                       label =
+                                         paste0("Example analysis on  ",
+                                                "Strelka VCFs")),
+                      rep_br(2),
+                      MyDownloadButton(outputId = "runmutectvcfs",
+                                       label =
+                                         paste0("Example analysis on ",
+                                                "Mutect VCFs")),
+                      rep_br(1))
+                    )), width = 6))
 }
 
 #' @import shiny
