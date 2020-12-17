@@ -15,9 +15,9 @@ The [mSigAct web server](https://msigact.ai) provides methods for analyzing muta
 signatures. "mSigAct" is an abbreviation of 
 <big><strong>m</strong></big>utational 
 <big><strong>Sig</strong></big>nature <big><strong>Act</strong></big>ivity. 
-We usually view a mutational signature as the pattern of mutations generated 
+A mutational signature is the pattern of mutations generated 
 by a particular 
-mutational process. 
+mutational process. (At least, this is the ideal that we usually aim for.)
 
 ### Mutational signature examples
 
@@ -29,7 +29,7 @@ par(cex = 0.8)
 ICAMS::PlotCatalog(PCAWG7::signature$genome$SBS96[ , "SBS1", drop = FALSE])
 ```
 
-These are kind of "single base substitution" (SBS)
+These are "single base substitutions" (SBSs)
 caused by deamination of 5-methyl cytosine.
 We most often look at
 SBS mutations in the context of preceding and following bases. We also, by convention,
