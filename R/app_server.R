@@ -907,9 +907,11 @@ app_server <- function(input, output, session) {
           PCAWG7::signature[[region]][[catalog.type]][, sigsForAttribution(), drop = FALSE]
       }
       
-      sigs.prop <- mSigAct::ExposureProportions(mutation.type = catalog.type,
-                                                cancer.type = cancer.type,
-                                                all.sigs = sig.universe)
+      sigs.prop <- mSigAct::ExposureProportions(
+        mutation.type = catalog.type,
+        cancer.type   = cancer.type,
+        all.sigs      = sig.universe,
+        must.include  = colnames(sig.universe))
       
       if (FALSE) {
         QP.exposure <- 
@@ -1246,18 +1248,22 @@ app_server <- function(input, output, session) {
     
     if (catalog.type == "SBS192") {
       sig.universe <- 
-        PCAWG7::signature[["genome"]][[catalog.type]][, sigsForAttributionVCF(), drop = FALSE]
+        PCAWG7::signature[["genome"]][[catalog.type]][, sigsForAttributionVCF(), 
+                                                      drop = FALSE]
     } else if (catalog.type == "SBS96") {
       sig.universe <- 
         COSMIC.v3.genome.SBS96.sigs[, sigsForAttributionVCF(), drop = FALSE]
     } else {
       sig.universe <- 
-        PCAWG7::signature[[region]][[catalog.type]][, sigsForAttributionVCF(), drop = FALSE]
+        PCAWG7::signature[[region]][[catalog.type]][, sigsForAttributionVCF(), 
+                                                    drop = FALSE]
     }
     
-    sigs.prop <- mSigAct::ExposureProportions(mutation.type = catalog.type,
-                                              cancer.type = cancer.type,
-                                              all.sigs = sig.universe)
+    sigs.prop <- mSigAct::ExposureProportions(
+      mutation.type = catalog.type,
+      cancer.type = cancer.type,
+      all.sigs = sig.universe,
+      must.include = colnames(sig.universe))
     
     if (FALSE) {
       QP.exposure <- 
