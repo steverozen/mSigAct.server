@@ -1011,10 +1011,8 @@ GenerateZipFileFromVCFs <- function(files,
   
   tmpdir <- tempfile()
   dir.create(tmpdir)
-  output.file <- ifelse(base.filename == "",
-                        paste0(tmpdir, .Platform$file.sep),
-                        file.path(tmpdir, paste0(base.filename, ".")))
-  
+  output.file <- paste0(tmpdir, .Platform$file.sep)
+                        
   for (name in names(catalogs.to.return)) {
     WriteCatalog(catalogs.to.return[[name]],
                  file = paste0(output.file, name, ".counts.csv"))

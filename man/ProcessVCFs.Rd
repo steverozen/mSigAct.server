@@ -22,8 +22,8 @@ function writes the content to that file path. See
 and message.}
 }
 \value{
-A list of updated notification ids for error, warning and message
-  after running this function.
+A list of catalogs and updated notification ids for error, warning
+  and message after running this function.
 }
 \description{
 This function is a wrapper function processing VCFs to

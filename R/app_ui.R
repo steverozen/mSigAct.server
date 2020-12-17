@@ -163,13 +163,6 @@ UploadVCFUI <- function() {
       ),
 
 
-    fixedRow(column(6,
-                    actionButton(inputId = "remove",
-                                 label = "Remove notifications"),
-                    offset = 6)),
-
-    br(),
-
     # Add a download button for user to download VCF files to test
     fixedRow(column(6,
                     downloadButton(outputId = "downloadsampleVCFs",
@@ -181,8 +174,8 @@ UploadVCFUI <- function() {
     fixedRow(column(6,
                     MyDownloadButton(outputId = "runstrelkasbsvcfs",
                                      label =
-                                       paste0("Example analysis on two ",
-                                              "1-sample Strelka VCFs")),
+                                       paste0("Example analysis on  ",
+                                              "Strelka VCFs")),
                     offset = 6)),
 
     # Add one line break
@@ -192,8 +185,8 @@ UploadVCFUI <- function() {
     fixedRow(column(6,
                     MyDownloadButton(outputId = "runmutectvcfs",
                                      label =
-                                       paste0("Example analysis on two ",
-                                              "1-sample Mutect VCFs")),
+                                       paste0("Example analysis on ",
+                                              "Mutect VCFs")),
                     offset = 6)),
 
     verbatimTextOutput(outputId = "testoutput")

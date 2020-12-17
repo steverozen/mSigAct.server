@@ -9,7 +9,7 @@ future::plan(future::multisession(workers = min(64, future::availableCores())))
 #' @import shinydashboard
 app_server <- function(input, output, session) {
   # List the first level callModules here
-  #tryCatch({
+  tryCatch({
     fut <- NULL
     result_val <- reactiveVal()
     running <- reactiveVal(FALSE)
@@ -60,6 +60,13 @@ app_server <- function(input, output, session) {
     
     dat <- data.frame(name = character(), spectrum = character(), 
                       proposed.aetiology = character())
+    
+    #######################################################################
+    # Functions related to UploadVCFUI(), the first tab
+    #######################################################################
+    # When user uploads VCF files, then show the action button to ge
+    
+    
     
     # Download sample VCFs when user clicks the button
     output$downloadsampleVCFs <- downloadHandler(
@@ -1355,5 +1362,6 @@ app_server <- function(input, output, session) {
     observeEvent(input$remove2, {
       RemoveAllNotifications(ids)
     })
-  }
+  })
+}
   
