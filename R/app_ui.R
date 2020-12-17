@@ -114,30 +114,37 @@ HomeUI <- function() {
 
 #' @import shiny
 UploadVCFUI <- function() {
-  # List the first level UI elements here
-  fixedPage(
-    # Add the first row of control widgets
-    fixedRow(
-      # Add radio buttons for user to specify the type of VCF files
-      column(6, AddVariantCaller()),
 
-      # Add a conditional panel for user to specify the column names in
-      # Mutect VCFs which contain the tumor sample information (if needed)
-      column(6, conditionalPanel(
-        condition = "input.variantCaller == 'unknown'",
-        MergeSBSsAsDBSOption()))
-    ),
-
-    # Add the next row of control widgets
-    fixedRow(
-      # Add radio buttons for user to specify the reference genome
-      column(6, AddReferenceGenome()),
-
-      # Add radio buttons for user to specify the genomic region
-      # from where the VCFs were generated
-      column(6, AddRegion())
-    ),
-
+  sidebarLayout(
+    
+    sidebarPanel = sidebarPanel(
+      fluidRow(
+        column(6, AddReferenceGenome()),
+        
+        column(6, AddRegion())
+      ),
+      
+      fluidRow(
+        column(6, AddVariantCaller()),
+        
+        # Hidden at first, pops up if Variant caller is "other"
+        column(6, conditionalPanel(
+          condition = "input.variantCaller == 'unknown'",
+          MergeSBSsAsDBSOption()))),
+      fluidRow(
+        column(6, UploadVCFFiles()),
+        column(
+          6, MyDownloadButton(
+            outputId = "download",
+            label = "Create catalogs",
+            style="color: #fff;
+                   background-color: #337ab7;
+                   border-color: #2e6da4;padding:4px;"),
+          uiOutput(outputId = "showSpectraFromVCF"),
+          uiOutput(outputId = "sigAttributionFromVCF"))
+      )), # end sidbarPanel
+      
+    mainPanel = mainPanel(
     # Add the next row of control widgets
     fixedRow(
       # Add text input for user to specify the sample names
@@ -146,39 +153,21 @@ UploadVCFUI <- function() {
 
       # Add text input for user to specify the base filename
       # of the CSV and PDF files generated
-      column(6, AddBaseFilename())
-    ),
+      # column(6, AddBaseFilename())
+     ),
 
     # Add the next row of control widgets
     fixedRow(
       # Add text input for user to specify the zip file name
-      column(6, AddZipfileName()),
+      column(6, AddZipfileName())
+      ),
 
-      # Add a file upload control for user to upload multiple VCF files
-      column(6, UploadVCFFiles())),
-
-
-    # Add the next row of control widgets
-    fixedRow(column(6,
-             splitLayout(cellWidths = c("22%", "20%", "30%"),
-                         MyDownloadButton(outputId = "download",
-                                          label = "Create catalogs",
-                                          style="color: #fff;
-                                       background-color: #337ab7;
-                                       border-color: #2e6da4;padding:4px;"),
-                         uiOutput(outputId = "showSpectraFromVCF"),
-                         uiOutput(outputId = "sigAttributionFromVCF")),
-             offset = 6)),
-
-    # Add one line break
-    br(),
 
     fixedRow(column(6,
                     actionButton(inputId = "remove",
                                  label = "Remove notifications"),
                     offset = 6)),
 
-    # Add one line break
     br(),
 
     # Add a download button for user to download VCF files to test
@@ -186,8 +175,6 @@ UploadVCFUI <- function() {
                     downloadButton(outputId = "downloadsampleVCFs",
                                    label = "Download example VCFs"),
                     offset = 6)),
-
-    # Add one line break
     br(),
 
     # Add a button for user to run analysis on example Strelka SBS VCFs
@@ -210,7 +197,7 @@ UploadVCFUI <- function() {
                     offset = 6)),
 
     verbatimTextOutput(outputId = "testoutput")
-  )
+  ))
 }
 
 #' @import shiny
