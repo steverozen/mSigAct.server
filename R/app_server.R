@@ -1055,7 +1055,7 @@ app_server <- function(input, output, session) {
                          choices = c("SBS96", "SBS192", "DBS78", "ID"))
           }
         )
-      })
+      }) # end of observeEvent
     
     CheckArgumentsForVCFAttribution <- reactive({
       list(input$selectedCancerTypeOfVCF, input$selectCatalogTypeOfVCF)
@@ -1108,54 +1108,55 @@ app_server <- function(input, output, session) {
                                      ), 
                                      multiple = TRUE
           )
-        }
-      )
-    }
-    )
-    
-    observeEvent(input$preselectedSigsForVCF, {
-      output$addSigForVCF <- renderUI(
-        actionButton(inputId = "addMoreSigsForVCF", label = "Add more signatures",
-                     style= "color: #fff; background-color: #337ab7;
+          
+          output$addSigForVCF <- renderUI(
+            actionButton(inputId = "addMoreSigsForVCF", label = "Add more signatures",
+                         style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4;padding:4px; ")
-      )
+          )
+          
+          
+          if (input.catalog.type == "SBS96") {
+            dat <<- data.frame(
+              name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
+                            rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
+              spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
+                                ' height="52"></img>'),
+              proposed.aetiology = SBS.aetiology)
+          } else if (input.catalog.type == "SBS192") {
+            dat <<- data.frame(
+              name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
+                            rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
+              spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
+                                ' height="52"></img>'),
+              proposed.aetiology = SBS.aetiology)
+          } else if (input.catalog.type == "DBS78") {
+            dat <<- data.frame(
+              name = paste0("<a href='", COSMIC.v3.DBS.sig.links, "' target='_blank'>", 
+                            rownames(COSMIC.v3.DBS.sig.links),  "</a>"), 
+              spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.PNG"',
+                                ' height="52"></img>'),
+              proposed.aetiology = DBS.aetiology)
+          } else if (input.catalog.type == "ID") {
+            dat <<- data.frame(
+              name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
+                            rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
+              spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.PNG"',
+                                ' height="52"></img>'),
+              proposed.aetiology = ID.aetiology)
+          } 
+        }) # end of renderUI
+      
+      
+      output$mytable <- NULL
+      shinyjs::hide(id = "mytable")
+        }) # end of observeEvent
+    
+      
       #if (is.na(req(input$selectCatalogTypeOfVCF))) {
       #  return()
       #}
-      if (input.catalog.type == "SBS96") {
-        dat <<- data.frame(
-          name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
-                        rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
-          spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
-                            ' height="52"></img>'),
-          proposed.aetiology = SBS.aetiology)
-      } else if (input.catalog.type == "SBS192") {
-        dat <<- data.frame(
-          name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
-                        rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
-          spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
-                            ' height="52"></img>'),
-          proposed.aetiology = SBS.aetiology)
-      } else if (input.catalog.type == "DBS78") {
-        dat <<- data.frame(
-          name = paste0("<a href='", COSMIC.v3.DBS.sig.links, "' target='_blank'>", 
-                        rownames(COSMIC.v3.DBS.sig.links),  "</a>"), 
-          spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.PNG"',
-                            ' height="52"></img>'),
-          proposed.aetiology = DBS.aetiology)
-      } else if (input.catalog.type == "ID") {
-        dat <<- data.frame(
-          name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
-                        rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
-          spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.PNG"',
-                            ' height="52"></img>'),
-          proposed.aetiology = ID.aetiology)
-      } 
-    })
-    
-    
-    output$mytable <- NULL
-    shinyjs::hide(id = "mytable")
+     
     #rownames(dat) <- names(COSMIC.v3.SBS.sig.links)
     
     #output$mytableForVCF <- DT::renderDataTable({
