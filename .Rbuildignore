@@ -5,12 +5,11 @@ dev_history.R
 ^dev$
 $run_dev.*
 ^\.travis\.yml$
-^README\.Rmd$
 ^app\.R$
 ^rsconnect$
 ^appveyor\.yml$
 ^\.github$
 .*\.Rmd$
-^top\.help\.md$
+^.*\.md$
 ^top\.help_files$
 ^mutograph\.png$

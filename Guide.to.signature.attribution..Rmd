@@ -1,0 +1,18 @@
+---
+title: "Guide to signature attribution in the [mSigAct web app](https://msigact.ai)"
+author: "Steve Rozen and Nanhai Jiang"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introducdtion
+
+The tab "Signature attribution" 
+provides analytical tools to estimate which mutational
+signatures have contributed to the mutational
+spectrum of a single tumor or tissue sample.
+
+

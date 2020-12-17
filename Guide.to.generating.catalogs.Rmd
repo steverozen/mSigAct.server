@@ -1,0 +1,20 @@
+---
+title: "Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web app](https://msigact.ai)"
+author: "Steve Rozen and Nanhai Jiang"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introducdtion
+
+The function of the tab "Generate spectrum catalogs from VCFs" is,
+well, to generate spectrum catalogs from VCFs and also to plot
+the spectra.
+
+How to upload files
+
+Possible problems
+
