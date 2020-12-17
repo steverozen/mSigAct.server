@@ -22,8 +22,6 @@ app_ui <- function(request) {
                value = "uploadSpectraTab"),
       tabPanel(title = "Show spectra", ShowSpectraUI(), 
                value = "showSpectraTab"),
-      tabPanel(title = "Signature attributions", SignatureAttributionUI(), 
-               value = "sigAttributionTab"),
       tabPanel(title = "Signature attributions", SignatureAttributionUI2(), 
                value = "sigAttributionTab2"),
       tabPanel(title = "Results", AttributionResultsUI(),
@@ -140,7 +138,7 @@ UploadVCFUI <- function() {
           uiOutput(outputId = "showSpectraFromVCF"),
           br(),
           uiOutput(outputId = "sigAttributionFromVCF"))
-      ), width = 6), # end sidbarPanel
+      ), width = 5), # end sidbarPanel
       
     mainPanel = mainPanel(
     # Add the next row of control widgets
@@ -179,162 +177,7 @@ UploadVCFUI <- function() {
                                          paste0("Example analysis on ",
                                                 "Mutect VCFs")),
                       rep_br(1))
-                    )), width = 6))
-}
-
-#' @import shiny
-UploadSpectraUI <- function() {
-  # List the first level UI elements here
-  fixedPage(
-    # Add the first row of control widgets
-    fixedRow(
-      # Add radio buttons for user to specify the reference genome
-      column(6, AddReferenceGenome2()),
-
-      # Add radio buttons for user to specify the genomic region
-      # from where the catalogs were generated
-      column(6, AddRegion2())
-    ),
-
-    # Add the next row of control widgets
-    fixedRow(
-      # Add a file upload control for user to upload spectra file
-      column(6,
-             div(tags$b("Load example spectra", style = "color: #337ab7;")),
-             br(),
-             splitLayout(cellWidths = c("20%", "20%", "20%", "20%"),
-                         actionButton(inputId = "preloadSBS96Spectra", 
-                                      label = "SBS96"),
-                         actionButton(inputId = "preloadSBS192Spectra", 
-                                      label = "SBS192"),
-                         actionButton(inputId = "preloadDBS78Spectra", 
-                                      label = "DBS78"),
-                         actionButton(inputId = "preloadIDSpectra", 
-                                      label = "ID"))
-             )
-    ),
-    
-    fixedRow(column(6, offset = 6,
-                    UploadSpectra(),
-                    downloadButton(outputId = "downloadSampleSpectra",
-                                   label = "Download example spectra"),
-    )),
-    
-    br(),
-
-    # Add a download button for user to download sample spectra to test
-    fixedRow(column(6, offset = 6,
-                    splitLayout(cellWidths = c("30%", "70%"), 
-                                uiOutput(outputId = "showSpectraFromCatalog"), 
-                                uiOutput(outputId = "sigAttributionFromCatalog"))
-             )),
-    
-    br(),
-    
-    fixedRow(column(6, offset = 6, 
-                    uiOutput(outputId = "removeButton2")))
-
-  )
-}
-
-#' @import shiny
-ShowSpectraUI <- function() {
-  fixedPage(
-    shinyjs::useShinyjs(),
-    sidebarLayout(
-
-      sidebarPanel(
-        uiOutput(outputId = "selectSampleFromUploadedVCF"),
-        uiOutput(outputId = "selectSampleFromUploadedCatalog"),
-        uiOutput(outputId = "buttonToSigAttribution")
-      ),
-
-      mainPanel(
-        
-        
-        if (FALSE) {
-          tabsetPanel(type = "tabs",
-                      tabPanel("SBS96", plotOutput("SBS96plot")),
-                      tabPanel("SBS192", plotOutput("SBS192plot")),
-                      tabPanel("SBS1536", plotOutput("SBS1536plot")),
-                      tabPanel("DBS78", plotOutput("DBS78plot")),
-                      tabPanel("DBS136", plotOutput("DBS136plot")),
-                      tabPanel("DBS144", plotOutput("DBS144plot")),
-                      tabPanel("ID", plotOutput("IDplot"))
-          )
-        },
-        
-        uiOutput(outputId = "spectraPlotFromVCF"),
-        uiOutput(outputId = "spectraPlotFromCatalog")
-        
-      )
-
-    )
-  )
-}
-
-#' @import shiny
-SignatureAttributionUI <- function() {
-  fixedPage(
-
-    sidebarLayout(
-
-      sidebarPanel(
-
-
-
-
-          
-          #actionButton(inputId = "cancel", label = "Cancel"),
-          br(),
-          #x7 <- uiOutput(outputId = "bookmarkButton2")
-          #x9 <- uiOutput(outputId = "restoreResults")
-          br(),
-          x9 <- uiOutput(outputId = "downloaResults"),
-      ),
-
-      mainPanel(
-        shinyjs::useShinyjs(),
-        uiOutput(outputId = "attributionResults")
-
-      )
-
-    )
-  )
-}
-
-#' @import shiny
-SignatureAttributionUI2 <- function() {
-  fixedPage(
-    sidebarLayout(
-      sidebarPanel(
-        uiOutput(outputId = "selectSampleFromCatalogForAttribution2"),
-        uiOutput(outputId = "selectCancerType2"),
-        uiOutput(outputId = "uploadedCatalogType"),
-        uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog2"),
-        uiOutput(outputId = "addSig"),
-        br(),
-        uiOutput(outputId = "chooseMoreSigs"),
-        uiOutput(outputId = "analysisButton"),
-        ######################################################
-        uiOutput(outputId = "selectSampleFromVCFForAttribution"),
-        uiOutput(outputId = "selectCancerTypeOfVCF"),
-        uiOutput(outputId = "chooseCatalogType"),
-        uiOutput(outputId = "chooseSigSubsetForVCF"),
-        uiOutput(outputId = "addSigForVCF"),
-        br(),
-        uiOutput(outputId = "chooseMoreSigsForVCF"),
-        uiOutput(outputId = "analysisButtonForVCF")
-        ),
-      
-      mainPanel(
-        # Must use DT::dataTableOutput instead of dataTableOutput,
-        # otherwise, the data table will not show up
-        DT::dataTableOutput(outputId = "mytable"),
-        DT::dataTableOutput(outputId = "mytableForVCF")
-      )
-    )
-  )
+                    )), width = 5))
 }
 
 #' @import shiny
