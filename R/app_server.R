@@ -10,6 +10,16 @@ future::plan(future::multisession(workers = min(64, future::availableCores())))
 app_server <- function(input, output, session) {
   # List the first level callModules here
   tryCatch({
+    
+    # Reactive expression for choosing more signatures
+    choose.more.sigs <- reactive({
+      if (length(sig.universe) == 0) {
+        return(NULL)
+      }
+      more.sigs <- setdiff(sig.universe, input$preselectedSigs)
+      return(more.sigs)
+    }) 
+    
     fut <- NULL
     result_val <- reactiveVal()
     running <- reactiveVal(FALSE)
@@ -46,7 +56,9 @@ app_server <- function(input, output, session) {
     
     list.of.catalogs <- NA
     
-    choose.more.sigs <- catalog.path <- input.catalog.type <- NA
+    region <- catalog.path <- input.catalog.type <- NA
+    
+    sig.universe <- NULL
     
     showSBS192Catalog <- TRUE
     
@@ -60,6 +72,9 @@ app_server <- function(input, output, session) {
     
     dat <- data.frame(name = character(), spectrum = character(), 
                       proposed.aetiology = character())
+    
+    AdjustNumberOfCores <- 
+      getFromNamespace(x = "Adj.mc.cores", ns = "mSigAct")
     
     #######################################################################
     # Functions related to UploadVCFUI(), the first tab
@@ -75,9 +90,6 @@ app_server <- function(input, output, session) {
                    border-color: #2e6da4;padding:4px;")
       })
     }) 
-   
-    
-    
     
     # Download sample VCFs when user clicks the button
     output$downloadsampleVCFs <- downloadHandler(
@@ -105,6 +117,7 @@ app_server <- function(input, output, session) {
       content = function(file) {
         results <- RunICAMSOnSampleStrelkaVCFs(session, output, file, ids)
         list.of.catalogs <<- results$counts
+        region <<- "genome"
         # When the downloadHandler function runs, increment rv$downloadFlag
         rv$downloadFlag <- rv$downloadFlag + 1
       })
@@ -117,6 +130,7 @@ app_server <- function(input, output, session) {
       content = function(file) {
         results <- RunICAMSOnSampleMutectVCFs(session, output, file, ids)
         list.of.catalogs <<- results$counts
+        region <<- "genome"
         # When the downloadHandler function runs, increment rv$downloadFlag
         rv$downloadFlag <- rv$downloadFlag + 1
       })
@@ -148,7 +162,7 @@ app_server <- function(input, output, session) {
             return()
           }
         }
-        
+        region <<- input$region
         result <- ProcessVCFs(input, output, file, ids)
         retval <<- result$retval
         old.error.ids <- ids$error
@@ -385,18 +399,6 @@ app_server <- function(input, output, session) {
       ShowTwoButtons()
     })
     
-    
-    observeEvent(CheckArgumentsForSpectra(), {
-      
-      if (TwoActionButtonsClicked(input) == FALSE) {
-        return()
-      } else {
-        output$removeButton2 <- renderUI(
-          actionButton(inputId = "remove2",
-                       label = "Remove notifications"))
-      }
-    })
-    
     # Check the arguments for uploaded spectra
     observeEvent(
       CheckArgumentsForSpectra(),
@@ -470,6 +472,7 @@ app_server <- function(input, output, session) {
         return()
       } else {
         req(input$ref.genome2, input$region2)
+        region <<- input$region2
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
                              region = input$region2)
@@ -665,40 +668,25 @@ app_server <- function(input, output, session) {
         }
         
         
-        output$selectSampleFromCatalogForAttribution2 <- renderUI(
+        output$selectSampleForAttribution <- renderUI(
           { 
             catalog <<- ICAMS::ReadCatalog(file = catalog.path,
                                            ref.genome = input$ref.genome2,
                                            region = input$region2)
-            
-            if (nrow(catalog) == 96) {
-              input.catalog.type <<- "SBS96"
-            } else if (nrow(catalog) == 192) {
-              input.catalog.type <<- "SBS192"
-            } else if (nrow(catalog) == 1536) {
-              input.catalog.type <<- "SBS1536"
-            } else if (nrow(catalog) == 78) {
-              input.catalog.type <<- "DBS78"
-            } else if (nrow(catalog) == 136) {
-              input.catalog.type <<- "DBS136"
-            } else if (nrow(catalog) == 144) {
-              input.catalog.type <<- "DBS144"
-            } else if (nrow(catalog) == 83) {
-              input.catalog.type <<- "ID"
-            }
+            input.catalog.type <<- CheckCatalogType(catalog)
             
             sample.names <- colnames(catalog)
-            selectInput(inputId = "selectedSampleFromCatalogForAttribution2",
-                        label = "Select sample from uploaded spectra",
+            selectInput(inputId = "selectedSampleForAttribution",
+                        label = "Select sample",
                         choices = sample.names)
           }
         )
         
-        output$selectCancerType2 <- renderUI(
+        output$selectCancerType <- renderUI(
           {
             cancer.types <-
               c("Unknown", colnames(CancerTypeToExposureStatData()))
-            selectInput(inputId = "selectedCancerType2",
+            selectInput(inputId = "selectedCancerType",
                         label = "Select cancer type",
                         choices = cancer.types)
           }
@@ -712,7 +700,7 @@ app_server <- function(input, output, session) {
         )
       })
     
-    observeEvent(input$selectedCancerType2, {
+    observeEvent(input$selectedCancerType, {
       if (!input.catalog.type %in% c("SBS96", "SBS192", "DBS78", "ID")) {
         showNotification(ui = "Error:", 
                          action = paste0("Can only do signature attribution ", 
@@ -721,21 +709,21 @@ app_server <- function(input, output, session) {
         return()
       }
       
-      if (input$selectedCancerType2 != "Unknown") {
-        output$chooseSigSubsetForSampleFromCatalog2 <- renderUI(
+      if (input$selectedCancerType != "Unknown") {
+        output$chooseSigSubset <- renderUI(
           { 
             
             if (input.catalog.type == "SBS96") {
-              sig.universe <- colnames(COSMIC.v3.genome.SBS96.sigs)
+              sig.universe <<- colnames(COSMIC.v3.genome.SBS96.sigs)
             } else {
-              sig.universe <- 
+              sig.universe <<- 
                 colnames(PCAWG7::signature[["genome"]][[input.catalog.type]])
             }
             
-            if (input$selectedCancerType2 == "Unknown") {
+            if (input$selectedCancerType == "Unknown") {
               selected.sig.universe <- NULL
             } else {
-              tmp <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType2,
+              tmp <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType,
                                            tumor.cohort = "PCAWG",
                                            sig.type = input.catalog.type,
                                            region = "genome")
@@ -753,30 +741,20 @@ app_server <- function(input, output, session) {
                 setdiff(selected.sig.universe1, rare.sigs)
             }
             
-            choose.more.sigs <<- setdiff(sig.universe, selected.sig.universe)
-            shinyWidgets::pickerInput (inputId = "preselectedSigs",
-                                       label = paste0("These signatures were preselected based ",  
-                                                      "on cancer type"),
-                                       choices = selected.sig.universe,
-                                       selected = selected.sig.universe,
-                                       options = shinyWidgets::pickerOptions(
-                                         actionsBox = TRUE,
-                                         dropupAuto = FALSE
-                                       ), 
-                                       multiple = TRUE
-            )
-            
-            
-            
-            
-          }
-        )
-        output$addSig <- renderUI(
-          actionButton(inputId = "addMoreSigs", label = "Add more signatures",
-                       style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4;padding:4px; ")
-        )
-        
+            tagList(
+              shinyWidgets::pickerInput(inputId = "preselectedSigs",
+                                        label = paste0("These signatures were preselected based ",  
+                                                       "on cancer type"),
+                                        choices = selected.sig.universe,
+                                        selected = selected.sig.universe,
+                                        options = shinyWidgets::pickerOptions(
+                                          actionsBox = TRUE,
+                                          dropupAuto = FALSE
+                                        ), 
+                                        multiple = TRUE
+              )) # end of tagList
+          }) # end of renderUI
+
         if (input.catalog.type == "SBS96") {
           dat <<- data.frame(
             name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
@@ -807,21 +785,20 @@ app_server <- function(input, output, session) {
             proposed.aetiology = ID.aetiology)
         } 
         
-        #rownames(dat) <- names(COSMIC.v3.SBS.sig.links)
-        
         output$mytable <- DT::renderDataTable({
-          DT::datatable(dat[input$preselectedSigs, ], escape = FALSE, rownames = FALSE) # HERE)
-        })
+          DT::datatable(dat[input$preselectedSigs, ], escape = FALSE, rownames = FALSE,
+                        options = list(lengthMenu = c(25, 50, 75), 
+                                       pageLength = 25))  # HERE)
+        }) # end of renderDataTable
       }
-      
-    })
+    }) # end of observeEvent
     
     observeEvent(input$addMoreSigs, {
       output$chooseMoreSigs <- renderUI(
         {
           shinyWidgets::pickerInput(inputId = "selectedMoreSigs",
                                     label = "Choose more signatures",  
-                                    choices = choose.more.sigs,
+                                    choices = choose.more.sigs(),
                                     options = shinyWidgets::pickerOptions(
                                       actionsBox = TRUE,
                                       dropupAuto = FALSE
@@ -881,21 +858,29 @@ app_server <- function(input, output, session) {
       if(running())
         return(NULL)
       running(TRUE)
-      
-      spect <- catalog[, input$selectedSampleFromCatalogForAttribution2, drop = FALSE]
+      browser()
+      spect <- catalog[, input$selectedSampleForAttribution, drop = FALSE]
       catalog.type <- input.catalog.type
-      cancer.type <- input$selectedCancerType2
-      region <- input$region2
+      cancer.type <- input$selectedCancerType
       
       if (catalog.type == "SBS192") {
-        sig.universe <- 
+        sig.universe <<- 
           PCAWG7::signature[["genome"]][[catalog.type]][, sigsForAttribution(), drop = FALSE]
       } else if (catalog.type == "SBS96") {
-        sig.universe <- 
+        sig.universe <<- 
           COSMIC.v3.genome.SBS96.sigs[, sigsForAttribution(), drop = FALSE]
       } else {
-        sig.universe <- 
+        sig.universe <<- 
           PCAWG7::signature[[region]][[catalog.type]][, sigsForAttribution(), drop = FALSE]
+      }
+      
+      # Do the first round of cut-off if there are many signatures in the beginning
+      if (length(sig.universe) > 15) {
+        retval <- 
+          mSigAct::OptimizeExposureQPBootstrap(spectrum = spect,
+                                               signatures = sig.universe, 
+                                               mc.cores = AdjustNumberOfCores(50))
+        sig.universe <<- sig.universe[, names(retval$exposure), drop = FALSE]
       }
       
       sigs.prop <- mSigAct::ExposureProportions(
@@ -903,17 +888,6 @@ app_server <- function(input, output, session) {
         cancer.type   = cancer.type,
         all.sigs      = sig.universe,
         must.include  = colnames(sig.universe))
-      
-      if (FALSE) {
-        QP.exposure <- 
-          GetExposureWithConfidence(catalog = spect,
-                                    sig.universe = sig.universe,
-                                    num.of.bootstrap.replicates = 10000,
-                                    method = decomposeQP,
-                                    conf.int = 0.95)
-        updated.sig.universe <- sig.universe[ , rownames(QP.exposure)]
-        updated.sigs.prop <- sigs.prop[rownames(QP.exposure)]
-      }
       
       # Create a Progress object
       progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
@@ -932,9 +906,6 @@ app_server <- function(input, output, session) {
             progress$inc(amount = value, detail = detail)
             interruptor$execInterrupts()
           }
-          
-          AdjustNumberOfCores <- 
-            getFromNamespace(x = "Adj.mc.cores", ns = "mSigAct")
           
           retval <- mSigAct::MAPAssignActivity1(
             spect = spect,
@@ -964,9 +935,7 @@ app_server <- function(input, output, session) {
           
           r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
                                                use.sig.names = TRUE)
-          reconstructed.catalog0 <- 
-            as.catalog(r.qp, ref.genome = input$ref.genome2, 
-                       region = input$region2)
+          reconstructed.catalog0 <- ICAMS::as.catalog(r.qp)
           
           cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
           
@@ -1022,60 +991,58 @@ app_server <- function(input, output, session) {
     observeEvent(
       CheckArgumentsForVCF(),
       {
-        #req(input$ref.genome2, input$region2)
-        
-        #if (showSBS192Catalog == FALSE) {
-        #  return()
-        #}
-        
-        output$selectSampleFromVCFForAttribution <- renderUI(
+        output$selectSampleForAttribution <- renderUI(
           { 
             sample.names <- colnames(list.of.catalogs[[1]])
-            selectInput(inputId = "selectedSampleFromVCFForAttribution",
+            selectInput(inputId = "selectedSampleForAttribution",
                         label = "Select sample",
                         choices = sample.names)
           }
         )
         
-        output$selectCancerTypeOfVCF <- renderUI(
+        output$selectCancerType <- renderUI(
           {
             cancer.types <-
               c("Unknown", colnames(CancerTypeToExposureStatData()))
-            selectInput(inputId = "selectedCancerTypeOfVCF",
+            selectInput(inputId = "selectedCancerType",
                         label = "Select cancer type",
                         choices = cancer.types)
           }
         )
         
-        
         output$chooseCatalogType <- renderUI(
           {
-            selectInput(inputId = "selectCatalogTypeOfVCF", 
+            selectInput(inputId = "selectCatalogType", 
                          label = "Select catalog type",
                          choices = c("SBS96", "SBS192", "DBS78", "ID"))
           }
         )
+        
+        # Hide the UI element previously generated by uploading spectra
+        shinyjs::hide(id = "uploadedCatalogType")
       }) # end of observeEvent
     
-    CheckArgumentsForVCFAttribution <- reactive({
-      list(input$selectedCancerTypeOfVCF, input$selectCatalogTypeOfVCF)
+    CheckArgumentsForAttribution <- reactive({
+      list(input$selectedCancerType, input$selectCatalogType)
     })
     
-    observeEvent(CheckArgumentsForVCFAttribution(), {
-      req(input$selectedCancerTypeOfVCF, input$selectCatalogTypeOfVCF)
+    observeEvent(CheckArgumentsForAttribution(), {
+      req(input$selectedCancerType, input$selectCatalogType)
       
-      input.catalog.type <<- input$selectCatalogTypeOfVCF
-      output$chooseSigSubsetForVCF <- renderUI(
+      input.catalog.type <<- input$selectCatalogType
+      catalog.name <- paste0("cat", input.catalog.type)
+      catalog <<- list.of.catalogs[[catalog.name]]
+      output$chooseSigSubset <- renderUI(
         { 
           
           if (input.catalog.type == "SBS96") {
-            sig.universe <- colnames(COSMIC.v3.genome.SBS96.sigs)
+            sig.universe <<- colnames(COSMIC.v3.genome.SBS96.sigs)
           } else {
-            sig.universe <- 
+            sig.universe <<- 
               colnames(PCAWG7::signature[["genome"]][[input.catalog.type]])
           }
           
-          if (input$selectedCancerTypeOfVCF == "Unknown") {
+          if (input$selectedCancerType == "Unknown") {
             selected.sig.universe <- NULL
           } else {
             tmp <- CancerTypeToSigSubset(cancer.type = input$selectedCancerTypeOfVCF,
@@ -1096,281 +1063,67 @@ app_server <- function(input, output, session) {
               setdiff(selected.sig.universe1, rare.sigs)
           }
           
-          choose.more.sigs <<- setdiff(sig.universe, selected.sig.universe)
-          shinyWidgets::pickerInput (inputId = "preselectedSigsForVCF",
-                                     label = paste0("These signatures were preselected based ",  
-                                                    "on cancer type"),
-                                     choices = selected.sig.universe,
-                                     selected = selected.sig.universe,
-                                     options = shinyWidgets::pickerOptions(
-                                       actionsBox = TRUE,
-                                       dropupAuto = FALSE
-                                     ), 
-                                     multiple = TRUE
+          
+          tagList(
+            shinyWidgets::pickerInput (inputId = "preselectedSigsForVCF",
+                                       label = "These signatures were preselected based on cancer type",  
+                                       choices = selected.sig.universe,
+                                       selected = selected.sig.universe,
+                                       options = shinyWidgets::pickerOptions(
+                                         actionsBox = TRUE,
+                                         dropupAuto = FALSE
+                                       ), 
+                                       multiple = TRUE
+            ),
+            
+            
           )
-          
-          output$addSigForVCF <- renderUI(
-            actionButton(inputId = "addMoreSigsForVCF", label = "Add more signatures",
-                         style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4;padding:4px; ")
-          )
-          
-          
-          if (input.catalog.type == "SBS96") {
-            dat <<- data.frame(
-              name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
-                            rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
-              spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
-                                ' height="52"></img>'),
-              proposed.aetiology = SBS.aetiology)
-          } else if (input.catalog.type == "SBS192") {
-            dat <<- data.frame(
-              name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
-                            rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
-              spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
-                                ' height="52"></img>'),
-              proposed.aetiology = SBS.aetiology)
-          } else if (input.catalog.type == "DBS78") {
-            dat <<- data.frame(
-              name = paste0("<a href='", COSMIC.v3.DBS.sig.links, "' target='_blank'>", 
-                            rownames(COSMIC.v3.DBS.sig.links),  "</a>"), 
-              spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.PNG"',
-                                ' height="52"></img>'),
-              proposed.aetiology = DBS.aetiology)
-          } else if (input.catalog.type == "ID") {
-            dat <<- data.frame(
-              name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
-                            rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
-              spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.PNG"',
-                                ' height="52"></img>'),
-              proposed.aetiology = ID.aetiology)
-          } 
         }) # end of renderUI
       
-      
-      output$mytable <- NULL
-      shinyjs::hide(id = "mytable")
-        }) # end of observeEvent
-    
-      
-      #if (is.na(req(input$selectCatalogTypeOfVCF))) {
-      #  return()
-      #}
-     
-    #rownames(dat) <- names(COSMIC.v3.SBS.sig.links)
-    
-    #output$mytableForVCF <- DT::renderDataTable({
-    #  DT::datatable(dat[input$preselectedSigsForVCF, ], escape = FALSE, rownames = FALSE) # HERE)
-    #})
-    
-  
-  observeEvent(input$addMoreSigsForVCF, {
-    output$chooseMoreSigsForVCF <- renderUI(
-      {
-        shinyWidgets::pickerInput(inputId = "selectedMoreSigsForVCF",
-                                  label = "Choose more signatures",  
-                                  choices = choose.more.sigs,
-                                  options = shinyWidgets::pickerOptions(
-                                    actionsBox = TRUE,
-                                    dropupAuto = FALSE
-                                  ), 
-                                  multiple = TRUE)
-      }
-    )
-  })
-  
-  sigsForAttributionVCF <- reactive({
-    sigs.to.show <- c(input$preselectedSigsForVCF, input$selectedMoreSigsForVCF)
-    if (is.na(input.catalog.type)) {
-      return()
-    }
-    
-    if (input.catalog.type %in% c("SBS96", "SBS192")) {
-      sigs.in.correct.order <- intersect(rownames(COSMIC.v3.SBS.sig.links), sigs.to.show)
-    } else if (input.catalog.type == "DBS78") {
-      sigs.in.correct.order <- intersect(rownames(COSMIC.v3.DBS.sig.links), sigs.to.show)
-    } else if (input.catalog.type == "ID") {
-      sigs.in.correct.order <- intersect(rownames(COSMIC.v3.ID.sig.links), sigs.to.show)
-    } else {
-      return()
-    }
-    
-    return(sigs.in.correct.order)
-  })
-  
-  observeEvent(sigsForAttributionVCF(), {
-    
-    plotdata$dat <<- dat[sigsForAttributionVCF(), ]
-    
-    output$mytableForVCF <- DT::renderDataTable({
-      DT::datatable(dat[sigsForAttributionVCF(), ], escape = FALSE, rownames = FALSE,
-                    options = list(lengthMenu = c(25, 50, 75), 
-                                   pageLength = 25)) 
-    })
-    
-    output$analysisButtonForVCF <- renderUI({
-      actionButton(inputId = "startAnalysisForVCF", label = "Analyze",
-                   style= "color: #fff; background-color: #337ab7;
+      observeEvent(CheckArgumentsForAttribution(), {
+        req(input$selectedCancerType, input$selectCatalogType)
+        output$addSig <- renderUI(
+          actionButton(inputId = "addMoreSigs", label = "Add more signatures",
+                       style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4;padding:4px; ")
-    })
-    
-  })
-  
-  observeEvent(input$startAnalysisForVCF, {
-    
-    if(length(sigsForAttributionVCF()) == 0) {
-      showNotification(ui = "Error:", 
-                       action = "No signatures selected for attribution analysis",
-                       type = "error")
-      return()
-    }
-    
-    #Don't do anything if in the middle of a run
-    if(running())
-      return(NULL)
-    running(TRUE)
-    
-    catalog.name <- paste0("cat", input$selectCatalogTypeOfVCF)
-    catalog <- list.of.catalogs[[catalog.name]]
-    
-    spect <- catalog[, input$selectedSampleFromVCFForAttribution, drop = FALSE]
-    catalog.type <- input.catalog.type
-    cancer.type <- input$selectedCancerTypeOfVCF
-    region <- input$region
-    
-    if (catalog.type == "SBS192") {
-      sig.universe <- 
-        PCAWG7::signature[["genome"]][[catalog.type]][, sigsForAttributionVCF(), 
-                                                      drop = FALSE]
-    } else if (catalog.type == "SBS96") {
-      sig.universe <- 
-        COSMIC.v3.genome.SBS96.sigs[, sigsForAttributionVCF(), drop = FALSE]
-    } else {
-      sig.universe <- 
-        PCAWG7::signature[[region]][[catalog.type]][, sigsForAttributionVCF(), 
-                                                    drop = FALSE]
-    }
-    
-    sigs.prop <- mSigAct::ExposureProportions(
-      mutation.type = catalog.type,
-      cancer.type = cancer.type,
-      all.sigs = sig.universe,
-      must.include = colnames(sig.universe))
-    
-    if (FALSE) {
-      QP.exposure <- 
-        GetExposureWithConfidence(catalog = spect,
-                                  sig.universe = sig.universe,
-                                  num.of.bootstrap.replicates = 10000,
-                                  method = decomposeQP,
-                                  conf.int = 0.95)
-      updated.sig.universe <- sig.universe[ , rownames(QP.exposure)]
-      updated.sigs.prop <- sigs.prop[rownames(QP.exposure)]
-    }
-    
-    # Create a Progress object
-    progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
-                                       message = "Analysis in progress",
-                                       detail = "This may take a while...")
-    result_val(NULL)
-    
-    fut <- future::future(
-      {
-        # Close the progress when this reactive exits (even if there's an error)
-        # on.exit(progress$close())
-        
-        # Create a callback function to update progress. Each time this is called, it
-        # will increase the progress by that value and update the detail
-        updateProgress <- function(value = NULL, detail = NULL) {
-          progress$inc(amount = value, detail = detail)
-          interruptor$execInterrupts()
-        }
-        
-        AdjustNumberOfCores <- 
-          getFromNamespace(x = "Adj.mc.cores", ns = "mSigAct")
-        
-        retval <- mSigAct::MAPAssignActivity1(
-          spect = spect,
-          sigs = sig.universe,
-          sigs.presence.prop = sigs.prop,
-          max.level = length(sigs.prop) - 1,
-          p.thresh = 0.01,
-          m.opts = mSigAct::DefaultManyOpts(),
-          max.mc.cores = AdjustNumberOfCores(50),
-          progress.monitor = updateProgress
         )
-        
-        return(retval)
-      }, seed = TRUE) %...>% {
-        retval <- .
-        plotdata$retval <<- retval
-        
-        MAP.best.exp <- retval$MAP
-        
-        QP.exp <- 
-          mSigAct::OptimizeExposureQP(spect, 
-                                      sig.universe[ , MAP.best.exp$sig.id, 
-                                                    drop = FALSE])
-        QP.best.MAP.exp <-
-          dplyr::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
-        
-        r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
-                                             use.sig.names = TRUE)
-        reconstructed.catalog0 <- 
-          as.catalog(r.qp, ref.genome = input$ref.genome, 
-                     region = input$region)
-        
-        cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
-        
-        colnames(reconstructed.catalog0) <- 
-          paste0("reconstructed (cosine similarity = ", cossim, ")")
-        reconstructed.catalog <- round(reconstructed.catalog0)
-        
-        plotdata$cossim <<- cossim
-        plotdata$spect <<- spect
-        plotdata$reconstructed.catalog <<- reconstructed.catalog
-        plotdata$sig.universe <<- sig.universe
-        plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
-        
-        retval <- PrepareAttributionResultsVCF(input, output, session, 
-                                             input.catalog.type, 
-                                             plotdata)
-        attribution.results <<- retval$attribution.results
-      } %...>% result_val
-    
-    # Show notification on error or user interrupt
-    fut <- promises::catch(fut,
-                           function(e){
-                             result_val(NULL)
-                             print(e$message)
-                             showNotification(e$message)
-                           })
-    
-    # When done with analysis, remove progress bar
-    fut <- promises::finally(fut, function(){
-      progress$close()
-      running(FALSE) # Declare done with run
-    })
-    
-    # Return something other than the future so we don't block the UI
-    NULL
-  })
-    
-    
+      })
+      
+      
+      if (input.catalog.type == "SBS96") {
+        dat <<- data.frame(
+          name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
+                        rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
+          spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
+                            ' height="52"></img>'),
+          proposed.aetiology = SBS.aetiology)
+      } else if (input.catalog.type == "SBS192") {
+        dat <<- data.frame(
+          name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
+                        rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
+          spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
+                            ' height="52"></img>'),
+          proposed.aetiology = SBS.aetiology)
+      } else if (input.catalog.type == "DBS78") {
+        dat <<- data.frame(
+          name = paste0("<a href='", COSMIC.v3.DBS.sig.links, "' target='_blank'>", 
+                        rownames(COSMIC.v3.DBS.sig.links),  "</a>"), 
+          spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.PNG"',
+                            ' height="52"></img>'),
+          proposed.aetiology = DBS.aetiology)
+      } else if (input.catalog.type == "ID") {
+        dat <<- data.frame(
+          name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
+                        rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
+          spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.PNG"',
+                            ' height="52"></img>'),
+          proposed.aetiology = ID.aetiology)
+      } 
+      
+        }) # end of observeEvent
     
     ###########################################################################
     
-
-    
-    # When user clicks the "Remove notifications" button, all the previous
-    # notifications(error, warning or message) will be removed
-    observeEvent(input$remove, {
-      RemoveAllNotifications(ids)
-    })
-    
-    observeEvent(input$remove2, {
-      RemoveAllNotifications(ids)
-    })
   })
 }
   
