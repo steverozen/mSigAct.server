@@ -1854,3 +1854,22 @@ PlotListOfCatalogsToPdf <- function(list.of.catalogs,
     invisible(list(plot.success = TRUE))
   }
 
+#' @keywords internal
+CheckCatalogType <- function(catalog) {
+  if (nrow(catalog) == 96) {
+    catalog.type <- "SBS96"
+  } else if (nrow(catalog) == 192) {
+    catalog.type <- "SBS192"
+  } else if (nrow(catalog) == 1536) {
+    catalog.type <- "SBS1536"
+  } else if (nrow(catalog) == 78) {
+    catalog.type <- "DBS78"
+  } else if (nrow(catalog) == 136) {
+    catalog.type <- "DBS136"
+  } else if (nrow(catalog) == 144) {
+    catalog.type <- "DBS144"
+  } else if (nrow(catalog) == 83) {
+    catalog.type <- "ID"
+  }
+  return(catalog.type)
+}

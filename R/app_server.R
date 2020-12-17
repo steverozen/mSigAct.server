@@ -181,7 +181,7 @@ app_server <- function(input, output, session) {
         {
           sample.names <- colnames(list.of.catalogs[[1]])
           radioButtons(inputId = "sampleNameFromUploadedVCF",
-                       label = "Select sample from uploaded VCF",
+                       label = "Select sample",
                        choices = sample.names,
                        selected = character(0))
         }
@@ -302,7 +302,7 @@ app_server <- function(input, output, session) {
                           border-color: #2e6da4;")
       )
       output$sigAttributionFromCatalog <- renderUI(
-        actionButton(inputId = "sigAttributionFromCatalog", 
+        actionButton(inputId = "sigAttributionOfCatalog", 
                      label = "Signature attribution",
                      style="color: #fff; background-color: #337ab7;
                           border-color: #2e6da4;"))
@@ -462,7 +462,7 @@ app_server <- function(input, output, session) {
       }
     })
     
-    observeEvent(input$sigAttributionFromCatalog, {
+    observeEvent(input$sigAttributionOfCatalog, {
       
       if (TwoActionButtonsClicked(input) == FALSE) {
         return()
@@ -470,6 +470,12 @@ app_server <- function(input, output, session) {
         return()
       } else {
         req(input$ref.genome2, input$region2)
+        catalog <<- 
+          ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
+                             region = input$region2)
+        
+       input.catalog.type <<- CheckCatalogType(catalog)
+        
         if (!input.catalog.type %in% c("SBS96", "SBS192", "DBS78", "ID")) {
           showNotification(ui = "Error:", 
                            action = paste0("Can only do signature attribution ", 
@@ -506,22 +512,7 @@ app_server <- function(input, output, session) {
             catalog <<- ICAMS::ReadCatalog(file = catalog.path,
                                            ref.genome = input$ref.genome2,
                                            region = input$region2)
-            
-            if (nrow(catalog) == 96) {
-              input.catalog.type <<- "SBS96"
-            } else if (nrow(catalog) == 192) {
-              input.catalog.type <<- "SBS192"
-            } else if (nrow(catalog) == 1536) {
-              input.catalog.type <<- "SBS1536"
-            } else if (nrow(catalog) == 78) {
-              input.catalog.type <<- "DBS78"
-            } else if (nrow(catalog) == 136) {
-              input.catalog.type <<- "DBS136"
-            } else if (nrow(catalog) == 144) {
-              input.catalog.type <<- "DBS144"
-            } else if (nrow(catalog) == 83) {
-              input.catalog.type <<- "ID"
-            }
+            input.catalog.type <<- CheckCatalogType(catalog)
             
             sample.names <- colnames(catalog)
             
@@ -651,14 +642,14 @@ app_server <- function(input, output, session) {
     })
     
     CheckArgumentsForSpectra <- reactive({
-      list(input$showSpectraFromCatalog, input$sigAttributionFromCatalog)
+      list(input$showSpectraFromCatalog, input$sigAttributionOfCatalog)
     })
     
     TwoActionButtonsClicked <- function(input) {
-      if(is.null(input$showSpectraFromCatalog) && is.null(input$sigAttributionFromCatalog)){
+      if(is.null(input$showSpectraFromCatalog) && is.null(input$sigAttributionOfCatalog)){
         return(FALSE)
       }
-      if(input$showSpectraFromCatalog == 0 && input$sigAttributionFromCatalog == 0){
+      if(input$showSpectraFromCatalog == 0 && input$sigAttributionOfCatalog == 0){
         return(FALSE)
       }
       return(TRUE)
@@ -1041,7 +1032,7 @@ app_server <- function(input, output, session) {
           { 
             sample.names <- colnames(list.of.catalogs[[1]])
             selectInput(inputId = "selectedSampleFromVCFForAttribution",
-                        label = "Select sample from uploaded VCF",
+                        label = "Select sample",
                         choices = sample.names)
           }
         )
