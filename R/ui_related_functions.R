@@ -1,16 +1,25 @@
 #' @import shiny
 #' @keywords internal
-AddVCFType <- function() {
-  radioButtons(inputId = "vcftype", 
-               label = h5(strong("Type of VCF files"), 
+AddVariantCaller <- function() {
+  radioButtons(inputId = "variantCaller", 
+               label = h5(strong("Variant caller"), 
                           style = "color: #337ab7"),
                choiceNames = 
-                 list(p(a(href = "https://github.com/Illumina/strelka", 
-                          "Strelka"), " single base substitutions (SBS)"),
-                      p(a(href = "https://github.com/Illumina/strelka", 
-                          "Strelka"), " Indel (ID)"),
-                      a(href = "https://github.com/broadgsa/gatk", "Mutect")),
-               choiceValues = list("strelka.sbs", "strelka.id", "mutect"),
+                 list(a(href = "https://github.com/Illumina/strelka",
+                        target = "_blank", "Strelka"),
+                      a(href = "https://github.com/broadgsa/gatk", 
+                        target = "_blank","Mutect"),
+                      "Others"),
+               choiceValues = list("strelka", "mutect", "unknown"),
+               selected = character(0))
+}
+
+MergeSBSsAsDBSOption <- function() {
+  radioButtons(inputId = "mergeSBS", 
+               label = h5(strong("Merge adjacent SBSs as DBS"), 
+                          style = "color: #337ab7"),
+               choiceNames = list("yes", "no"),
+               choiceValues = list("yes", "no"),
                selected = character(0))
 }
 

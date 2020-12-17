@@ -18,7 +18,7 @@ app_ui <- function(request) {
       tabPanel(title = "Home", HomeUI()),
       tabPanel(title = "Generate spectrum catalogs from VCFs",
                UploadVCFUI(), value = "generateCatalogTab"),
-      tabPanel(title = "Upload spectra", UploadSpectraUI(), 
+      tabPanel(title = "Signature attribution", UploadSpectraUI(), 
                value = "uploadSpectraTab"),
       tabPanel(title = "Show spectra", ShowSpectraUI(), 
                value = "showSpectraTab"),
@@ -39,12 +39,12 @@ app_ui <- function(request) {
 
 #' @import shiny
 TutorialUI <- function() {
-  general.guide.path <- system.file("tutorial/top.help.md", 
-                                    package = "mSigAct.server")
+  #general.guide.path <- system.file("tutorial/top.help.md", 
+  #                                  package = "mSigAct.server")
   fixedPage(
     tabsetPanel(id = "helpPages",
                 tabPanel(title = "General guide",
-                         includeMarkdown(path = general.guide.path)),
+                         includeMarkdown(path = "top.help.md")),
                 tabPanel(title = "Guide to generating catalogs"),
                 tabPanel(title = "Guide to signature attribution"))
   )
@@ -117,13 +117,13 @@ UploadVCFUI <- function() {
     # Add the first row of control widgets
     fixedRow(
       # Add radio buttons for user to specify the type of VCF files
-      column(6, AddVCFType()),
+      column(6, AddVariantCaller()),
 
       # Add a conditional panel for user to specify the column names in
       # Mutect VCFs which contain the tumor sample information (if needed)
       column(6, conditionalPanel(
-        condition = "input.vcftype == 'mutect'",
-        AddTumorColNames()))
+        condition = "input.variantCaller == 'unknown'",
+        MergeSBSsAsDBSOption()))
     ),
 
     # Add the next row of control widgets
@@ -158,11 +158,14 @@ UploadVCFUI <- function() {
 
     # Add the next row of control widgets
     fixedRow(column(6,
+                    splitLayout(cellWidths = c("22%", "20%", "30%"),
                     MyDownloadButton(outputId = "download",
                                      label = "Create catalogs",
                                      style="color: #fff;
                                        background-color: #337ab7;
-                                       border-color: #2e6da4"),
+                                       border-color: #2e6da4;padding:4px;"),
+                    uiOutput(outputId = "showSpectraFromVCF"),
+                    uiOutput(outputId = "sigAttributionFromVCF")),
                     offset = 6)),
 
     # Add one line break
@@ -190,7 +193,7 @@ UploadVCFUI <- function() {
                     MyDownloadButton(outputId = "runstrelkasbsvcfs",
                                      label =
                                        paste0("Example analysis on two ",
-                                              "1-sample Strelka SBS VCFs")),
+                                              "1-sample Strelka VCFs")),
                     offset = 6)),
 
     # Add one line break
@@ -225,11 +228,7 @@ UploadSpectraUI <- function() {
     # Add the next row of control widgets
     fixedRow(
       # Add a file upload control for user to upload spectra file
-      column(6, offset = 6,
-             UploadSpectra(),
-             downloadButton(outputId = "downloadSampleSpectra",
-                            label = "Download example spectra"),
-             rep_br(2),
+      column(6,
              div(tags$b("Load example spectra", style = "color: #337ab7;")),
              br(),
              splitLayout(cellWidths = c("20%", "20%", "20%", "20%"),
@@ -243,6 +242,12 @@ UploadSpectraUI <- function() {
                                       label = "ID"))
              )
     ),
+    
+    fixedRow(column(6, offset = 6,
+                    UploadSpectra(),
+                    downloadButton(outputId = "downloadSampleSpectra",
+                                   label = "Download example spectra"),
+    )),
     
     br(),
 
@@ -268,8 +273,8 @@ ShowSpectraUI <- function() {
     sidebarLayout(
 
       sidebarPanel(
-        x <- uiOutput(outputId = "selectSampleFromUploadedVCF"),
-        y <- uiOutput(outputId = "selectSampleFromUploadedCatalog"),
+        uiOutput(outputId = "selectSampleFromUploadedVCF"),
+        uiOutput(outputId = "selectSampleFromUploadedCatalog"),
         uiOutput(outputId = "buttonToSigAttribution")
       ),
 
@@ -380,7 +385,9 @@ golem_add_external_resources <- function(){
                     system.file("app/DBS78", package = "mSigAct.server"))
   addResourcePath(prefix = "ID", directoryPath = 
                     system.file("app/ID", package = "mSigAct.server"))
-  addResourcePath(prefix = "results", directoryPath = tempdir())
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  addResourcePath(prefix = "results", directoryPath = tmpdir)
   
   tags$head(
     golem::activate_js(),
@@ -389,7 +396,8 @@ golem_add_external_resources <- function(){
     # Or for example, you can add shinyalert::useShinyalert() here
     #tags$link(rel="stylesheet", type="text/css", href="www/custom.css")
     
-    # adjust size of progress bar and center it
+    #includeCSS(path = "inst/app/www/style.css")
+    
     tags$style(
       HTML(".shiny-notification {
               height: 100px;

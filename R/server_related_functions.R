@@ -92,17 +92,34 @@ CheckInputsForSpectra <- function(input, catalog.path) {
 #' @keywords internal
 CheckInputsForVCF <- function(input) {
   error <- NULL
-  if (is.null(input$vcftype)) {
-    error <- append(error, "Type of VCF files must be provided")
+  if (is.null(input$variantCaller)) {
+    error <- append(error, "Variant caller information must be provided")
+    return(error)
+  }
+  
+  if (input$variantCaller == "unknown") {
+    if (is.null(input$mergeSBS)) {
+      error <- 
+        append(error, paste0("Whether to merge adjacent SBSs as DBS ", 
+                             "must be specified when variant caller is unknown"))
+      return(error)
+    }
   }
   
   if (is.null(input$ref.genome)) {
     error <- append(error, "Reference genome must be provided")
+    return(error)
   }
   
   
   if (is.null(input$region)) {
     error <- append(error, "Genomic region must be provided")
+    return(error)
+  }
+  
+  if (is.null(input$vcf.files)) {
+    error <- append(error, "No VCF uploaded")
+    return(error)
   }
   
   return(error)
@@ -115,7 +132,7 @@ AddErrorMessage <- function(error) {
   if (!is.null(error)) {
     for (i in 1:length(error)) {
       id.error <- showNotification(ui = "Error:", action = error[i],
-                                   duration = NULL, type = "error")
+                                    type = "error")
       id <- append(id, id.error)
     }
   }
@@ -146,7 +163,7 @@ AddNotifications <- function(res) {
   if (!is.null(res$error)) {
     for (i in 1:length(res$error)) {
       id.error <- showNotification(ui = "Error:", action = res$error[i],
-                                   duration = NULL, type = "error")
+                                    type = "error")
       id$error <- id.error
     }
   }
@@ -154,7 +171,7 @@ AddNotifications <- function(res) {
   if (!is.null(res$warning)) {
     for (i in 1:length(res$warning)) {
       id.warning <- showNotification(ui = "Warning:", action = res$warning[i],
-                                     duration = NULL, type = "warning")
+                                      type = "warning")
       id$warning <- c(id$warning, id.warning)
     }
   }
@@ -162,7 +179,7 @@ AddNotifications <- function(res) {
   if (!is.null(res$message)) {
     for (i in 1:length(res$message)) {
       id.message <- showNotification(ui = "Message:", action = res$message[i],
-                                     duration = NULL, type = "message")
+                                      type = "message")
       id$message <- id.message
     }
   }
@@ -214,11 +231,11 @@ AssignNumberOfAsterisks <- getFromNamespace("AssignNumberOfAsterisks", "ICAMS")
 #'
 #' @keywords internal
 AddRunInformation <-
-  function(files, vcf.names, zipfile.name, vcftype, ref.genome,
+  function(files, tmpdir, vcf.names, zipfile.name, vcftype, ref.genome,
            region, mutation.loads, strand.bias.statistics) {
 
     run.info <-
-      file(description = file.path(tempdir(), "run-information.txt"), open = "w")
+      file(description = file.path(tmpdir, "run-information.txt"), open = "w")
 
     # Add the header information
     time.info <- strftime(Sys.time(), usetz = TRUE) # Get time zone information
@@ -254,7 +271,7 @@ AddRunInformation <-
                  "https://cran.rstudio.com/web/packages/ICAMS/index.html"), run.info)
     writeLines("", run.info)
     writeLines(c("Shiny interface of ICAMS is available at ",
-                 "https://jnh01.shinyapps.io/ICAMS/"), run.info)
+                 "https://www.msigact.ai/"), run.info)
 
     # Add ICAMS and R version used
     writeLines("", run.info)
@@ -265,12 +282,12 @@ AddRunInformation <-
     # Add input parameters specified by the user
     writeLines("", run.info)
     writeLines("--- Input parameters ---", run.info)
-    if (vcftype == "strelka.sbs") {
-      vcftype <- "Strelka SBS VCF"
-    } else if (vcftype == "strelka.id") {
-      vcftype <- "Strelka ID VCF"
+    if (vcftype == "strelka") {
+      vcftype <- "Strelka VCF"
     } else if (vcftype == "mutect") {
       vcftype <- "Mutect VCF"
+    } else if (vcftype == "unknown") {
+      vcftype <- "Unknown"
     }
 
     if (ref.genome == "hg19") {
@@ -280,7 +297,7 @@ AddRunInformation <-
     } else if (ref.genome == "mm10") {
       ref.genome <- "Mouse GRCm38/mm10"
     }
-    writeLines(paste0("Type of VCF:      ", vcftype), run.info)
+    writeLines(paste0("Variant caller:   ", vcftype), run.info)
     writeLines(paste0("Reference genome: ", ref.genome), run.info)
     writeLines(paste0("Region:           ", region), run.info)
 
@@ -539,10 +556,12 @@ GenerateZipFileFromMutectVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
   }
-
+  
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
   output.file <- ifelse(base.filename == "",
-                        paste0(tempdir(), .Platform$file.sep),
-                        file.path(tempdir(), paste0(base.filename, ".")))
+                        paste0(tmpdir, .Platform$file.sep),
+                        file.path(tmpdir, paste0(base.filename, ".")))
 
   for (name in names(catalogs)) {
     WriteCatalog(catalogs[[name]],
@@ -588,10 +607,10 @@ GenerateZipFileFromMutectVCFs <- function(files,
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
 
-  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "mutect",
+  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "mutect",
                     ref.genome, region, mutation.loads, strand.bias.statistics)
 
-  file.names <- list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$",
+  file.names <- list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
                            full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
@@ -743,10 +762,12 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
 
   # Transform the counts catalogs to density catalogs
   catalogs.density <- TransCountsCatalogToDensity(catalogs)
-
+  
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
   output.file <- ifelse(base.filename == "",
-                        paste0(tempdir(), .Platform$file.sep),
-                        file.path(tempdir(), paste0(base.filename, ".")))
+                        paste0(tmpdir, .Platform$file.sep),
+                        file.path(tmpdir, paste0(base.filename, ".")))
 
   if (is.function(updateProgress)) {
     updateProgress(value = 0.3, detail = "writing catalogs to CSV files")
@@ -793,11 +814,11 @@ GenerateZipFileFromStrelkaSBSVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
-  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "strelka.sbs",
+  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "strelka.sbs",
                     ref.genome, region, mutation.loads, strand.bias.statistics)
 
   file.names <-
-    list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$",
+    list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
                full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
@@ -879,6 +900,247 @@ ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
   # Get the new notification ids
   new.ids <- AddNotifications(result$error.info)
 
+  # Update the notification ids
+  updated.ids <- UpdateNotificationIDs(ids, new.ids)
+  return(list(retval = result$retval, ids = updated.ids))
+}
+
+
+#' This function generates a zip archive from VCFs
+#'
+#' @inheritParams GenerateZipFileFromMutectVCFs
+#' 
+#' @inheritParams ICAMS::VCFsToZipFile
+#'
+#' @param files Character vector of file paths to the VCF files.
+#'
+#' @import ICAMS
+#'
+#' @import zip
+#'
+#' @importFrom utils getFromNamespace
+#'
+#' @keywords internal
+GenerateZipFileFromVCFs <- function(files,
+                                    zipfile,
+                                    vcf.names,
+                                    zipfile.name,
+                                    ref.genome,
+                                    variant.caller,
+                                    mergeSBS,
+                                    num.of.cores,
+                                    trans.ranges = NULL,
+                                    region = "unknown",
+                                    names.of.VCFs = NULL,
+                                    base.filename = "",
+                                    updateProgress = NULL){
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "reading and splitting VCFs")
+  }
+  
+  if (variant.caller == "unknown" && mergeSBS == "yes") {
+    get.vaf.function <- function(x) {
+      x$VAF <- 0.5
+      x$read.depth <- NA
+      return(x)
+    }
+  } else {
+    get.vaf.function <- NULL
+  }
+  split.vcfs <- ReadAndSplitVCFs(files = files,
+                                 variant.caller = variant.caller,
+                                 num.of.cores = num.of.cores,
+                                 names.of.VCFs = names.of.VCFs,
+                                 get.vaf.function = get.vaf.function)
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "generating SBS catalogs")
+  }
+  SBS.list <-
+    ICAMS::VCFsToSBSCatalogs(list.of.SBS.vcfs = split.vcfs$SBS,
+                             ref.genome = ref.genome,
+                             num.of.cores = num.of.cores,
+                             region = region)
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.3, detail = "generating DBS catalogs")
+  }
+  DBS.list <-
+    ICAMS::VCFsToDBSCatalogs(list.of.DBS.vcfs = split.vcfs$DBS,
+                             ref.genome = ref.genome,
+                             num.of.cores = num.of.cores,
+                             region = region)
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.2, detail = "generating ID catalogs")
+  }
+  ID.list <-
+    ICAMS::VCFsToIDCatalogs(list.of.vcfs = split.vcfs$ID,
+                            ref.genome = ref.genome,
+                            num.of.cores = num.of.cores,
+                            region = region)
+  
+  CombineAndReturnCatalogsForMutectVCFs <-
+    getFromNamespace("CombineAndReturnCatalogsForMutectVCFs", "ICAMS")
+  catalogs0 <-
+    CombineAndReturnCatalogsForMutectVCFs(split.vcfs.list = split.vcfs,
+                                          SBS.list = SBS.list,
+                                          DBS.list = DBS.list,
+                                          ID.list = ID.list)
+  
+  GetMutationLoadsFromMutectVCFs <-
+    getFromNamespace("GetMutationLoadsFromMutectVCFs", "ICAMS")
+  mutation.loads <- GetMutationLoadsFromMutectVCFs(catalogs0)
+  strand.bias.statistics<- NULL
+  
+  # Retrieve the catalog matrix from catalogs0
+  catalogs <- catalogs0
+  catalogs$discarded.variants <- catalogs$annotated.vcfs <- NULL
+  catalogs.to.return <- catalogs
+  
+  # Remove the ID counts catalog as it does not have abundance for
+  # it to be transformed to density catalog
+  catalogs$catID <- NULL
+  
+  # Transform the counts catalogs to density catalogs
+  catalogs.density <- TransCountsCatalogToDensity(catalogs)
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
+  }
+  
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  output.file <- ifelse(base.filename == "",
+                        paste0(tmpdir, .Platform$file.sep),
+                        file.path(tmpdir, paste0(base.filename, ".")))
+  
+  for (name in names(catalogs.to.return)) {
+    WriteCatalog(catalogs.to.return[[name]],
+                 file = paste0(output.file, name, ".counts.csv"))
+  }
+  
+  # Write the density catalogs to CSV files
+  for (name in names(catalogs.density)) {
+    WriteCatalog(catalogs.density[[name]],
+                 file = paste0(output.file, name, ".csv"))
+  }
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "plotting catalogs to PDF files")
+  }
+  
+  for (name in names(catalogs.to.return)) {
+    PlotCatalogToPdf(catalogs.to.return[[name]],
+                     file = paste0(output.file, name, ".counts.pdf"))
+    if (name == "catSBS192") {
+      list <- PlotCatalogToPdf(catalogs.to.return[[name]],
+                               file = paste0(output.file, "SBS12.counts.pdf"),
+                               plot.SBS12 = TRUE)
+      strand.bias.statistics <-
+        c(strand.bias.statistics, list$strand.bias.statistics)
+    }
+  }
+  
+  # Plotting the density catalogs to PDFs
+  for (name in names(catalogs.density)) {
+    PlotCatalogToPdf(catalogs.density[[name]],
+                     file = paste0(output.file, name, ".pdf"))
+    if (name == "catSBS192.density") {
+      list <- PlotCatalogToPdf(catalogs.density[[name]],
+                               file = paste0(output.file, "SBS12.density.pdf"),
+                               plot.SBS12 = TRUE)
+      strand.bias.statistics <-
+        c(strand.bias.statistics, list$strand.bias.statistics)
+    }
+  }
+  
+  if (is.function(updateProgress)) {
+    updateProgress(value = 0.1, detail = "generating zip archive")
+  }
+  
+  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, 
+                    vcftype = variant.caller,
+                    ref.genome, region, mutation.loads, strand.bias.statistics)
+  
+  file.names <- list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
+                           full.names = TRUE)
+  zip::zipr(zipfile = zipfile, files = file.names)
+  unlink(file.names)
+  
+  return(list(counts = catalogs.to.return, density = catalogs.density))
+}
+
+#' This function is a wrapper function processing VCFs to
+#' generate a zip archive
+#'
+#' @inheritParams ProcessMutectVCFs
+#'
+#' @return A list of updated notification ids for error, warning and message
+#'   after running this function.
+#'
+#' @keywords internal
+ProcessVCFs <- function(input, output, file, ids) {
+  # vcfs.info is a data frame that contains one row for each uploaded file,
+  # and four columns "name", "size", "type" and "datapath".
+  # "name": The filename provided by the web browser.
+  # "size": The size of the uploaded data, in bytes.
+  # "type": The MIME type reported by the browser.
+  # "datapath": The path to a temp file that contains the data that was uploaded.
+  vcfs.info <- input$vcf.files
+  
+  # Get the sample names specified by user
+  vcf.names <- GetNamesOfVCFs(input$names.of.VCFs)
+  
+  if (is.null(vcf.names)) {
+    # If user didn't specify sample names, then use VCF names
+    # as the sample names
+    names.of.VCFs <-
+      # Get VCF file names without extension
+      tools::file_path_sans_ext(vcfs.info$name)
+  } else {
+    names.of.VCFs <- vcf.names
+  }
+  
+  # Get the base name of the CSV and PDF files to create specified by user
+  base.filename <- input$base.filename
+  
+  # Create a Progress object
+  progress <- shiny::Progress$new()
+  progress$set(message = "Progress", value = 0)
+  # Close the progress when this reactive exits (even if there's an error)
+  on.exit(progress$close())
+  
+  # Create a callback function to update progress. Each time this is called, it
+  # will increase the progress by that value and update the detail
+  updateProgress <- function(value = NULL, detail = NULL) {
+    value1 <- value + progress$getValue()
+    progress$set(value = value1, detail = detail)
+  }
+  
+  num.of.cores <- min(10, length(vcfs.info$name))
+  
+  # Catch the errors, warnings and messages and store them in a list when
+  # generating a zip archive from Strelka SBS VCFs
+  result <- CatchToList(
+    GenerateZipFileFromVCFs(files = vcfs.info$datapath,
+                            zipfile = file,
+                            vcf.names = vcfs.info$name,
+                            zipfile.name = input$zipfile.name,
+                            ref.genome = input$ref.genome,
+                            variant.caller = input$variantCaller,
+                            mergeSBS = input$mergeSBS,
+                            num.of.cores = num.of.cores,
+                            trans.ranges = NULL,
+                            region = input$region,
+                            names.of.VCFs = names.of.VCFs,
+                            base.filename = base.filename,
+                            updateProgress = updateProgress)
+  )
+  
+  # Get the new notification ids
+  new.ids <- AddNotifications(result$error.info)
+  
   # Update the notification ids
   updated.ids <- UpdateNotificationIDs(ids, new.ids)
   return(list(retval = result$retval, ids = updated.ids))
@@ -1195,10 +1457,12 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
     getFromNamespace("GetMutationLoadsFromStrelkaIDVCFs", "ICAMS")
   mutation.loads <- GetMutationLoadsFromStrelkaIDVCFs(list)
   strand.bias.statistics<- NULL
-
+  
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
   output.file <- ifelse(base.filename == "",
-                        paste0(tempdir(), .Platform$file.sep),
-                        file.path(tempdir(), paste0(base.filename, ".")))
+                        paste0(tmpdir, .Platform$file.sep),
+                        file.path(tmpdir, paste0(base.filename, ".")))
 
   if (is.function(updateProgress)) {
     updateProgress(value = 0.4, detail = "writing catalog to CSV file")
@@ -1213,10 +1477,10 @@ GenerateZipFileFromStrelkaIDVCFs <- function(files,
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating zip archive")
   }
-  AddRunInformation(files, vcf.names, zipfile.name, vcftype = "strelka.id",
+  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "strelka.id",
                     ref.genome, region, mutation.loads, strand.bias.statistics)
 
-  file.names <- list.files(path = tempdir(), pattern = "\\.(pdf|csv|txt)$",
+  file.names <- list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
                            full.names = TRUE)
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
