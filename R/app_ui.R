@@ -56,10 +56,12 @@ AttributionResultsUI <- function() {
     tabsetPanel(id = "tabSetPanelresults",
       tabPanel(title = "Attribution counts", 
                value = "attributionCountsBest",
-               DT::dataTableOutput(outputId = "exposureTable")),
+               DT::dataTableOutput(outputId = "exposureTable"),
+               DT::dataTableOutput(outputId = "exposureTableVCF")),
       tabPanel(title = "Attribution plot", 
                value = "attributionPlotBest",
-               uiOutput(outputId = "pdfview"))),
+               uiOutput(outputId = "pdfview"),
+               uiOutput(outputId = "pdfviewVCF"))),
   )
 }
 
@@ -158,15 +160,15 @@ UploadVCFUI <- function() {
 
     # Add the next row of control widgets
     fixedRow(column(6,
-                    splitLayout(cellWidths = c("22%", "20%", "30%"),
-                    MyDownloadButton(outputId = "download",
-                                     label = "Create catalogs",
-                                     style="color: #fff;
+             splitLayout(cellWidths = c("22%", "20%", "30%"),
+                         MyDownloadButton(outputId = "download",
+                                          label = "Create catalogs",
+                                          style="color: #fff;
                                        background-color: #337ab7;
                                        border-color: #2e6da4;padding:4px;"),
-                    uiOutput(outputId = "showSpectraFromVCF"),
-                    uiOutput(outputId = "sigAttributionFromVCF")),
-                    offset = 6)),
+                         uiOutput(outputId = "showSpectraFromVCF"),
+                         uiOutput(outputId = "sigAttributionFromVCF")),
+             offset = 6)),
 
     # Add one line break
     br(),
@@ -254,8 +256,8 @@ UploadSpectraUI <- function() {
     # Add a download button for user to download sample spectra to test
     fixedRow(column(6, offset = 6,
                     splitLayout(cellWidths = c("30%", "70%"), 
-                                uiOutput(outputId = "showSpectra"), 
-                                uiOutput(outputId = "sigAttribution"))
+                                uiOutput(outputId = "showSpectraFromCatalog"), 
+                                uiOutput(outputId = "sigAttributionFromCatalog"))
              )),
     
     br(),
@@ -269,7 +271,7 @@ UploadSpectraUI <- function() {
 #' @import shiny
 ShowSpectraUI <- function() {
   fixedPage(
-
+    shinyjs::useShinyjs(),
     sidebarLayout(
 
       sidebarPanel(
@@ -309,31 +311,13 @@ SignatureAttributionUI <- function() {
     sidebarLayout(
 
       sidebarPanel(
-          x <- uiOutput(outputId = "selectSampleFromVCFForAttribution"),
 
-          y <- uiOutput(outputId = "selectSampleFromCatalogForAttribution"),
 
-          y1 <- uiOutput(outputId = "selectCancerType"),
 
-          y2 <- uiOutput(outputId = "choosecatalogtype"),
 
-          x3 <- uiOutput(outputId = "chooseSigSubsetForSampleFromVCF"),
-          y5 <- uiOutput(outputId = "analyzeButtonOnTop"),
-          #x7 <- uiOutput(outputId = "bookmarkButton3"),
           
-          br(),
-          y4 <- uiOutput(outputId = "chooseSigSubsetForSampleFromCatalog"),
-
-          x5 <- uiOutput(outputId = "analyzeButtonForVCF"),
-          splitLayout(cellWidths = c("25%", "75%"),
-                      uiOutput(outputId = "analyzeButton2"),
-                      uiOutput(outputId = "sigTestButton2")),
-          
-          br(),
-          uiOutput(outputId = "cancelButton"),
           #actionButton(inputId = "cancel", label = "Cancel"),
           br(),
-          x8 <- uiOutput(outputId = "bookmarkButton"),
           #x7 <- uiOutput(outputId = "bookmarkButton2")
           #x9 <- uiOutput(outputId = "restoreResults")
           br(),
@@ -362,12 +346,23 @@ SignatureAttributionUI2 <- function() {
         uiOutput(outputId = "addSig"),
         br(),
         uiOutput(outputId = "chooseMoreSigs"),
-        uiOutput(outputId = "analysisButton")),
+        uiOutput(outputId = "analysisButton"),
+        ######################################################
+        uiOutput(outputId = "selectSampleFromVCFForAttribution"),
+        uiOutput(outputId = "selectCancerTypeOfVCF"),
+        uiOutput(outputId = "chooseCatalogType"),
+        uiOutput(outputId = "chooseSigSubsetForVCF"),
+        uiOutput(outputId = "addSigForVCF"),
+        br(),
+        uiOutput(outputId = "chooseMoreSigsForVCF"),
+        uiOutput(outputId = "analysisButtonForVCF")
+        ),
       
       mainPanel(
         # Must use DT::dataTableOutput instead of dataTableOutput,
         # otherwise, the data table will not show up
-        DT::dataTableOutput(outputId = "mytable")
+        DT::dataTableOutput(outputId = "mytable"),
+        DT::dataTableOutput(outputId = "mytableForVCF")
       )
     )
   )
