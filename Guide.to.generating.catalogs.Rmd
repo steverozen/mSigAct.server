@@ -14,7 +14,13 @@ The function of the tab "Generate spectrum catalogs from VCFs" is,
 well, to generate spectrum catalogs from VCFs and also to plot
 the spectra.
 
-How to upload files
+The main input area is this
 
-Possible problems
+```{r VCFinput, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF.input.screen.png")
+```
+
+It is necessary to select one item from each input
+radio button, and then select one or more
+VCF Files (variant call files) for upload.
 
