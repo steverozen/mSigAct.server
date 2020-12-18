@@ -14,19 +14,21 @@ app_ui <- function(request) {
     
     shinyjs::useShinyjs(),
     shinyjs::extendShinyjs(text = jscode, functions = c()),
-    navbarPage(title = "mSigAct", id = "panels",
-      tabPanel(title = "Home", HomeUI()),
-      tabPanel(title = "Generate spectrum catalogs from VCFs",
+    navbarPage(title = tags$b("mSigAct"), id = "panels",
+      tabPanel(title = tags$b("Home"), HomeUI()),
+      tabPanel(title = tags$b("Generate spectrum", 
+                              tags$br(), "catalogs from VCFs"),
                UploadVCFUI(), value = "generateCatalogTab"),
-      tabPanel(title = "Signature attribution", UploadSpectraUI(), 
+      tabPanel(title = tags$b("Upload spectra for", tags$br(),
+                              "signature attribution"), UploadSpectraUI(), 
                value = "uploadSpectraTab"),
-      tabPanel(title = "Show spectra", ShowSpectraUI(), 
+      tabPanel(title = tags$b("Show spectra"), ShowSpectraUI(), 
                value = "showSpectraTab"),
-      tabPanel(title = "Signature attributions", SignatureAttributionUI(), 
+      tabPanel(title = tags$b("Get signature attributions"), SignatureAttributionUI(), 
                value = "sigAttributionTab2"),
-      tabPanel(title = "Results", AttributionResultsUI(),
+      tabPanel(title = tags$b("Results"), AttributionResultsUI(),
                value = "attributionResultsTab"),
-      tabPanel(title = "Guides", TutorialUI(),
+      tabPanel(title = tags$b("Guides (help)"), TutorialUI(),
                value = "tutorialTab"),
       position = "fixed-top"),
     
@@ -40,23 +42,29 @@ TutorialUI <- function() {
   #general.guide.path <- system.file("tutorial/top.help.md", 
   #                                  package = "mSigAct.server")
   fixedPage(
-    tabsetPanel(id = "helpPages",
-                tabPanel(title = "General guide",
-                         includeMarkdown(path = "top.help.md")),
-                tabPanel(title = "Guide to generating catalogs"),
-                tabPanel(title = "Guide to signature attribution"))
-  )
+    tabsetPanel(
+      id = "helpPages",
+      tabPanel(title = tags$b("General guide"),
+               includeMarkdown(path = "inst/guides/general.guide.md")),
+      tabPanel(title = tags$b("Guide to generating catalogs"),
+               includeMarkdown(
+                 path = "inst/guides/Guide.to.generating.catalogs.md")),
+      tabPanel(title = tags$b("Guide to signature attribution"),
+               includeMarkdown(
+                 path = "inst/guides/Guide.to.signature.attribution.md"))
+    ) # tabsetPanel
+  ) # fixedPage
 }
 
 #' @import shiny
 AttributionResultsUI <- function() {
   fixedPage(
     tabsetPanel(id = "tabSetPanelresults",
-      tabPanel(title = "Attribution counts", 
+      tabPanel(title = tags$b("Attribution counts"), 
                value = "attributionCountsBest",
                DT::dataTableOutput(outputId = "exposureTable"),
                DT::dataTableOutput(outputId = "exposureTableVCF")),
-      tabPanel(title = "Attribution plot", 
+      tabPanel(title = tags$b("Attribution plot"), 
                value = "attributionPlotBest",
                uiOutput(outputId = "pdfview"),
                uiOutput(outputId = "pdfviewVCF"))),
