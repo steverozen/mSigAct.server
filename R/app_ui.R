@@ -22,11 +22,11 @@ app_ui <- function(request) {
                value = "uploadSpectraTab"),
       tabPanel(title = "Show spectra", ShowSpectraUI(), 
                value = "showSpectraTab"),
-      tabPanel(title = "Signature attributions", SignatureAttributionUI2(), 
+      tabPanel(title = "Signature attributions", SignatureAttributionUI(), 
                value = "sigAttributionTab2"),
       tabPanel(title = "Results", AttributionResultsUI(),
                value = "attributionResultsTab"),
-      tabPanel(title = "Tutorial", TutorialUI(),
+      tabPanel(title = "Guides", TutorialUI(),
                value = "tutorialTab"),
       position = "fixed-top"),
     

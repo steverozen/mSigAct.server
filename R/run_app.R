@@ -17,11 +17,3 @@ MyRunApp <- function() {
   runApp(list(ui = app_ui, server = app_server),
          host="127.0.0.1", launch.browser = TRUE)
 }
-
-#' @keywords internal
-LoadAndRunApp <- function() {
-  devtools::load_all()
-  enableBookmarking(store = "server")
-  runApp(list(ui = app_ui, server = app_server),
-         host="127.0.0.1", launch.browser = TRUE)
-}

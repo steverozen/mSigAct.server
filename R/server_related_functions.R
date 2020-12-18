@@ -1873,3 +1873,87 @@ CheckCatalogType <- function(catalog) {
   }
   return(catalog.type)
 }
+
+#' @keywords internal
+PrepareSigsAetiologyTable <- function(input.catalog.type) {
+  if (input.catalog.type == "SBS96") {
+    dat <- data.frame(
+      name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
+                    rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
+      spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
+                        ' height="52"></img>'),
+      proposed.aetiology = SBS.aetiology)
+  } else if (input.catalog.type == "SBS192") {
+    dat <- data.frame(
+      name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
+                    rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
+      spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
+                        ' height="52"></img>'),
+      proposed.aetiology = SBS.aetiology)
+  } else if (input.catalog.type == "DBS78") {
+    dat <- data.frame(
+      name = paste0("<a href='", COSMIC.v3.DBS.sig.links, "' target='_blank'>", 
+                    rownames(COSMIC.v3.DBS.sig.links),  "</a>"), 
+      spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.PNG"',
+                        ' height="52"></img>'),
+      proposed.aetiology = DBS.aetiology)
+  } else if (input.catalog.type == "ID") {
+    dat <- data.frame(
+      name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
+                    rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
+      spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.PNG"',
+                        ' height="52"></img>'),
+      proposed.aetiology = ID.aetiology)
+  } 
+  return(dat)
+}
+
+#' @keywords internal
+ShowPreselectedSigs <- function(input, output, input.catalog.type) {
+  sig.universe <- NULL
+  output$chooseSigSubset <- renderUI(
+    { 
+      if (input.catalog.type == "SBS96") {
+        sig.universe <<- colnames(COSMIC.v3.genome.SBS96.sigs)
+      } else {
+        sig.universe <<- 
+          colnames(PCAWG7::signature[["genome"]][[input.catalog.type]])
+      }
+      
+      if (input$selectedCancerType == "Unknown") {
+        selected.sig.universe <- NULL
+      } else {
+        tmp <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType,
+                                     tumor.cohort = "PCAWG",
+                                     sig.type = input.catalog.type,
+                                     region = "genome")
+        selected.sig.universe0 <- colnames(tmp)
+        
+        # Exclude possible artifact signatures
+        possible.artifacts <- mSigAct::PossibleArtifacts()
+        
+        selected.sig.universe1 <- 
+          setdiff(selected.sig.universe0, possible.artifacts)
+        
+        # Exclude rare signatures
+        rare.sigs <- mSigAct::RareSignatures()
+        selected.sig.universe <-
+          setdiff(selected.sig.universe1, rare.sigs)
+      }
+      
+      tagList(
+        shinyWidgets::pickerInput(inputId = "preselectedSigs",
+                                  label = paste0("These signatures were preselected based ",  
+                                                 "on cancer type"),
+                                  choices = selected.sig.universe,
+                                  selected = selected.sig.universe,
+                                  options = shinyWidgets::pickerOptions(
+                                    actionsBox = TRUE,
+                                    dropupAuto = FALSE,
+                                    `live-search`=TRUE
+                                  ), 
+                                  multiple = TRUE
+        )) # end of tagList
+    }) # end of renderUI
+  return(sig.universe)
+}
