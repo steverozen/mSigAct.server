@@ -30,7 +30,8 @@ app_ui <- function(request) {
                value = "attributionResultsTab"),
       tabPanel(title = tags$b("Guides (help)"), TutorialUI(),
                value = "tutorialTab"),
-      position = "fixed-top"),
+      position = "fixed-top",
+      windowTitle = "mSigAct: Mutational Signature Activity"),
     
     # Add padding because navbar pinned at the top
     tags$style(type="text/css", "body {padding-top: 70px;}"),
