@@ -1,6 +1,6 @@
 # Cannot use plan(multicore), otherwise the progress bar for asynchronous
 # process will not work properly
-#future::plan(future::multisession(workers = min(64, future::availableCores())))
+future::plan(future::multisession(workers = min(64, future::availableCores())))
 
 #' @import mSigAct
 #' @import promises
