@@ -620,7 +620,7 @@ app_server <- function(input, output, session) {
           showNotification(ui = "Error:", 
                            action = paste0("Can only do signature attribution ", 
                                            "for SBS96, SBS192, DBS78 and ID"),
-                           type = "error")
+                           type = "error", duration = NULL)
           return()
         }
         # Hide the widgets for previous uploaded VCF
@@ -708,7 +708,7 @@ app_server <- function(input, output, session) {
         showNotification(ui = "Error:", 
                          action = paste0("Can only do signature attribution ", 
                                          "for SBS96, SBS192, DBS78 and ID"),
-                         type = "error")
+                         type = "error", duration = NULL)
         return()
       }
       
@@ -878,7 +878,7 @@ app_server <- function(input, output, session) {
       if(length(sigsForAttribution()) == 0) {
         showNotification(ui = "Error:", 
                          action = "No signatures selected for attribution analysis",
-                         type = "error")
+                         type = "error", duration = NULL)
         return()
       }
       
@@ -915,7 +915,6 @@ app_server <- function(input, output, session) {
         cancer.type   = cancer.type,
         all.sigs      = sig.universe,
         must.include  = colnames(sig.universe))
-      
       # Create a Progress object
       progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
                                          message = "Analysis in progress",

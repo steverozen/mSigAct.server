@@ -92,6 +92,17 @@ CheckInputsForSpectra <- function(input, catalog.path) {
 #' @keywords internal
 CheckInputsForVCF <- function(input) {
   error <- NULL
+  
+  if (is.null(input$ref.genome)) {
+    error <- append(error, "Reference genome must be provided")
+    return(error)
+  }
+  
+  if (is.null(input$region)) {
+    error <- append(error, "Genomic region must be provided")
+    return(error)
+  }
+  
   if (is.null(input$variantCaller)) {
     error <- append(error, "Variant caller information must be provided")
     return(error)
@@ -104,17 +115,6 @@ CheckInputsForVCF <- function(input) {
                              "must be specified when variant caller is unknown"))
       return(error)
     }
-  }
-  
-  if (is.null(input$ref.genome)) {
-    error <- append(error, "Reference genome must be provided")
-    return(error)
-  }
-  
-  
-  if (is.null(input$region)) {
-    error <- append(error, "Genomic region must be provided")
-    return(error)
   }
   
   if (is.null(input$vcf.files)) {
@@ -132,7 +132,7 @@ AddErrorMessage <- function(error) {
   if (!is.null(error)) {
     for (i in 1:length(error)) {
       id.error <- showNotification(ui = "Error:", action = error[i],
-                                    type = "error")
+                                    type = "error", duration = NULL)
       id <- append(id, id.error)
     }
   }
@@ -163,7 +163,7 @@ AddNotifications <- function(res) {
   if (!is.null(res$error)) {
     for (i in 1:length(res$error)) {
       id.error <- showNotification(ui = "Error:", action = res$error[i],
-                                    type = "error")
+                                    type = "error", duration = NULL)
       id$error <- id.error
     }
   }
@@ -1368,11 +1368,11 @@ PrepareAttributionResults2 <-
       stopifnot(setequal(order.name, rownames(dt)))
       dt0 <- dt[order.name, ]
       
-      grDevices::png(filename=png.spectrum.file.path, width = 1539, height = 276)
+      grDevices::png(filename=png.spectrum.file.path, width = 1539, height = 300)
       ICAMS::PlotCatalog(spect)
       grDevices::dev.off()
       
-      grDevices::png(filename=png.reconstructed.file.path, width = 1539, height = 276)
+      grDevices::png(filename=png.reconstructed.file.path, width = 1539, height = 300)
       ICAMS::PlotCatalog(reconstructed.catalog)
       grDevices::dev.off()
       
@@ -1788,11 +1788,10 @@ ShowPreselectedSigs <- function(input, output, input.catalog.type) {
       if (input$selectedCancerType == "Unknown") {
         selected.sig.universe <- NULL
       } else {
-        tmp <- CancerTypeToSigSubset(cancer.type = input$selectedCancerType,
-                                     tumor.cohort = "PCAWG",
-                                     sig.type = input.catalog.type,
-                                     region = "genome")
-        selected.sig.universe0 <- colnames(tmp)
+        tmp <- 
+          mSigAct::ExposureProportions(mutation.type = input.catalog.type,
+                                            cancer.type = input$selectedCancerType)
+        selected.sig.universe0 <- names(tmp)
         
         # Exclude possible artifact signatures
         possible.artifacts <- mSigAct::PossibleArtifacts()
