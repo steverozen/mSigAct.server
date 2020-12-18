@@ -103,9 +103,9 @@ AddRegion2 <- function(){
                choices = 
                 c("genome", "exome", "transcript", "unknown"),
                 # It is conceivable that someone uploads and
-                # SBS96 spectrum that is only from a transcript,
+                # SBS96, or DBS78 spectrum that is only from a transcript,
                 # e.g.because it was collapsed from a SBS192
-                # spectrum.
+                # spectrum. 
                 # c("genome", "exome", "unknown"),
                selected = character(0))
 }
