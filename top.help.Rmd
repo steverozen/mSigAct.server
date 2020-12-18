@@ -149,12 +149,14 @@ has been tested under the following browsers and operating systems
 
 ```{r echo = FALSE, results = "asis"}
 df <- data.frame(OS = c("Linux", "MacOS", "Windows"),
-                 Version = c("Ubuntu 20.04", "Mojave", "10"),
-                 Chrome = c("86.0.4240.198", "87.0.4280.88", "87.0.4280.88"),
+                 Version = c("&nbsp;&nbsp;Ubuntu 20.04&nbsp;&nbsp;", "Mojave", "10"),
+                 Chrome = c("&nbsp;&nbsp;&nbsp;86.0.4240.198&nbsp;&nbsp;&nbsp;",
+                            "87.0.4280.88", "87.0.4280.88"),
                  Edge = c("N/A", "87.0.664.60", "87.0.664.60"),
-                 Firefox = c("82.0.3", "84.0", "83.0"),
+                 Firefox = c("&nbsp;&nbsp;&nbsp;&nbsp;82.0.3&nbsp;&nbsp;&nbsp;&nbsp;", 
+                             "84.0", "83.0"),
                  Safari = c("N/A", "14.0", "N/A"))
-knitr::kable(df)
+knitr::kable(df, format = "simple", padding = 4, align = "c", escape = FALSE)
 ```
 
 ## Code availability

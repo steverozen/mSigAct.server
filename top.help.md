@@ -116,38 +116,38 @@ has been tested under the following browsers and operating systems
 <table>
 <thead>
 <tr class="header">
-<th style="text-align: left;">OS</th>
-<th style="text-align: left;">Version</th>
-<th style="text-align: left;">Chrome</th>
-<th style="text-align: left;">Edge</th>
-<th style="text-align: left;">Firefox</th>
-<th style="text-align: left;">Safari</th>
+<th style="text-align: center;">OS</th>
+<th style="text-align: center;">Version</th>
+<th style="text-align: center;">Chrome</th>
+<th style="text-align: center;">Edge</th>
+<th style="text-align: center;">Firefox</th>
+<th style="text-align: center;">Safari</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Linux</td>
-<td style="text-align: left;">Ubuntu 20.04</td>
-<td style="text-align: left;">86.0.4240.198</td>
-<td style="text-align: left;">N/A</td>
-<td style="text-align: left;">82.0.3</td>
-<td style="text-align: left;">N/A</td>
+<td style="text-align: center;">Linux</td>
+<td style="text-align: center;">  Ubuntu 20.04  </td>
+<td style="text-align: center;">   86.0.4240.198   </td>
+<td style="text-align: center;">N/A</td>
+<td style="text-align: center;">    82.0.3    </td>
+<td style="text-align: center;">N/A</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">MacOS</td>
-<td style="text-align: left;">Mojave</td>
-<td style="text-align: left;">87.0.4280.88</td>
-<td style="text-align: left;">87.0.664.60</td>
-<td style="text-align: left;">84.0</td>
-<td style="text-align: left;">14.0</td>
+<td style="text-align: center;">MacOS</td>
+<td style="text-align: center;">Mojave</td>
+<td style="text-align: center;">87.0.4280.88</td>
+<td style="text-align: center;">87.0.664.60</td>
+<td style="text-align: center;">84.0</td>
+<td style="text-align: center;">14.0</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Windows</td>
-<td style="text-align: left;">10</td>
-<td style="text-align: left;">87.0.4280.88</td>
-<td style="text-align: left;">87.0.664.60</td>
-<td style="text-align: left;">83.0</td>
-<td style="text-align: left;">N/A</td>
+<td style="text-align: center;">Windows</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">87.0.4280.88</td>
+<td style="text-align: center;">87.0.664.60</td>
+<td style="text-align: center;">83.0</td>
+<td style="text-align: center;">N/A</td>
 </tr>
 </tbody>
 </table>
