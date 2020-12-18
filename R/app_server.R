@@ -799,6 +799,13 @@ app_server <- function(input, output, session) {
       
     }) # end of observeEvent
     
+    # Update the catalog used for attribution if user selects another catalog type
+    # for analysis
+    observeEvent(input$selectCatalogType, {
+      catalog.name <- paste0("cat", input$selectCatalogType)
+      catalog <<- list.of.catalogs[[catalog.name]]
+    })
+    
     observeEvent(input$addMoreSigs, {
       output$chooseMoreSigs <- renderUI(
         {
@@ -914,7 +921,6 @@ app_server <- function(input, output, session) {
                                          message = "Analysis in progress",
                                          detail = "This may take a while...")
       result_val(NULL)
-      
       fut <- future::future(
         {
           # Close the progress when this reactive exits (even if there's an error)
