@@ -85,7 +85,13 @@ AddRegion <- function(){
   radioButtons(inputId = "region", 
                label = h5(strong("Genomic region"), style = "color: #337ab7"), 
                choices = 
-                 c("genome", "exome", "transcript", "unknown"),
+                 # c("genome", "exome", "transcript", "unknown"),
+                 # The only way to get a transcript only VCF file
+                 # is if someone filters it computationally.
+                 # If someone did that it would be up to them
+                 # to understand the density spectrum plots for
+                 # SBS96 and DBS78 are off.
+                 c("genome", "exome", "unknown"),
                selected = character(0))
 }
 
@@ -95,7 +101,12 @@ AddRegion2 <- function(){
   radioButtons(inputId = "region2", 
                label = h5(strong("Genomic region"), style = "color: #337ab7"), 
                choices = 
-                 c("genome", "exome", "transcript", "unknown"),
+                c("genome", "exome", "transcript", "unknown"),
+                # It is conceivable that someone uploads and
+                # SBS96, or DBS78 spectrum that is only from a transcript,
+                # e.g.because it was collapsed from a SBS192
+                # spectrum. 
+                # c("genome", "exome", "unknown"),
                selected = character(0))
 }
 
