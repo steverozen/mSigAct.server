@@ -52,7 +52,7 @@ app_server <- function(input, output, session) {
     retval <- list()
     
     # Create a variable which can be used to store the uploaded catalog later
-    catalog <- NA
+    catalog <- NULL
     
     list.of.catalogs <- NA
     
@@ -749,7 +749,8 @@ app_server <- function(input, output, session) {
                                         selected = selected.sig.universe,
                                         options = shinyWidgets::pickerOptions(
                                           actionsBox = TRUE,
-                                          dropupAuto = FALSE
+                                          dropupAuto = FALSE,
+                                          `live-search`=TRUE
                                         ), 
                                         multiple = TRUE
               )) # end of tagList
@@ -801,7 +802,8 @@ app_server <- function(input, output, session) {
                                     choices = choose.more.sigs(),
                                     options = shinyWidgets::pickerOptions(
                                       actionsBox = TRUE,
-                                      dropupAuto = FALSE
+                                      dropupAuto = FALSE,
+                                      `live-search`=TRUE
                                     ), 
                                     multiple = TRUE)
         }
@@ -858,7 +860,6 @@ app_server <- function(input, output, session) {
       if(running())
         return(NULL)
       running(TRUE)
-      browser()
       spect <- catalog[, input$selectedSampleForAttribution, drop = FALSE]
       catalog.type <- input.catalog.type
       cancer.type <- input$selectedCancerType
@@ -1028,10 +1029,11 @@ app_server <- function(input, output, session) {
     
     observeEvent(CheckArgumentsForAttribution(), {
       req(input$selectedCancerType, input$selectCatalogType)
-      
       input.catalog.type <<- input$selectCatalogType
-      catalog.name <- paste0("cat", input.catalog.type)
-      catalog <<- list.of.catalogs[[catalog.name]]
+      if (is.null(catalog)) {
+        catalog.name <- paste0("cat", input.catalog.type)
+        catalog <<- list.of.catalogs[[catalog.name]]
+      }
       output$chooseSigSubset <- renderUI(
         { 
           
