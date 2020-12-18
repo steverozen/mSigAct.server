@@ -1,4 +1,4 @@
-﻿name,proposed.aetiology
+name,proposed.aetiology
 SBS1,Spontaneous deamination of 5-methylcytosine (clock-like signature)
 SBS2,Activity of APOBEC family of cytidine deaminases
 SBS3,Defective homologous recombination DNA damage repair
@@ -34,11 +34,11 @@ SBS27,Possible sequencing artefacts
 SBS28,Unknown
 SBS29,Tobacco chewing
 SBS30,Defective DNA base excision repair due to NTHL1 mutations
-SBS31,Platinum chemotherpay treatment
+SBS31,Platinum chemotherapy treatment
 SBS32,Azathioprine treatment
 SBS33,Unknown
 SBS34,Unknown
-SBS35,Platinum chemotherpay treatment
+SBS35,Platinum chemotherapy treatment
 SBS36,Defective DNA base excision repair due to MUTYH mutations
 SBS37,Unknown
 SBS38,Indirect effect of ultraviolet light
