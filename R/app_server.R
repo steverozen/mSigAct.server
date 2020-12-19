@@ -882,10 +882,6 @@ app_server <- function(input, output, session) {
       if(running())
         return(NULL)
       
-      output$cancelButton <- renderUI(
-        actionButton(inputId = "cancel", label = "Cancel")
-      )
-      
       running(TRUE)
       spect <- catalog[, input$selectedSampleForAttribution, drop = FALSE]
       catalog.type <- input.catalog.type()
