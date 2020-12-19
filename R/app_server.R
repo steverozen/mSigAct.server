@@ -709,18 +709,17 @@ app_server <- function(input, output, session) {
       }
       
       if (input$selectedCancerType != "Unknown") {
-        
         ShowPreselectedSigs(input, output,input.catalog.type())
-        
         } # end of if statement
-    }) # end of observeEvent
     
-    # Show the actionButton for user to add more signatures
-    output$addSig <- renderUI(
-      actionButton(inputId = "addMoreSigs", label = "Add more signatures",
-                   style= "color: #fff; background-color: #337ab7;
+      # Show the actionButton for user to add more signatures
+      output$addSig <- renderUI(
+        actionButton(inputId = "addMoreSigs", label = "Add more signatures",
+                     style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4; ")
-    )
+      )
+    }, ignoreInit = TRUE) # end of observeEvent
+    
     
     # When user clicks either of the two actionButtons "Show spectra", 
     # "Signature attribution" on UploadVCFUI page, then update
@@ -785,6 +784,7 @@ app_server <- function(input, output, session) {
     
     observeEvent(CheckArgumentsForAttribution(), {
       req(input$selectedCancerType, input$selectCatalogType)
+      
       input.catalog.type(input$selectCatalogType) 
       if (is.null(catalog)) {
         catalog.name <- paste0("cat", input.catalog.type())
@@ -793,7 +793,14 @@ app_server <- function(input, output, session) {
       
       ShowPreselectedSigs(input, output, input.catalog.type())
       
-    }) # end of observeEvent
+      # Show the actionButton for user to add more signatures
+      output$addSig <- renderUI(
+        actionButton(inputId = "addMoreSigs", label = "Add more signatures",
+                     style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4; ")
+      )
+      
+    }, ignoreInit = TRUE) # end of observeEvent
     
     # Update the catalog used for attribution if user selects another catalog type
     # for analysis
@@ -831,16 +838,21 @@ app_server <- function(input, output, session) {
         return()
       }
       
-      if (input.catalog.type() %in% c("SBS96", "SBS192")) {
+      if (input.catalog.type() == "SBS96") {
         sigs.in.correct.order <- 
-          intersect(rownames(COSMIC.v3.SBS.sig.links), sigsForAttribution())
+          intersect(rownames(COSMIC.v3.SBS96.sig.links), sigsForAttribution())
+      } else if (input.catalog.type() == "SBS192") {
+        sigs.in.correct.order <- 
+          intersect(rownames(COSMIC.v3.SBS192.sig.links), sigsForAttribution())
       } else if (input.catalog.type() == "DBS78") {
         sigs.in.correct.order <- 
-          intersect(rownames(COSMIC.v3.DBS.sig.links), sigsForAttribution())
+          intersect(rownames(COSMIC.v3.DBS78.sig.links), sigsForAttribution())
       } else if (input.catalog.type() == "ID") {
         sigs.in.correct.order <- 
           intersect(rownames(COSMIC.v3.ID.sig.links), sigsForAttribution())
-      } 
+      } else {
+        sigs.in.correct.order <- NULL
+      }
       
       dat <<- PrepareSigsAetiologyTable(input.catalog.type())
       plotdata$dat <<- dat[sigs.in.correct.order, ]
@@ -851,15 +863,22 @@ app_server <- function(input, output, session) {
                                      pageLength = 25)) 
       })
       
-      shinyjs::show(id = "sigAetiologyTable")
+      if (is.null(sigsForAttribution())) {
+        shinyjs::hide(id = "sigAetiologyTable")
+      } else {
+        shinyjs::show(id = "sigAetiologyTable")
+      }
       
-      output$analysisButton <- renderUI({
-        actionButton(inputId = "startAnalysis", label = "Analyze",
-                     style= "color: #fff; background-color: #337ab7;
+      # Don't show "Analyze" button if no signatures were selected in the beginning
+      if (!is.null(sigsForAttribution())) {
+        output$analysisButton <- renderUI({
+          actionButton(inputId = "startAnalysis", label = "Analyze",
+                       style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4; ")
-      })
-      
-    })
+        })
+      } # Need to use ignoreNULL here otherwise sigAetiologyTable will not change
+        # if user deselect all signatures
+    }, ignoreNULL = FALSE,  ignoreInit = TRUE)
     
     # When user changes input for sample selected and catalog type
     # hide the previous signatuer aetiology table
