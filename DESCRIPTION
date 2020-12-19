@@ -13,7 +13,10 @@ Language: en-US
 biocViews:
 Depends: 
     R (>= 4.0)
-Imports: config,
+Imports: BSgenome.Hsapiens.1000genomes.hs37d5,
+    BSgenome.Hsapiens.UCSC.hg38,
+    BSgenome.Mmusculus.UCSC.mm10,
+    config,
     data.table,
     dplyr,
     DT,
@@ -38,9 +41,7 @@ Remotes: github::steverozen/ICAMSxtra@master,
     github::steverozen/mSigAct@master,
     github::steverozen/PCAWG7@master
 RoxygenNote: 7.1.1
-Suggests: BSgenome.Hsapiens.1000genomes.hs37d5,
-    BSgenome.Hsapiens.UCSC.hg38,
-    BSgenome.Mmusculus.UCSC.mm10,
+Suggests: 
     testthat (>= 2.1.0),
     shinytest
 
