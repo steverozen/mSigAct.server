@@ -13,3 +13,4 @@ $run_dev.*
 ^.*\.md$
 ^top\.help_files$
 ^mutograph\.png$
+^general\.guide_files$
