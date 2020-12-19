@@ -2,7 +2,7 @@
 
 cat(getwd(), "\n")
 
-SBS96.sigs <- PCAWG7::signature$genome$SBS96
+SBS96.sigs <- COSMIC.v3.genome.SBS96.sigs
 for (name in colnames(SBS96.sigs)) {
   file.path <- file.path("inst/app/SBS96", paste0(name, ".png")) 
   grDevices::png(filename=file.path, width = 1700, height = 250)
