@@ -11,19 +11,6 @@ app_server <- function(input, output, session) {
   # List the first level callModules here
   tryCatch({
     
-    if (FALSE) {
-      sig.universe.rv <- reactive({
-        if (input.catalog.type() == "SBS96") {
-          sig.universe <- colnames(COSMIC.v3.genome.SBS96.sigs)
-        } else {
-          sig.universe <- 
-            colnames(PCAWG7::signature[["genome"]][[input.catalog.type()]])
-        }
-        return(sig.universe)
-      })
-    }
-
-    
     # Reactive expression for choosing more signatures
     choose.more.sigs <- reactive({
       if (input.catalog.type() == "SBS96") {
@@ -85,7 +72,7 @@ app_server <- function(input, output, session) {
     plotdata <- list(cossim = NULL, spect = NULL, 
                      reconstructed.catalog = NULL,
                      sig.universe = NULL, 
-                     QP.best.MAP.exp = NULL,
+                     best.MAP.exp = NULL,
                      dat = NULL)
     
     dat <- data.frame(name = character(), spectrum = character(), 
@@ -915,6 +902,7 @@ app_server <- function(input, output, session) {
         cancer.type   = cancer.type,
         all.sigs      = sig.universe,
         must.include  = colnames(sig.universe))
+      
       # Create a Progress object
       progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
                                          message = "Analysis in progress",
@@ -957,16 +945,7 @@ app_server <- function(input, output, session) {
           } else {
             MAP.best.exp <- retval$MAP
             
-            QP.exp <- 
-              mSigAct::OptimizeExposureQP(spect, 
-                                          sig.universe[ , MAP.best.exp$sig.id, 
-                                                        drop = FALSE])
-            QP.best.MAP.exp <-
-              dplyr::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
-            
-            r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
-                                                 use.sig.names = TRUE)
-            reconstructed.catalog0 <- ICAMS::as.catalog(r.qp)
+            reconstructed.catalog0 <- retval$MAP.recon
             
             cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
             
@@ -978,7 +957,7 @@ app_server <- function(input, output, session) {
             plotdata$spect <<- spect
             plotdata$reconstructed.catalog <<- reconstructed.catalog
             plotdata$sig.universe <<- sig.universe
-            plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
+            plotdata$best.MAP.exp <<- MAP.best.exp
             
             retval <- PrepareAttributionResults2(input, output, session, 
                                                  input.catalog.type(), 
