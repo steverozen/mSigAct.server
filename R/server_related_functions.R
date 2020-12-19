@@ -831,12 +831,19 @@ PrepareAttributionResults2 <-
       order.name <- c(tbl2$name, name1)
       stopifnot(setequal(order.name, rownames(dt)))
       dt0 <- dt[order.name, ]
+      if (input.catalog.type %in% c("SBS96", "ID")) {
+        width <- 1700
+        height <- 250
+      } else {
+        width <- 2000
+        height <- 300
+      }
       
-      grDevices::png(filename=png.spectrum.file.path, width = 1700, height = 300)
+      grDevices::png(filename=png.spectrum.file.path, width = width, height = height)
       ICAMS::PlotCatalog(spect)
       grDevices::dev.off()
       
-      grDevices::png(filename=png.reconstructed.file.path, width = 1700, height = 300)
+      grDevices::png(filename=png.reconstructed.file.path, width = width, height = height)
       ICAMS::PlotCatalog(reconstructed.catalog)
       grDevices::dev.off()
       
@@ -1063,28 +1070,28 @@ PrepareSigsAetiologyTable <- function(input.catalog.type) {
     dat <- data.frame(
       name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
                     rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
-      spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
+      spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS.sig.links), '.png"',
                         ' height="52"></img>'),
       proposed.aetiology = SBS.aetiology)
   } else if (input.catalog.type == "SBS192") {
     dat <- data.frame(
       name = paste0("<a href='", COSMIC.v3.SBS.sig.links, "' target='_blank'>", 
                     rownames(COSMIC.v3.SBS.sig.links),  "</a>"), 
-      spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.PNG"',
+      spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS.sig.links), '.png"',
                         ' height="52"></img>'),
       proposed.aetiology = SBS.aetiology)
   } else if (input.catalog.type == "DBS78") {
     dat <- data.frame(
       name = paste0("<a href='", COSMIC.v3.DBS.sig.links, "' target='_blank'>", 
                     rownames(COSMIC.v3.DBS.sig.links),  "</a>"), 
-      spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.PNG"',
+      spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS.sig.links), '.png"',
                         ' height="52"></img>'),
       proposed.aetiology = DBS.aetiology)
   } else if (input.catalog.type == "ID") {
     dat <- data.frame(
       name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
                     rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
-      spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.PNG"',
+      spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.png"',
                         ' height="52"></img>'),
       proposed.aetiology = ID.aetiology)
   } 
