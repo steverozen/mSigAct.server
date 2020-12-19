@@ -947,11 +947,12 @@ GenerateZipFileFromVCFs <- function(files,
   } else {
     get.vaf.function <- NULL
   }
-  split.vcfs <- ReadAndSplitVCFs(files = files,
-                                 variant.caller = variant.caller,
-                                 num.of.cores = num.of.cores,
-                                 names.of.VCFs = names.of.VCFs,
-                                 get.vaf.function = get.vaf.function)
+  split.vcfs <- 
+    ICAMS::ReadAndSplitVCFs(files = files,
+                            variant.caller = variant.caller,
+                            num.of.cores = num.of.cores,
+                            names.of.VCFs = names.of.VCFs,
+                            get.vaf.function = get.vaf.function)
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "generating SBS catalogs")
@@ -1326,7 +1327,7 @@ PrepareAttributionResults2 <-
                          cosine.similarity = c(1, cossim))
       tbl2 <- data.frame(name = QP.best.MAP.exp$sig.id, 
                          count = QP.best.MAP.exp$QP.best.MAP.exp)
-      tbl2 <- dplyr::arrange(tbl2, desc(count))
+      tbl2 <- dplyr::arrange(tbl2, dplyr::desc(count))
       
       tbl <- dplyr::bind_rows(tbl1, tbl2)
       utils::write.csv(tbl, file = table.file.path, na = "", row.names = FALSE)
@@ -1676,7 +1677,7 @@ TransCountsCatalogToDensity <- function(list) {
 
 # Quiets concerns of R CMD check about no visible binding for global variable
 if(getRversion() >= "2.15.1") {
-  utils::globalVariables(c("%...>%", ".", "ids"))
+  utils::globalVariables(c("%...>%", ".", "ids", "count"))
 }
 
 #' Plot List of catalogs to Pdf
