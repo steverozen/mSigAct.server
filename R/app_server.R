@@ -902,7 +902,7 @@ app_server <- function(input, output, session) {
       }
       
       # Do the first round of cut-off if there are many signatures in the beginning
-      if (length(ncol(sig.universe)) > 15) {
+      if (ncol(sig.universe) > 15) {
         retval <- 
           mSigAct::OptimizeExposureQPBootstrap(spectrum = spect,
                                                signatures = sig.universe, 
