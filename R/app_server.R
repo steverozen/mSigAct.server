@@ -92,7 +92,7 @@ app_server <- function(input, output, session) {
           label = "Create catalogs",
           style="color: #fff;
                    background-color: #337ab7;
-                   border-color: #2e6da4;padding:4px;")
+                   border-color: #2e6da4;")
       })
     }) 
     
@@ -187,13 +187,13 @@ app_server <- function(input, output, session) {
       output$showSpectraFromVCF <- renderUI({
         actionButton(inputId = "showSpectraOfVCF", label = "Show spectra",
                      style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4;padding:4px; ")
+                              border-color: #2e6da4; ")
       })
       
       output$sigAttributionFromVCF <- renderUI({
         actionButton(inputId = "sigAttributionOfVCF", label = "Signature attribution",
                      style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4;padding:4px; ")
+                              border-color: #2e6da4; ")
       })
       
       output$selectSampleFromUploadedVCF <- renderUI(
@@ -719,7 +719,7 @@ app_server <- function(input, output, session) {
     output$addSig <- renderUI(
       actionButton(inputId = "addMoreSigs", label = "Add more signatures",
                    style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4;padding:4px; ")
+                              border-color: #2e6da4; ")
     )
     
     # When user clicks either of the two actionButtons "Show spectra", 
@@ -856,12 +856,12 @@ app_server <- function(input, output, session) {
       output$analysisButton <- renderUI({
         actionButton(inputId = "startAnalysis", label = "Analyze",
                      style= "color: #fff; background-color: #337ab7;
-                              border-color: #2e6da4;padding:4px; ")
+                              border-color: #2e6da4; ")
       })
       
     })
     
-    # When user changes input for sample selected, catalog type and catalog type
+    # When user changes input for sample selected and catalog type
     # hide the previous signatuer aetiology table
     hideAetiologyTable <- reactive(
       list(input$selectedSampleForAttribution,
@@ -878,9 +878,14 @@ app_server <- function(input, output, session) {
         return()
       }
       
-      #Don't do anything if in the middle of a run
+      # Don't do anything if in the middle of a run
       if(running())
         return(NULL)
+      
+      output$cancelButton <- renderUI(
+        actionButton(inputId = "cancel", label = "Cancel")
+      )
+      
       running(TRUE)
       spect <- catalog[, input$selectedSampleForAttribution, drop = FALSE]
       catalog.type <- input.catalog.type()
@@ -993,6 +998,14 @@ app_server <- function(input, output, session) {
       # Return something other than the future so we don't block the UI
       NULL
     })
+    
+    # Send interrupt signal to future
+    observeEvent(input$cancel,{
+      if(running()) {
+        interruptor$interrupt("Task cancelled")
+      }
+    })
+    
   }) # end of tryCatch
 }
   

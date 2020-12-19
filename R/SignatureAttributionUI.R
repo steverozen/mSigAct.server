@@ -15,7 +15,10 @@ SignatureAttributionUI <- function() {
         br(),
         
         uiOutput(outputId = "chooseMoreSigs"),
-        uiOutput(outputId = "analysisButton")
+        uiOutput(outputId = "analysisButton"),
+        br(),
+        
+        uiOutput(outputId = "cancelButton")
       ),
       
       mainPanel(
