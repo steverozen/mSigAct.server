@@ -832,11 +832,11 @@ PrepareAttributionResults2 <-
       stopifnot(setequal(order.name, rownames(dt)))
       dt0 <- dt[order.name, ]
       
-      grDevices::png(filename=png.spectrum.file.path, width = 1539, height = 300)
+      grDevices::png(filename=png.spectrum.file.path, width = 1700, height = 300)
       ICAMS::PlotCatalog(spect)
       grDevices::dev.off()
       
-      grDevices::png(filename=png.reconstructed.file.path, width = 1539, height = 300)
+      grDevices::png(filename=png.reconstructed.file.path, width = 1700, height = 300)
       ICAMS::PlotCatalog(reconstructed.catalog)
       grDevices::dev.off()
       

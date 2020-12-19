@@ -846,7 +846,7 @@ app_server <- function(input, output, session) {
       plotdata$dat <<- dat[sigs.in.correct.order, ]
       output$sigAetiologyTable <- DT::renderDataTable({
         DT::datatable(dat[sigs.in.correct.order, ], escape = FALSE, rownames = FALSE,
-                      colnames = c("Name", "Spectrum", "Proposed aetiology"), 
+                      colnames = c("Name", "Signature profile", "Proposed aetiology"), 
                       options = list(lengthMenu = c(25, 50, 75), 
                                      pageLength = 25)) 
       })
