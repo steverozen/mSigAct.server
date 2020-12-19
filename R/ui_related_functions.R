@@ -101,12 +101,13 @@ AddRegion2 <- function(){
   radioButtons(inputId = "region2", 
                label = h5(strong("Genomic region"), style = "color: #337ab7"), 
                choices = 
-                c("genome", "exome", "transcript", "unknown"),
-                # It is conceivable that someone uploads and
+                # c("genome", "exome", "transcript", "unknown"),
+                # It is conceivable that someone uploads an
                 # SBS96, or DBS78 spectrum that is only from a transcript,
                 # e.g.because it was collapsed from a SBS192
-                # spectrum. 
-                # c("genome", "exome", "unknown"),
+                # spectrum, but there is no SBS96 count signature
+                # derived from transcript only opportunity
+                 c("genome", "exome", "unknown"),
                selected = character(0))
 }
 
