@@ -38,6 +38,9 @@ information is needed to calculate the VAFs (variant allele frequencies).
 If \code{"unknown"}(default) and \code{get.vaf.function} is NULL, then VAF
 and read depth will be NAs.}
 
+\item{mergeSBS}{Whether to merge adjacent SBSs as DBS. Value can be "yes" or
+"no".}
+
 \item{num.of.cores}{The number of cores to use. Not available on Windows
 unless \code{num.of.cores = 1}.}
 

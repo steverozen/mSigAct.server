@@ -8,6 +8,9 @@
 * Create new temporary directory each time when user generate catalogs and do
 signature attribution.
 
+## Fixed
+* Fixed a bug in generating zip archive when the input region is "unknown".
+
 <br>
 
 # ICAMS.shiny 0.0.4

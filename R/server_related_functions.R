@@ -424,10 +424,9 @@ AddRunInformation <-
     close(run.info)
   }
 
-#' This function generates a zip archive from Mutect VCF files.
+#' This function generates a zip archive from VCFs
 #'
-#'
-#' @param files Character vector of file paths to the Mutect VCF files.
+#' @param files Character vector of file paths to the VCF files.
 #'
 #' @param zipfile Pathname of the zip file to be created.
 #'
@@ -437,7 +436,19 @@ AddRunInformation <-
 #'
 #' @param ref.genome A \code{ref.genome} argument as described in
 #'   \code{\link[ICAMS]{ICAMS}}.
+#'   
+#' @param variant.caller Name of the variant caller that produces the VCF, can
+#'   be either \code{strelka}, \code{mutect} or \code{freebayes}. This
+#'   information is needed to calculate the VAFs (variant allele frequencies).
+#'   If \code{"unknown"}(default) and \code{get.vaf.function} is NULL, then VAF
+#'   and read depth will be NAs.
 #'
+#' @param mergeSBS Whether to merge adjacent SBSs as DBS. Value can be "yes" or
+#'   "no".
+#'   
+#' @param num.of.cores The number of cores to use. Not available on Windows
+#'   unless \code{num.of.cores = 1}.
+#'   
 #' @param trans.ranges Optional. If \code{ref.genome} specifies one of the
 #'   \code{\link[BSgenome]{BSgenome}} object
 #'   \enumerate{
@@ -461,13 +472,6 @@ AddRunInformation <-
 #'   \code{files} and file paths without extensions (and the leading dot) will be
 #'   used as the names of the VCF files.
 #'
-#' @param tumor.col.name Optional. Character vector of column names in VCFs which contain
-#'   the tumor sample information. The order of names in \code{tumor.col.names}
-#'   should match the order of VCFs listed in \code{files}. If
-#'   \code{tumor.col.names} is equal to \code{NA}(default), this function will
-#'   use the 10th column in all the VCFs to calculate VAFs.
-#'   See \code{\link[ICAMS]{GetMutectVAF}} for more details.
-#'
 #' @param base.filename Optional. The base name of the CSV and PDF files to be
 #'   produced; multiple files will be generated, each ending in
 #'   \eqn{x}\code{.csv} or \eqn{x}\code{.pdf}, where \eqn{x} indicates the type
@@ -475,439 +479,7 @@ AddRunInformation <-
 #'
 #' @param updateProgress A callback function to update the progress indicator on
 #'   the user interface.
-#'
-#' @import ICAMS
-#'
-#' @import zip
-#'
-#' @importFrom utils getFromNamespace
-#'
-#' @keywords internal
-GenerateZipFileFromMutectVCFs <- function(files,
-                                          zipfile,
-                                          vcf.names,
-                                          zipfile.name,
-                                          ref.genome,
-                                          trans.ranges = NULL,
-                                          region = "unknown",
-                                          names.of.VCFs = NULL,
-                                          tumor.col.names = NA,
-                                          base.filename = "",
-                                          updateProgress = NULL){
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "reading and splitting VCFs")
-  }
-  split.vcfs <- ReadAndSplitMutectVCFs(files, names.of.VCFs, tumor.col.names)
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "generating SBS catalogs")
-  }
-  SBS.list <-
-    ICAMS::VCFsToSBSCatalogs(list.of.SBS.vcfs = split.vcfs$SBS,
-                             ref.genome = ref.genome,
-                             region = region)
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.3, detail = "generating DBS catalogs")
-  }
-  DBS.list <-
-    ICAMS::VCFsToDBSCatalogs(list.of.DBS.vcfs = split.vcfs$DBS,
-                             ref.genome = ref.genome,
-                             region = region)
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.2, detail = "generating ID catalogs")
-  }
-  ID.list <-
-    ICAMS::VCFsToIDCatalogs(list.of.vcfs = split.vcfs$ID,
-                            ref.genome = ref.genome,
-                            region = region)
-  CombineAndReturnCatalogsForMutectVCFs <-
-    getFromNamespace("CombineAndReturnCatalogsForMutectVCFs", "ICAMS")
-  catalogs0 <-
-    CombineAndReturnCatalogsForMutectVCFs(split.vcfs.list = split.vcfs,
-                                          SBS.list = SBS.list,
-                                          DBS.list = DBS.list,
-                                          ID.list = ID.list)
-
-  GetMutationLoadsFromMutectVCFs <-
-    getFromNamespace("GetMutationLoadsFromMutectVCFs", "ICAMS")
-  mutation.loads <- GetMutationLoadsFromMutectVCFs(catalogs0)
-  strand.bias.statistics<- NULL
-
-  # Retrieve the catalog matrix from catalogs0
-  catalogs <- catalogs0
-  catalogs$discarded.variants <- catalogs$annotated.vcfs <- NULL
-
-
-  # Remove the ID counts catalog as it does not have abundance for
-  # it to be transformed to density catalog
-  catalogs$catID <- NULL
-
-  # Transform the counts catalogs to density catalogs
-  catalogs.density <- TransCountsCatalogToDensity(catalogs)
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
-  }
-  
-  tmpdir <- tempfile()
-  dir.create(tmpdir)
-  output.file <- ifelse(base.filename == "",
-                        paste0(tmpdir, .Platform$file.sep),
-                        file.path(tmpdir, paste0(base.filename, ".")))
-
-  for (name in names(catalogs)) {
-    WriteCatalog(catalogs[[name]],
-                 file = paste0(output.file, name, ".counts.csv"))
-  }
-
-  # Write the density catalogs to CSV files
-  for (name in names(catalogs.density)) {
-    WriteCatalog(catalogs.density[[name]],
-                 file = paste0(output.file, name, ".csv"))
-  }
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "plotting catalogs to PDF files")
-  }
-
-  for (name in names(catalogs)) {
-    PlotCatalogToPdf(catalogs[[name]],
-                     file = paste0(output.file, name, ".counts.pdf"))
-    if (name == "catSBS192") {
-      list <- PlotCatalogToPdf(catalogs[[name]],
-                               file = paste0(output.file, "SBS12.counts.pdf"),
-                               plot.SBS12 = TRUE)
-      strand.bias.statistics <-
-        c(strand.bias.statistics, list$strand.bias.statistics)
-    }
-  }
-
-  # Plotting the density catalogs to PDFs
-  for (name in names(catalogs.density)) {
-    PlotCatalogToPdf(catalogs.density[[name]],
-                     file = paste0(output.file, name, ".pdf"))
-    if (name == "catSBS192.density") {
-      list <- PlotCatalogToPdf(catalogs.density[[name]],
-                               file = paste0(output.file, "SBS12.density.pdf"),
-                               plot.SBS12 = TRUE)
-      strand.bias.statistics <-
-        c(strand.bias.statistics, list$strand.bias.statistics)
-    }
-  }
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "generating zip archive")
-  }
-
-  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "mutect",
-                    ref.genome, region, mutation.loads, strand.bias.statistics)
-
-  file.names <- list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
-                           full.names = TRUE)
-  zip::zipr(zipfile = zipfile, files = file.names)
-  unlink(file.names)
-}
-
-#' This function is a wrapper function processing Mutect VCF files to
-#' generate a zip archive.
-#'
-#' @param input A list-like object used in shiny app to store the current values
-#'   of all of the widgets in the app.
-#'
-#' @param output A list-like object used in shiny app that stores instructions
-#'   for building the R objects in the app.
-#'
-#' @param file A file path (string) of a nonexistent temp file, using which the
-#'   function writes the content to that file path. See
-#'   \code{\link[shiny]{downloadHandler}} for more details.
-#'
-#' @param ids A list containing the existing notification ids for error, warning
-#'   and message.
-#'
-#' @return A list of updated notification ids for error, warning and message
-#'   after running this function.
-#'
-#' @keywords internal
-ProcessMutectVCFs <- function(input, output, file, ids) {
-  # vcfs.info is a data frame that contains one row for each uploaded file,
-  # and four columns "name", "size", "type" and "datapath".
-  # "name": The filename provided by the web browser.
-  # "size": The size of the uploaded data, in bytes.
-  # "type": The MIME type reported by the browser.
-  # "datapath": The path to a temp file that contains the data that was uploaded.
-  vcfs.info <- input$vcf.files
-
-  # Get the sample names specified by user
-  vcf.names <- GetNamesOfVCFs(input$names.of.VCFs)
-
-  if (is.null(vcf.names)) {
-    # If user didn't specify sample names, then use VCF names
-    # as the sample names
-    names.of.VCFs <-
-      # Get VCF file names without extension
-      tools::file_path_sans_ext(vcfs.info$name)
-  } else {
-    names.of.VCFs <- vcf.names
-  }
-
-  # Get the names of columns containing tumor sample information in Mutect VCFs
-  # specified by user
-  tumor.col.names <- GetTumorColNames(input$tumor.col.names)
-
-  # Get the base name of the CSV and PDF files to create specified by user
-  base.filename <- input$base.filename
-
-  # Create a Progress object
-  progress <- shiny::Progress$new()
-  progress$set(message = "Progress", value = 0)
-  # Close the progress when this reactive exits (even if there's an error)
-  on.exit(progress$close())
-
-  # Create a callback function to update progress. Each time this is called, it
-  # will increase the progress by that value and update the detail
-  updateProgress <- function(value = NULL, detail = NULL) {
-    value1 <- value + progress$getValue()
-    progress$set(value = value1, detail = detail)
-  }
-
-  # Catch the errors, warnings and messages and store them in a list when
-  # generating a zip archive from Mutect VCFs
-  res <- CatchToList(
-    GenerateZipFileFromMutectVCFs(files = vcfs.info$datapath,
-                                  zipfile = file,
-                                  vcf.names = vcfs.info$name,
-                                  zipfile.name = input$zipfile.name,
-                                  ref.genome = input$ref.genome,
-                                  trans.ranges = NULL,
-                                  region = input$region,
-                                  names.of.VCFs = names.of.VCFs,
-                                  tumor.col.names = tumor.col.names,
-                                  base.filename = base.filename,
-                                  updateProgress = updateProgress)
-  )
-
-  # Get the new notification ids
-  new.ids <- AddNotifications(res$error.info)
-
-  # Update the notification ids
-  return(UpdateNotificationIDs(ids, new.ids))
-}
-
-#' This function generates a zip archive from Strelka SBS VCF files.
-#'
-#' @inheritParams GenerateZipFileFromMutectVCFs
-#'
-#' @param files Character vector of file paths to the Strelka SBS VCF files.
-#'
-#' @import ICAMS
-#'
-#' @import zip
-#'
-#' @importFrom utils getFromNamespace
-#'
-#' @keywords internal
-GenerateZipFileFromStrelkaSBSVCFs <- function(files,
-                                              zipfile,
-                                              vcf.names,
-                                              zipfile.name,
-                                              ref.genome,
-                                              trans.ranges = NULL,
-                                              region = "unknown",
-                                              names.of.VCFs = NULL,
-                                              base.filename = "",
-                                              updateProgress = NULL){
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "reading and splitting VCFs")
-  }
-  split.vcfs <- ReadAndSplitStrelkaSBSVCFs(files, names.of.VCFs)
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "generating SBS catalogs")
-  }
-  SBS.list <-
-    ICAMS::VCFsToSBSCatalogs(list.of.SBS.vcfs = split.vcfs$SBS.vcfs,
-                            ref.genome = ref.genome,
-                            region = region)
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.3, detail = "generating DBS catalogs")
-  }
-  DBS.list <-
-    ICAMS::VCFsToDBSCatalogs(list.of.DBS.vcfs = split.vcfs$DBS.vcfs,
-                             ref.genome = ref.genome,
-                             region = region)
-
-  CombineAndReturnCatalogsForStrelkaSBSVCFs <-
-    getFromNamespace("CombineAndReturnCatalogsForStrelkaSBSVCFs", "ICAMS")
-  catalogs0 <-
-    CombineAndReturnCatalogsForStrelkaSBSVCFs(split.vcfs.list = split.vcfs,
-                                              SBS.list = SBS.list,
-                                              DBS.list = DBS.list)
-  GetMutationLoadsFromStrelkaSBSVCFs <-
-    getFromNamespace("GetMutationLoadsFromStrelkaSBSVCFs", "ICAMS")
-  mutation.loads <- GetMutationLoadsFromStrelkaSBSVCFs(catalogs0)
-  strand.bias.statistics<- NULL
-
-  # Retrieve the catalog matrix from catalogs0
-  catalogs <- catalogs0
-  catalogs$discarded.variants <- catalogs$annotated.vcfs <- NULL
-
-  # Transform the counts catalogs to density catalogs
-  catalogs.density <- TransCountsCatalogToDensity(catalogs)
-  
-  tmpdir <- tempfile()
-  dir.create(tmpdir)
-  output.file <- ifelse(base.filename == "",
-                        paste0(tmpdir, .Platform$file.sep),
-                        file.path(tmpdir, paste0(base.filename, ".")))
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.3, detail = "writing catalogs to CSV files")
-  }
-  for (name in names(catalogs)) {
-    WriteCatalog(catalogs[[name]],
-                 file = paste0(output.file, name, ".counts.csv"))
-  }
-
-  # Write the density catalogs to CSV files
-  for (name in names(catalogs.density)) {
-    WriteCatalog(catalogs.density[[name]],
-                 file = paste0(output.file, name, ".csv"))
-  }
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "plotting catalogs to PDF files")
-  }
-  for (name in names(catalogs)) {
-    PlotCatalogToPdf(catalogs[[name]],
-                     file = paste0(output.file, name, ".counts.pdf"))
-    if (name == "catSBS192") {
-      list <- PlotCatalogToPdf(catalogs[[name]],
-                               file = paste0(output.file, "SBS12.counts.pdf"),
-                               plot.SBS12 = TRUE)
-      strand.bias.statistics<- c(strand.bias.statistics,
-                                 list$strand.bias.statistics)
-    }
-  }
-
-  # Plotting the density catalogs to PDFs
-  for (name in names(catalogs.density)) {
-    PlotCatalogToPdf(catalogs.density[[name]],
-                     file = paste0(output.file, name, ".pdf"))
-    if (name == "catSBS192.density") {
-      list <- PlotCatalogToPdf(catalogs.density[[name]],
-                               file = paste0(output.file, "SBS12.density.pdf"),
-                               plot.SBS12 = TRUE)
-      strand.bias.statistics <-
-        c(strand.bias.statistics, list$strand.bias.statistics)
-    }
-  }
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "generating zip archive")
-  }
-  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "strelka.sbs",
-                    ref.genome, region, mutation.loads, strand.bias.statistics)
-
-  file.names <-
-    list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
-               full.names = TRUE)
-  zip::zipr(zipfile = zipfile, files = file.names)
-  unlink(file.names)
-
-  # Add ID catalog with zero counts
-  catID <- matrix(0, nrow = length(ICAMS::catalog.row.order$ID),
-                  ncol = length(vcf.names))
-  rownames(catID) <- ICAMS::catalog.row.order$ID
-  colnames(catID) <- vcf.names
-  catID <- as.catalog(object = catID, ref.genome = ref.genome,
-                      region = region, catalog.type = "counts")
-
-  catalogs$catID <- catID
-  return(list(counts = catalogs, density = catalogs.density))
-}
-
-#' This function is a wrapper function processing Strelka SBS VCF files to
-#' generate a zip archive.
-#'
-#' @inheritParams ProcessMutectVCFs
-#'
-#' @return A list of updated notification ids for error, warning and message
-#'   after running this function.
-#'
-#' @keywords internal
-ProcessStrelkaSBSVCFs <- function(input, output, file, ids) {
-  # vcfs.info is a data frame that contains one row for each uploaded file,
-  # and four columns "name", "size", "type" and "datapath".
-  # "name": The filename provided by the web browser.
-  # "size": The size of the uploaded data, in bytes.
-  # "type": The MIME type reported by the browser.
-  # "datapath": The path to a temp file that contains the data that was uploaded.
-  vcfs.info <- input$vcf.files
-
-  # Get the sample names specified by user
-  vcf.names <- GetNamesOfVCFs(input$names.of.VCFs)
-
-  if (is.null(vcf.names)) {
-    # If user didn't specify sample names, then use VCF names
-    # as the sample names
-    names.of.VCFs <-
-      # Get VCF file names without extension
-      tools::file_path_sans_ext(vcfs.info$name)
-  } else {
-    names.of.VCFs <- vcf.names
-  }
-
-  # Get the base name of the CSV and PDF files to create specified by user
-  base.filename <- input$base.filename
-
-  # Create a Progress object
-  progress <- shiny::Progress$new()
-  progress$set(message = "Progress", value = 0)
-  # Close the progress when this reactive exits (even if there's an error)
-  on.exit(progress$close())
-
-  # Create a callback function to update progress. Each time this is called, it
-  # will increase the progress by that value and update the detail
-  updateProgress <- function(value = NULL, detail = NULL) {
-    value1 <- value + progress$getValue()
-    progress$set(value = value1, detail = detail)
-  }
-
-  # Catch the errors, warnings and messages and store them in a list when
-  # generating a zip archive from Strelka SBS VCFs
-  result <- CatchToList(
-    GenerateZipFileFromStrelkaSBSVCFs(files = vcfs.info$datapath,
-                                      zipfile = file,
-                                      vcf.names = vcfs.info$name,
-                                      zipfile.name = input$zipfile.name,
-                                      ref.genome = input$ref.genome,
-                                      trans.ranges = NULL,
-                                      region = input$region,
-                                      names.of.VCFs = names.of.VCFs,
-                                      base.filename = base.filename,
-                                      updateProgress = updateProgress)
-  )
-
-  # Get the new notification ids
-  new.ids <- AddNotifications(result$error.info)
-
-  # Update the notification ids
-  updated.ids <- UpdateNotificationIDs(ids, new.ids)
-  return(list(retval = result$retval, ids = updated.ids))
-}
-
-
-#' This function generates a zip archive from VCFs
-#'
-#' @inheritParams GenerateZipFileFromMutectVCFs
 #' 
-#' @inheritParams ICAMS::VCFsToZipFile
-#'
-#' @param files Character vector of file paths to the VCF files.
-#'
 #' @import ICAMS
 #'
 #' @import zip
@@ -997,8 +569,10 @@ GenerateZipFileFromVCFs <- function(files,
   # it to be transformed to density catalog
   catalogs$catID <- NULL
   
-  # Transform the counts catalogs to density catalogs
-  catalogs.density <- TransCountsCatalogToDensity(catalogs)
+  if (!is.null(attributes(catalogs$catSBS96)$abundance)) {
+    # Transform the counts catalogs to density catalogs
+    catalogs.density <- TransCountsCatalogToDensity(catalogs)
+  }
   
   if (is.function(updateProgress)) {
     updateProgress(value = 0.1, detail = "writing catalogs to CSV files")
@@ -1013,10 +587,12 @@ GenerateZipFileFromVCFs <- function(files,
                  file = paste0(output.file, name, ".counts.csv"))
   }
   
-  # Write the density catalogs to CSV files
-  for (name in names(catalogs.density)) {
-    WriteCatalog(catalogs.density[[name]],
-                 file = paste0(output.file, name, ".csv"))
+  if (!is.null(attributes(catalogs$catSBS96)$abundance)) {
+    # Write the density catalogs to CSV files
+    for (name in names(catalogs.density)) {
+      WriteCatalog(catalogs.density[[name]],
+                   file = paste0(output.file, name, ".csv"))
+    }
   }
   
   if (is.function(updateProgress)) {
@@ -1035,16 +611,18 @@ GenerateZipFileFromVCFs <- function(files,
     }
   }
   
-  # Plotting the density catalogs to PDFs
-  for (name in names(catalogs.density)) {
-    PlotCatalogToPdf(catalogs.density[[name]],
-                     file = paste0(output.file, name, ".pdf"))
-    if (name == "catSBS192.density") {
-      list <- PlotCatalogToPdf(catalogs.density[[name]],
-                               file = paste0(output.file, "SBS12.density.pdf"),
-                               plot.SBS12 = TRUE)
-      strand.bias.statistics <-
-        c(strand.bias.statistics, list$strand.bias.statistics)
+  if (!is.null(attributes(catalogs$catSBS96)$abundance)) {
+    # Plotting the density catalogs to PDFs
+    for (name in names(catalogs.density)) {
+      PlotCatalogToPdf(catalogs.density[[name]],
+                       file = paste0(output.file, name, ".pdf"))
+      if (name == "catSBS192.density") {
+        list <- PlotCatalogToPdf(catalogs.density[[name]],
+                                 file = paste0(output.file, "SBS12.density.pdf"),
+                                 plot.SBS12 = TRUE)
+        strand.bias.statistics <-
+          c(strand.bias.statistics, list$strand.bias.statistics)
+      }
     }
   }
   
@@ -1061,13 +639,28 @@ GenerateZipFileFromVCFs <- function(files,
   zip::zipr(zipfile = zipfile, files = file.names)
   unlink(file.names)
   
-  return(list(counts = catalogs.to.return, density = catalogs.density))
+  if (!is.null(attributes(catalogs$catSBS96)$abundance)) {
+    return(list(counts = catalogs.to.return, density = catalogs.density))
+  } else {
+    return(list(counts = catalogs.to.return))
+  }
 }
 
 #' This function is a wrapper function processing VCFs to
 #' generate a zip archive
 #'
-#' @inheritParams ProcessMutectVCFs
+#' @param input A list-like object used in shiny app to store the current values
+#'   of all of the widgets in the app.
+#'
+#' @param output A list-like object used in shiny app that stores instructions
+#'   for building the R objects in the app.
+#'
+#' @param file A file path (string) of a nonexistent temp file, using which the
+#'   function writes the content to that file path. See
+#'   \code{\link[shiny]{downloadHandler}} for more details.
+#'
+#' @param ids A list containing the existing notification ids for error, warning
+#'   and message.
 #'
 #' @return A list of catalogs and updated notification ids for error, warning
 #'   and message after running this function.
@@ -1286,142 +879,6 @@ PrepareAttributionResults2 <-
       
       return(list(attribution.results = TRUE))
   }
-
-#' This function generates a zip archive from Strelka ID VCF files.
-#'
-#' @inheritParams GenerateZipFileFromMutectVCFs
-#'
-#' @param files Character vector of file paths to the Strelka ID VCF files.
-#'
-#' @import ICAMS
-#'
-#' @import zip
-#'
-#' @importFrom utils getFromNamespace
-#'
-#' @keywords internal
-GenerateZipFileFromStrelkaIDVCFs <- function(files,
-                                             zipfile,
-                                             vcf.names,
-                                             zipfile.name,
-                                             ref.genome,
-                                             region = "unknown",
-                                             names.of.VCFs = NULL,
-                                             base.filename = "",
-                                             updateProgress = NULL){
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "reading VCFs")
-  }
-  list.of.vcfs <- ReadStrelkaIDVCFs(files, names.of.VCFs)
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "generating ID catalog")
-  }
-  list <-
-    ICAMS::VCFsToIDCatalogs(list.of.vcfs = list.of.vcfs,
-                            ref.genome = ref.genome,
-                            region = region)
-
-  GetMutationLoadsFromStrelkaIDVCFs <-
-    getFromNamespace("GetMutationLoadsFromStrelkaIDVCFs", "ICAMS")
-  mutation.loads <- GetMutationLoadsFromStrelkaIDVCFs(list)
-  strand.bias.statistics<- NULL
-  
-  tmpdir <- tempfile()
-  dir.create(tmpdir)
-  output.file <- ifelse(base.filename == "",
-                        paste0(tmpdir, .Platform$file.sep),
-                        file.path(tmpdir, paste0(base.filename, ".")))
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.4, detail = "writing catalog to CSV file")
-  }
-  WriteCatalog(list$catalog, file = paste0(output.file, "catID.csv"))
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "plotting catalog to PDF file")
-  }
-  PlotCatalogToPdf(list$catalog, file = paste0(output.file, "catID.pdf"))
-
-  if (is.function(updateProgress)) {
-    updateProgress(value = 0.1, detail = "generating zip archive")
-  }
-  AddRunInformation(files, tmpdir, vcf.names, zipfile.name, vcftype = "strelka.id",
-                    ref.genome, region, mutation.loads, strand.bias.statistics)
-
-  file.names <- list.files(path = tmpdir, pattern = "\\.(pdf|csv|txt)$",
-                           full.names = TRUE)
-  zip::zipr(zipfile = zipfile, files = file.names)
-  unlink(file.names)
-}
-
-#' This function is a wrapper function processing Strelka ID VCF files to
-#' generate a zip archive.
-#'
-#' @inheritParams ProcessMutectVCFs
-#'
-#' @return A list of updated notification ids for error, warning and message
-#'   after running this function.
-#'
-#' @keywords internal
-ProcessStrelkaIDVCFs <- function(input, output, file, ids) {
-  # vcfs.info is a data frame that contains one row for each uploaded file,
-  # and four columns "name", "size", "type" and "datapath".
-  # "name": The filename provided by the web browser.
-  # "size": The size of the uploaded data, in bytes.
-  # "type": The MIME type reported by the browser.
-  # "datapath": The path to a temp file that contains the data that was uploaded.
-  vcfs.info <- input$vcf.files
-
-  # Get the sample names specified by user
-  vcf.names <- GetNamesOfVCFs(input$names.of.VCFs)
-
-  if (is.null(vcf.names)) {
-    # If user didn't specify sample names, then use VCF names
-    # as the sample names
-    names.of.VCFs <-
-      # Get VCF file names without extension
-      tools::file_path_sans_ext(vcfs.info$name)
-  } else {
-    names.of.VCFs <- vcf.names
-  }
-
-  # Get the base name of the CSV and PDF files to create specified by user
-  base.filename <- input$base.filename
-
-  # Create a Progress object
-  progress <- shiny::Progress$new(min = 0, max = 0.8)
-  progress$set(message = "Progress", value = 0)
-  # Close the progress when this reactive exits (even if there's an error)
-  on.exit(progress$close())
-
-  # Create a callback function to update progress. Each time this is called, it
-  # will increase the progress by that value and update the detail
-  updateProgress <- function(value = NULL, detail = NULL) {
-    value1 <- value + progress$getValue()
-    progress$set(value = value1, detail = detail)
-  }
-
-  # Catch the errors, warnings and messages and store them in a list when
-  # generating a zip archive from Strelka ID VCFs
-  res <- CatchToList(
-    GenerateZipFileFromStrelkaIDVCFs(files = vcfs.info$datapath,
-                                     zipfile = file,
-                                     vcf.names = vcfs.info$name,
-                                     zipfile.name = input$zipfile.name,
-                                     ref.genome = input$ref.genome,
-                                     region = input$region,
-                                     names.of.VCFs = names.of.VCFs,
-                                     base.filename = base.filename,
-                                     updateProgress = updateProgress)
-  )
-
-  # Get the new notification ids
-  new.ids <- AddNotifications(res)
-
-  # Update the notification ids
-  return(UpdateNotificationIDs(ids, new.ids))
-}
 
 #' Prepare test VCFs for user to test
 #'
