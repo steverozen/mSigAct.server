@@ -34,7 +34,7 @@ app_ui <- function(request) {
       windowTitle = "mSigAct: Mutational Signature Activity"),
     
     # Add padding because navbar pinned at the top
-    tags$style(type="text/css", "body {padding-top: 70px;}"),
+    tags$style(type="text/css", "body {padding-top: 75px;}"),
   )
 }
 
@@ -60,15 +60,7 @@ TutorialUI <- function() {
 #' @import shiny
 AttributionResultsUI <- function() {
   fixedPage(
-    tabsetPanel(id = "tabSetPanelresults",
-      tabPanel(title = tags$b("Attribution counts"), 
-               value = "attributionCountsBest",
-               DT::dataTableOutput(outputId = "exposureTable"),
-               DT::dataTableOutput(outputId = "exposureTableVCF")),
-      tabPanel(title = tags$b("Attribution plot"), 
-               value = "attributionPlotBest",
-               uiOutput(outputId = "pdfview"),
-               uiOutput(outputId = "pdfviewVCF"))),
+    DT::dataTableOutput(outputId = "exposureTable")
   )
 }
 
@@ -201,10 +193,6 @@ golem_add_external_resources <- function(){
                     system.file("app/DBS78", package = "mSigAct.server"))
   addResourcePath(prefix = "ID", directoryPath = 
                     system.file("app/ID", package = "mSigAct.server"))
-  tmpdir <- tempfile()
-  dir.create(tmpdir)
-  addResourcePath(prefix = "results", directoryPath = tmpdir)
-  
   tags$head(
     golem::activate_js(),
     # Add here all the external resources

@@ -756,6 +756,11 @@ PrepareAttributionResults2 <-
       
       list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
       
+      # Create a temp directory for storing attribution results
+      tmpdir <- tempfile()
+      dir.create(tmpdir)
+      addResourcePath(prefix = "results", directoryPath = tmpdir)
+      
       output.file.path <- resourcePaths()["results"]
       spect.name <- colnames(spect)
       
