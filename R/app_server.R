@@ -409,7 +409,7 @@ app_server <- function(input, output, session) {
     })
     
     # After showing the spectra plot from catalog, show an actionButton to redirect
-    # to "Signature attribution" tab if the spectra catalog type is suppported for
+    # to "Signature attribution" tab if the spectra catalog type is supported for
     # signature attribution
     observeEvent(CheckArgumentsForSpectra(), {
       
@@ -425,9 +425,12 @@ app_server <- function(input, output, session) {
       output$selectSampleFromUploadedCatalog <-
         renderUI(
           {
+            # Change the region information for SBS192 catalog
+            my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
+            
             catalog <<- ICAMS::ReadCatalog(file = catalog.path,
                                            ref.genome = input$ref.genome2,
-                                           region = input$region2)
+                                           region = my.region)
             input.catalog.type(CheckCatalogType(catalog)) 
             
             sample.names <- colnames(catalog)
@@ -597,9 +600,13 @@ app_server <- function(input, output, session) {
       } else {
         req(input$ref.genome2, input$region2)
         region <<- input$region2
+        
+        # Change the region information for SBS192 catalog
+        my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
+        
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
-                             region = input$region2)
+                             region = my.region)
         
        input.catalog.type(CheckCatalogType(catalog))
         
@@ -654,9 +661,11 @@ app_server <- function(input, output, session) {
         
         output$selectSampleForAttribution <- renderUI(
           { 
+            # Change the region information for SBS192 catalog
+            my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
             catalog <<- ICAMS::ReadCatalog(file = catalog.path,
                                            ref.genome = input$ref.genome2,
-                                           region = input$region2)
+                                           region = my.region)
             input.catalog.type(CheckCatalogType(catalog))
             sample.names <- colnames(catalog)
             selectInput(inputId = "selectedSampleForAttribution",
