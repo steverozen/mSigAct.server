@@ -949,35 +949,42 @@ app_server <- function(input, output, session) {
           
           plotdata$retval <<- retval
           
-          MAP.best.exp <- retval$MAP
-          
-          QP.exp <- 
-            mSigAct::OptimizeExposureQP(spect, 
-                                        sig.universe[ , MAP.best.exp$sig.id, 
-                                                      drop = FALSE])
-          QP.best.MAP.exp <-
-            dplyr::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
-          
-          r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
-                                               use.sig.names = TRUE)
-          reconstructed.catalog0 <- ICAMS::as.catalog(r.qp)
-          
-          cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
-          
-          colnames(reconstructed.catalog0) <- 
-            paste0("reconstructed (cosine similarity = ", cossim, ")")
-          reconstructed.catalog <- round(reconstructed.catalog0)
-          
-          plotdata$cossim <<- cossim
-          plotdata$spect <<- spect
-          plotdata$reconstructed.catalog <<- reconstructed.catalog
-          plotdata$sig.universe <<- sig.universe
-          plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
-          
-          retval <- PrepareAttributionResults2(input, output, session, 
-                                               input.catalog.type(), 
-                                               plotdata)
-          attribution.results <<- retval$attribution.results
+          if (retval$success == FALSE || is.null(retval$success)) {
+            showNotification(ui = "Message:", 
+                             action = retval$messages,
+                             type = "message", duration = NULL)
+            return()
+          } else {
+            MAP.best.exp <- retval$MAP
+            
+            QP.exp <- 
+              mSigAct::OptimizeExposureQP(spect, 
+                                          sig.universe[ , MAP.best.exp$sig.id, 
+                                                        drop = FALSE])
+            QP.best.MAP.exp <-
+              dplyr::tibble(sig.id = names(QP.exp), QP.best.MAP.exp = QP.exp)
+            
+            r.qp <- mSigAct::ReconstructSpectrum(sig.universe, exp = QP.exp, 
+                                                 use.sig.names = TRUE)
+            reconstructed.catalog0 <- ICAMS::as.catalog(r.qp)
+            
+            cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
+            
+            colnames(reconstructed.catalog0) <- 
+              paste0("reconstructed (cosine similarity = ", cossim, ")")
+            reconstructed.catalog <- round(reconstructed.catalog0)
+            
+            plotdata$cossim <<- cossim
+            plotdata$spect <<- spect
+            plotdata$reconstructed.catalog <<- reconstructed.catalog
+            plotdata$sig.universe <<- sig.universe
+            plotdata$QP.best.MAP.exp <<- QP.best.MAP.exp
+            
+            retval <- PrepareAttributionResults2(input, output, session, 
+                                                 input.catalog.type(), 
+                                                 plotdata)
+            attribution.results <<- retval$attribution.results
+          }
         } %...>% result_val
       
       # Show notification on error or user interrupt
@@ -985,7 +992,8 @@ app_server <- function(input, output, session) {
                              function(e){
                                result_val(NULL)
                                print(e$message)
-                               showNotification(e$message)
+                               showNotification(e$message, 
+                                                duration = NULL)
                              })
       
       # When done with analysis, remove progress bar

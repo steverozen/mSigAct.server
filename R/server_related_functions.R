@@ -171,7 +171,7 @@ AddNotifications <- function(res) {
   if (!is.null(res$warning)) {
     for (i in 1:length(res$warning)) {
       id.warning <- showNotification(ui = "Warning:", action = res$warning[i],
-                                      type = "warning")
+                                      type = "warning", duration = NULL)
       id$warning <- c(id$warning, id.warning)
     }
   }
@@ -179,7 +179,7 @@ AddNotifications <- function(res) {
   if (!is.null(res$message)) {
     for (i in 1:length(res$message)) {
       id.message <- showNotification(ui = "Message:", action = res$message[i],
-                                      type = "message")
+                                      type = "message", duration = NULL)
       id$message <- id.message
     }
   }
