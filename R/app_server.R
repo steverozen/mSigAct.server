@@ -199,10 +199,18 @@ app_server <- function(input, output, session) {
       output$selectSampleFromUploadedVCF <- renderUI(
         {
           sample.names <- colnames(list.of.catalogs[[1]])
-          radioButtons(inputId = "sampleNameFromUploadedVCF",
-                       label = "Select sample",
-                       choices = sample.names,
-                       selected = character(0))
+          
+          tagList(
+            radioButtons(inputId = "sampleNameFromUploadedVCF",
+                         label = "Select sample",
+                         choices = sample.names,
+                         selected = character(0)),
+            
+            actionButton(inputId = "clickToSigAttributionForVCF",
+                         label = "Signature attribution",
+                         style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4")
+          )
         }
       )
       #shinyjs::show(id = "sampleNameFromUploadedVCF")
@@ -442,7 +450,7 @@ app_server <- function(input, output, session) {
                            selected = character(0)),
               
               if (input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
-                actionButton(inputId = "clickToSigAttribution",
+                actionButton(inputId = "clickToSigAttributionForSpectra",
                              label = "Signature attribution",
                              style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4")
@@ -454,7 +462,13 @@ app_server <- function(input, output, session) {
     })
     
     # When user clicks the action button on Show spectra page, direct user to the relevant tab
-    observeEvent(input$clickToSigAttribution, {
+    observeEvent(input$clickToSigAttributionForSpectra, {
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                     selected = "sigAttributionTab2")
+    })
+    
+    observeEvent(input$clickToSigAttributionForVCF, {
       shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                      selected = "sigAttributionTab2")
