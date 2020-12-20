@@ -148,6 +148,7 @@ app_server <- function(input, output, session) {
         results <- RunICAMSOnSampleMutectVCFs(session, output, file, ids)
         list.of.catalogs <<- results$counts
         input.region("genome")
+        input.ref.genome("hg19")
         # When the downloadHandler function runs, increment rv$downloadFlag
         rv$downloadFlag <- rv$downloadFlag + 1
       })
@@ -647,7 +648,6 @@ app_server <- function(input, output, session) {
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
                              region = my.region)
-        
        input.catalog.type(CheckCatalogType(catalog))
         
         if (!input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
@@ -671,11 +671,11 @@ app_server <- function(input, output, session) {
     ########################################################################
     # Start of functions related to SignatureAttributionUI
     ########################################################################
-    
     # When user clicks either of the two actionButtons "Show spectra", 
     # "Signature attribution" on UploadSpectraUI page, then update
     # the shiny widgets used for attribution analysis
     CheckArgumentsForSpectra <- reactive({
+      
       list(input$showSpectraOfCatalog, input$sigAttributionOfCatalog)
     })
     
@@ -691,7 +691,8 @@ app_server <- function(input, output, session) {
     
     observeEvent(
       CheckArgumentsForSpectra(),
-      {
+      { 
+        
         req(input$ref.genome2, input$region2)
         input.ref.genome(input$ref.genome2)
         input.region(input$region2)
@@ -725,7 +726,6 @@ app_server <- function(input, output, session) {
                         choices = cancer.types)
           }
         )
-        
         output$uploadedCatalogType <- renderUI(
           {
             p(tags$b("Mutation type: "), input.catalog.type())
