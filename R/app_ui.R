@@ -93,31 +93,44 @@ HomeUI <- function() {
     h5("This web site has two main functions:"),
 
     h5(tags$ol(
-      tags$li(actionLink(inputId = "linkToGenerateCatalogTab",
-                   label = "Create and plot mutational spectrum \"catalogs\" from VCF* files")),
+      tags$li(actionLink(
+        inputId = "linkToGenerateCatalogTab",
+        label = "Generate mutational spectrum catalogs from VCFs* and plot them")),
       br(),
-      tags$li(actionLink(inputId = "linkToUploadSpectraTab",
-                   label = paste0("Estimate which mutational signatures contributed to a ",
-                 "mutational spectrum"))),
+      tags$li(actionLink(
+        inputId = "linkToUploadSpectraTab",
+        label = paste0("Signature attribution: ", 
+                       "Estimate which mutational signatures contributed to a ",
+                       "mutational spectrum"))),
     )),
-
-
-    h5(a(href = "https://tinyurl.com/rdzwnxd", "*VCF", target = "_blank"),
-       " files contain one mutation per line, and are created ",
+    
+    
+    h5(a(href = "https://tinyurl.com/rdzwnxd", "*VCFs", target = "_blank"),
+       " are file that contain one mutation per line, and are created ",
       "by variant callers such as ",
       a(href = "https://github.com/Illumina/strelka", "Strelka", target = "_blank"), 
       " or ",
       a(href = "https://github.com/broadgsa/gatk", "Mutect", target = "_blank")),
 
+    h5("Report issues, make suggestions, or request help by posting on ",
+       a(href = "https://github.com/steverozen/mSigAct.server/issues",
+         "github", target = "_blank"),
+       " or by contacting ",
+       a(href = "mailto:steverozen@gmail.com", "steverozen@gmail.com",
+         target = "_blankd")),
+    
+    # Impressionistic collage
+    img(src = "www/rozen-mut-sig-collage.png", 
+        width = "500", height = "370"),
+    
     # Add a link to the PCAWG7 paper about mutational signatures
     h5("For background see ",
-      a(href = "https://doi.org/10.1038/s41586-020-1943-3",
-        "\"The repertoire of mutational signatures in human cancer\"", target = "_blank"),
-      " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",
-      "COSMIC Mutational Signatures", target = "_blank")),
-
-    # Add an overview picture about the Shiny interface
-    img(src = "www/rozen-mut-sig-collage.png", width = "601", height = "430"),
+       a(href = "https://doi.org/10.1038/s41586-020-1943-3",
+         "\"The repertoire of mutational signatures in human cancer\"", target = "_blank"),
+       " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",
+                  "COSMIC Mutational Signatures", target = "_blank"))
+    
+    
   )
 }
 
