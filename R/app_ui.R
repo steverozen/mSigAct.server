@@ -61,7 +61,7 @@ TutorialUI <- function() {
 AttributionResultsUI <- function() {
   fixedPage(
     br(),
-    fixedRow(splitLayout(cellWidths = c("20%", "14%", "20%"),
+    fixedRow(splitLayout(cellWidths = c("25%", "17.5%", "20%"),
                          downloadButton(outputId = "downloadExposureTable", 
                                         label = "Download exposure counts"),
                          downloadButton(outputId = "downloadPdf",
