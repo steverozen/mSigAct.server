@@ -30,7 +30,7 @@ UploadSpectraUI <- function() {
                wellPanel(
                  div(tags$b("Load example spectra", style = "color: #337ab7;")),
                  br(),
-                 splitLayout(cellWidths = c("21%", "23%", "21%", "21%"),
+                 splitLayout(cellWidths = c("25%", "27%", "25%", "25%"),
                              actionButton(inputId = "preloadSBS96Spectra", 
                                           label = "SBS96"),
                              actionButton(inputId = "preloadSBS192Spectra", 
@@ -44,7 +44,7 @@ UploadSpectraUI <- function() {
                                 label = "Download example spectra"),
                ) # End wellPanel
         ) # end column
-      )# end fluidRow
+      ), width = 7 # end fluidRow
     ) # end mainPanel
   ) # End sidebarLayout
 } # End function

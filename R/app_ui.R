@@ -15,20 +15,26 @@ app_ui <- function(request) {
     shinyjs::useShinyjs(),
     shinyjs::extendShinyjs(text = jscode, functions = c()),
     navbarPage(title = tags$b("mSigAct"), id = "panels",
-      tabPanel(title = tags$b("Home"), HomeUI()),
+      tabPanel(title = tags$b("Home"), 
+               HomeUI()),
       tabPanel(title = tags$b("Generate spectrum", 
                               tags$br(), "catalogs from VCFs"),
-               UploadVCFUI(), value = "generateCatalogTab"),
+               UploadVCFUI(), 
+               value = "generateCatalogTab"),
       tabPanel(title = tags$b("Upload spectra for", tags$br(),
-                              "signature attribution"), UploadSpectraUI(), 
+                              "signature attribution"), 
+               UploadSpectraUI(), 
                value = "uploadSpectraTab"),
       tabPanel(title = tags$b("Show spectra"), ShowSpectraUI(), 
                value = "showSpectraTab"),
-      tabPanel(title = tags$b("Get signature attributions"), SignatureAttributionUI(), 
+      tabPanel(title = tags$b("Get signature attributions"), 
+               SignatureAttributionUI(), 
                value = "sigAttributionTab2"),
-      tabPanel(title = tags$b("Results"), AttributionResultsUI(),
+      tabPanel(title = tags$b("Results"), 
+               AttributionResultsUI(),
                value = "attributionResultsTab"),
-      tabPanel(title = tags$b("Guides (help)"), TutorialUI(),
+      tabPanel(title = tags$b("Guides (help)"), 
+               TutorialUI(),
                value = "tutorialTab"),
       position = "fixed-top",
       windowTitle = "mSigAct: Mutational Signature Activity"),
@@ -166,7 +172,7 @@ UploadVCFUI <- function() {
       
     mainPanel = mainPanel(
     # Add the next row of control widgets
-    fixedRow(
+    fluidRow(
       # Add text input for user to specify the sample names
       # representing different VCF files
       column(6, AddSampleNames()),
@@ -177,14 +183,14 @@ UploadVCFUI <- function() {
      ),
 
     # Add the next row of control widgets
-    fixedRow(
+    fluidRow(
       # Add text input for user to specify the zip file name
       column(6, AddZipfileName())
       ),
 
     br(),
     # Add a download button for user to download VCF files to test
-    fixedRow(column(6,
+    fluidRow(column(6,
                     wellPanel(
                       h5(strong("Example data and analysis", style = "color: #337ab7")),
                       br(),
@@ -201,7 +207,9 @@ UploadVCFUI <- function() {
                                          paste0("Example analysis on ",
                                                 "Mutect VCFs")),
                       rep_br(1))
-                    )), width = 5))
+                    ) # end of column
+             ), width = 6) # end of mainPanel
+  ) # end of sidebarLayout
 }
 
 #' @import shiny
