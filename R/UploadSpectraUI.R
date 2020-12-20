@@ -21,7 +21,7 @@ UploadSpectraUI <- function() {
                br(),
                uiOutput(outputId = "sigAttributionFromCatalog"))
       ), # end fluidRown
-      width = 4
+      width = 5
     ), # end sidebarPanel
     
     mainPanel = mainPanel(

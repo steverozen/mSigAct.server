@@ -120,7 +120,7 @@ HomeUI <- function() {
 
     h5("Report issues, make suggestions, or request help by posting on ",
        a(href = "https://github.com/steverozen/mSigAct.server/issues",
-         "github", target = "_blank"),
+         "GitHub", target = "_blank"),
        " or by contacting ",
        a(href = "mailto:steverozen@gmail.com", "steverozen@gmail.com",
          target = "_blankd")),
