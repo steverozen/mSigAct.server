@@ -974,6 +974,13 @@ app_server <- function(input, output, session) {
             interruptor$execInterrupts()
           }
           
+          # In some cases the first phase of the search, which is a 
+          # global search, might find different optima depending
+          # on the random seed, so the purpose of set.seed with L'Ecuyer-CMRG
+          # is to get reproducible results across mclapply / mcparallel 
+          # (https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mcparallel.html).
+          set.seed(102119, kind = "L'Ecuyer-CMRG")
+          
           retval <- mSigAct::MAPAssignActivity1(
             spect = spect,
             sigs = sig.universe,
