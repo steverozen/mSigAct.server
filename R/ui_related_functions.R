@@ -14,6 +14,8 @@ AddVariantCaller <- function() {
                selected = character(0))
 }
 
+#' @import shiny
+#' @keywords internal
 MergeSBSsAsDBSOption <- function() {
   radioButtons(inputId = "mergeSBS", 
                label = h5(strong("Merge adjacent SBSs as DBS"), 

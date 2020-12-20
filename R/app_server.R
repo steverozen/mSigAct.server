@@ -182,7 +182,15 @@ app_server <- function(input, output, session) {
 
       })
     
+    # When user uploads new VCF, hide the "Show spectra" and "Signature
+    # attribution" button
+    observeEvent(input$vcf.files, {
+      shinyjs::hide(id = "showSpectraFromVCF")
+      shinyjs::hide(id = "sigAttributionFromVCF")
+    })
     
+    # When user clicks "Generate catalog" button, then show the "Show spectra"
+    # and "Signature attribution" button
     observeEvent(rv$downloadFlag, {
       output$showSpectraFromVCF <- renderUI({
         actionButton(inputId = "showSpectraOfVCF", label = "Show spectra",
@@ -195,6 +203,9 @@ app_server <- function(input, output, session) {
                      style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4; ")
       })
+      
+      shinyjs::show(id = "showSpectraFromVCF")
+      shinyjs::show(id = "sigAttributionFromVCF")
       
       output$selectSampleFromUploadedVCF <- renderUI(
         {
