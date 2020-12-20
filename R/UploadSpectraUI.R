@@ -30,7 +30,7 @@ UploadSpectraUI <- function() {
                wellPanel(
                  div(tags$b("Load example spectra", style = "color: #337ab7;")),
                  br(),
-                 splitLayout(cellWidths = c("20%", "22%", "20%", "20%"),
+                 splitLayout(cellWidths = c("21%", "23%", "21%", "21%"),
                              actionButton(inputId = "preloadSBS96Spectra", 
                                           label = "SBS96"),
                              actionButton(inputId = "preloadSBS192Spectra", 
