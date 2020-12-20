@@ -130,7 +130,7 @@ UploadVCFUI <- function() {
       fluidRow(
         column(6, AddReferenceGenome()),
         
-        column(6, AddRegion())
+        column(6, AddRegionForVCF())
       ),
       
       fluidRow(
@@ -195,12 +195,7 @@ UploadVCFUI <- function() {
 golem_add_external_resources <- function(){
   addResourcePath(prefix = "www", directoryPath = 
                     system.file("app/www", package = "mSigAct.server"))
-  addResourcePath(prefix = "SBS96", directoryPath = 
-                    system.file("app/SBS96", package = "mSigAct.server"))
-  addResourcePath(prefix = "SBS192", directoryPath = 
-                    system.file("app/SBS192", package = "mSigAct.server"))
-  addResourcePath(prefix = "DBS78", directoryPath = 
-                    system.file("app/DBS78", package = "mSigAct.server"))
+  
   addResourcePath(prefix = "ID", directoryPath = 
                     system.file("app/ID", package = "mSigAct.server"))
   tags$head(

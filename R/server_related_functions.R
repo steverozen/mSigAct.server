@@ -1065,39 +1065,53 @@ CheckCatalogType <- function(catalog) {
 }
 
 #' @keywords internal
-PrepareSigsAetiologyTable <- function(input.catalog.type) {
-  if (input.catalog.type == "SBS96") {
-    dat <- data.frame(
-      name = paste0("<a href='", COSMIC.v3.SBS96.sig.links, "' target='_blank'>", 
-                    rownames(COSMIC.v3.SBS96.sig.links),  "</a>"), 
-      spectrum = paste0('<img src="SBS96/', rownames(COSMIC.v3.SBS96.sig.links), '.png"',
-                        ' height="52"></img>'),
-      proposed.aetiology = SBS.aetiology)
-  } else if (input.catalog.type == "SBS192") {
-    dat <- data.frame(
-      name = paste0("<a href='", COSMIC.v3.SBS192.sig.links, "' target='_blank'>", 
-                    rownames(COSMIC.v3.SBS192.sig.links),  "</a>"), 
-      spectrum = paste0('<img src="SBS192/', rownames(COSMIC.v3.SBS192.sig.links), '.png"',
-                        ' height="52"></img>'),
-      proposed.aetiology = SBS.aetiology, 
-      row.names = rownames(COSMIC.v3.SBS192.sig.links))
-  } else if (input.catalog.type == "DBS78") {
-    dat <- data.frame(
-      name = paste0("<a href='", COSMIC.v3.DBS78.sig.links, "' target='_blank'>", 
-                    rownames(COSMIC.v3.DBS78.sig.links),  "</a>"), 
-      spectrum = paste0('<img src="DBS78/', rownames(COSMIC.v3.DBS78.sig.links), '.png"',
-                        ' height="52"></img>'),
-      proposed.aetiology = DBS.aetiology)
-  } else if (input.catalog.type == "ID") {
-    dat <- data.frame(
-      name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
-                    rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
-      spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.png"',
-                        ' height="52"></img>'),
-      proposed.aetiology = ID.aetiology)
-  } 
-  return(dat)
-}
+PrepareSigsAetiologyTable <- 
+  function(input.catalog.type, input.ref.genome, input.region) {
+    if (input.catalog.type == "ID") {
+      dat <- data.frame(
+        name = paste0("<a href='", COSMIC.v3.ID.sig.links, "' target='_blank'>", 
+                      rownames(COSMIC.v3.ID.sig.links),  "</a>"), 
+        spectrum = paste0('<img src="ID/', rownames(COSMIC.v3.ID.sig.links), '.png"',
+                          ' height="52"></img>'),
+        proposed.aetiology = ID.aetiology)
+      
+      return(dat)
+    } 
+    
+    prefix.name <- paste(input.ref.genome, input.region, input.catalog.type, sep = "-")
+    tmp <- file.path("/app/COSMIC", input.ref.genome, input.region, input.catalog.type)
+    addResourcePath(prefix = prefix.name, directoryPath = 
+                      file.path(system.file(package = "mSigAct.server"), tmp))
+    
+    if (input.catalog.type == "SBS96") {
+      dat <- data.frame(
+        name = paste0("<a href='", COSMIC.v3.SBS96.sig.links, "' target='_blank'>", 
+                      rownames(COSMIC.v3.SBS96.sig.links),  "</a>"), 
+        spectrum = paste0('<img src="', prefix.name, '/', 
+                          rownames(COSMIC.v3.SBS96.sig.links), '.png"',
+                          ' height="52"></img>'),
+        proposed.aetiology = SBS.aetiology)
+    } else if (input.catalog.type == "SBS192") {
+      dat <- data.frame(
+        name = paste0("<a href='", COSMIC.v3.SBS192.sig.links, "' target='_blank'>", 
+                      rownames(COSMIC.v3.SBS192.sig.links),  "</a>"), 
+        spectrum = paste0('<img src="', prefix.name, '/', 
+                          rownames(COSMIC.v3.SBS192.sig.links), '.png"',
+                          ' height="52"></img>'),
+        proposed.aetiology = SBS.aetiology, 
+        row.names = rownames(COSMIC.v3.SBS192.sig.links))
+    } else if (input.catalog.type == "DBS78") {
+      dat <- data.frame(
+        name = paste0("<a href='", COSMIC.v3.DBS78.sig.links, "' target='_blank'>", 
+                      rownames(COSMIC.v3.DBS78.sig.links),  "</a>"), 
+        spectrum = paste0('<img src="', prefix.name, '/', 
+                          rownames(COSMIC.v3.DBS78.sig.links), '.png"',
+                          ' height="52"></img>'),
+        proposed.aetiology = DBS.aetiology)
+    } 
+    
+    return(dat)
+  }
 
 #' @keywords internal
 ShowPreselectedSigs <- function(input, output, input.catalog.type) {

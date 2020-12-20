@@ -4,9 +4,14 @@
 
 * Enabled process VCFs with unknown variant caller.
 
+* Created internal data `COSMIC.v3.sigs` to select the signatures used for 
+attribution based on user input.
+
 ## Changed
 * Create new temporary directory each time when user generate catalogs and do
 signature attribution.
+
+*
 
 ## Fixed
 * Fixed a bug in generating zip archive when the input region is "unknown".

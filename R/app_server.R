@@ -11,18 +11,7 @@ app_server <- function(input, output, session) {
   # List the first level callModules here
   tryCatch({
     
-    # Reactive expression for choosing more signatures
-    choose.more.sigs <- reactive({
-      if (input.catalog.type() == "SBS96") {
-        sig.universe <- colnames(COSMIC.v3.genome.SBS96.sigs)
-      } else {
-        sig.universe <- 
-          colnames(PCAWG7::signature[["genome"]][[input.catalog.type()]])
-      }
-      more.sigs <- setdiff(sig.universe, input$preselectedSigs)
-      return(more.sigs)
-    }) 
-    
+    # Predefine some values for later use
     fut <- NULL
     result_val <- reactiveVal()
     running <- reactiveVal(FALSE)
@@ -54,16 +43,16 @@ app_server <- function(input, output, session) {
     # Create an empty list which can be used to store the return value of processing VCFs
     retval <- list()
     
-    # Create a variable which can be used to store the uploaded catalog later
-    catalog <- NULL
+    # Create variables which can be used to store values later
+    catalog <- sig.universe <-NULL
     
-    list.of.catalogs <- NA
+    list.of.catalogs <- catalog.path <- NA
     
-    region <- catalog.path <- NA
+    input.catalog.type <- reactiveVal(NULL)
     
-    input.catalog.type <- reactiveVal(NA)
-    
-    sig.universe.all <- sig.universe <- NULL
+    input.region <- reactiveVal(NULL)
+      
+    input.ref.genome <- reactiveVal(NULL)
     
     showSBS192Catalog <- TRUE
     
@@ -80,6 +69,28 @@ app_server <- function(input, output, session) {
     
     AdjustNumberOfCores <- 
       getFromNamespace(x = "Adj.mc.cores", ns = "mSigAct")
+    
+    #######################################################################
+    # Reactive expressions
+    #######################################################################
+    choose.more.sigs <- reactive({
+      more.sigs <- setdiff(colnames(total.signatures()), input$preselectedSigs)
+      return(more.sigs)
+    }) 
+    
+    total.signatures <- reactive(
+      {
+        if (input.catalog.type() == "ID") {
+          # The abudance information is not available for ID spectra, so 
+          # we always use the human genome signatures for attribution analysis
+          total.signatures <- COSMIC.v3.hg19.genome.ID.sigs
+        } else {
+          total.signatures <-
+            COSMIC.v3.sigs[[input.ref.genome()]][[input.region()]][[input.catalog.type()]]
+        }
+        return(total.signatures)
+      }
+    )
     
     #######################################################################
     # Functions related to UploadVCFUI(), the first tab
@@ -122,7 +133,8 @@ app_server <- function(input, output, session) {
       content = function(file) {
         results <- RunICAMSOnSampleStrelkaVCFs(session, output, file, ids)
         list.of.catalogs <<- results$counts
-        region <<- "genome"
+        input.region("genome")
+        input.ref.genome("hg19")
         # When the downloadHandler function runs, increment rv$downloadFlag
         rv$downloadFlag <- rv$downloadFlag + 1
       })
@@ -135,20 +147,10 @@ app_server <- function(input, output, session) {
       content = function(file) {
         results <- RunICAMSOnSampleMutectVCFs(session, output, file, ids)
         list.of.catalogs <<- results$counts
-        region <<- "genome"
+        input.region("genome")
         # When the downloadHandler function runs, increment rv$downloadFlag
         rv$downloadFlag <- rv$downloadFlag + 1
       })
-    
-    if (FALSE) {
-      output$SBS96plot <- NULL
-      output$SBS192plot <- NULL
-      output$SBS1536plot <- NULL
-      output$DBS78plot <- NULL
-      output$DBS136plot <- NULL
-      output$DBS144plot <- NULL
-      output$IDplot <- NULL
-    }
     
     # When user submits VCF to analysis, then the program will try to
     # generate a zip archive based on the input files and parameters
@@ -167,7 +169,8 @@ app_server <- function(input, output, session) {
             return()
           }
         }
-        region <<- input$region
+        input.ref.genome(input$ref.genome)
+        input.region(input$region)
         result <- ProcessVCFs(input, output, file, ids)
         retval <<- result$retval
         old.error.ids <- ids$error
@@ -239,9 +242,6 @@ app_server <- function(input, output, session) {
       shinyjs::show(id = "selectSampleFromUploadedVCF")
       
       shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
-      if (input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
-        shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
-      }
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                      selected = "showSpectraTab")
     })
@@ -433,6 +433,8 @@ app_server <- function(input, output, session) {
     observeEvent(CheckArgumentsForSpectra(), {
       
       req(input$ref.genome2, input$region2)
+      input.ref.genome(input$ref.genome2)
+      input.region(input$region2)
       
       # Delete the previous spectra plot
       output$spectraPlotFromCatalog <- NULL
@@ -600,6 +602,18 @@ app_server <- function(input, output, session) {
         return()
       } else {
         req(input$ref.genome2, input$region2)
+        input.ref.genome(input$ref.genome2)
+        input.region(input$region2)
+        
+        # Change the region information for SBS192 catalog
+        my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
+        
+        catalog <<- 
+          ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
+                             region = my.region)
+        
+        input.catalog.type(CheckCatalogType(catalog))
+        
         # Hide the widgets for previous uploaded VCF
         output$spectraPlotFromVCF <- NULL
         output$selectSampleFromUploadedVCF <- NULL
@@ -624,7 +638,8 @@ app_server <- function(input, output, session) {
         return()
       } else {
         req(input$ref.genome2, input$region2)
-        region <<- input$region2
+        input.ref.genome(input$ref.genome2)
+        input.region(input$region2)
         
         # Change the region information for SBS192 catalog
         my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
@@ -678,6 +693,8 @@ app_server <- function(input, output, session) {
       CheckArgumentsForSpectra(),
       {
         req(input$ref.genome2, input$region2)
+        input.ref.genome(input$ref.genome2)
+        input.region(input$region2)
         
         # Check whether the SBS192 catalog has the correct "region" parameter
         if (showSBS192Catalog == FALSE) {
@@ -859,7 +876,7 @@ app_server <- function(input, output, session) {
     
     observeEvent(sigsForAttribution(), {
       
-      if (is.na(input.catalog.type())) {
+      if (is.null(input.catalog.type())) {
         return()
       }
       
@@ -879,7 +896,8 @@ app_server <- function(input, output, session) {
         sigs.in.correct.order <- NULL
       }
       
-      dat <<- PrepareSigsAetiologyTable(input.catalog.type())
+      dat <<- PrepareSigsAetiologyTable(input.catalog.type(), 
+                                        input.ref.genome(), input.region())
       plotdata$dat <<- dat[sigs.in.correct.order, ]
       output$sigAetiologyTable <- DT::renderDataTable({
         DT::datatable(dat[sigs.in.correct.order, ], escape = FALSE, rownames = FALSE,
@@ -931,15 +949,12 @@ app_server <- function(input, output, session) {
       catalog.type <- input.catalog.type()
       cancer.type <- input$selectedCancerType
       
-      if (catalog.type == "SBS192") {
+      if (catalog.type == "ID") {
         sig.universe <<- 
-          PCAWG7::signature[["genome"]][[catalog.type]][, sigsForAttribution(), drop = FALSE]
-      } else if (catalog.type == "SBS96") {
-        sig.universe <<- 
-          COSMIC.v3.genome.SBS96.sigs[, sigsForAttribution(), drop = FALSE]
+          COSMIC.v3.hg19.genome.ID.sigs[, sigsForAttribution(), drop = FALSE]
       } else {
-        sig.universe <<- 
-          PCAWG7::signature[[region]][[catalog.type]][, sigsForAttribution(), drop = FALSE]
+        
+        sig.universe <<- total.signatures()[, sigsForAttribution(), drop = FALSE]
       }
       
       # Do the first round of cut-off if there are many signatures in the beginning

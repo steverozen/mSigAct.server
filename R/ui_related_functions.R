@@ -83,7 +83,7 @@ AddReferenceGenome2 <- function(){
 
 #' @import shiny
 #' @keywords internal
-AddRegion <- function(){
+AddRegionForVCF <- function(){
   radioButtons(inputId = "region", 
                label = h5(strong("Genomic region"), style = "color: #337ab7"), 
                choices = 
@@ -99,17 +99,19 @@ AddRegion <- function(){
 
 #' @import shiny
 #' @keywords internal
-AddRegion2 <- function(){
+AddRegionForSpectra <- function(){
   radioButtons(inputId = "region2", 
-               label = h5(strong("Genomic region"), style = "color: #337ab7"), 
-               choices = 
+               label = h5(strong("Use which signatures for attribution?"), 
+                          style = "color: #337ab7"), 
+               choiceNames = list("genome signatures",
+                                  "signatures transformed for exome data"),
                 # c("genome", "exome", "transcript", "unknown"),
                 # It is conceivable that someone uploads an
                 # SBS96, or DBS78 spectrum that is only from a transcript,
                 # e.g.because it was collapsed from a SBS192
                 # spectrum, but there is no SBS96 count signature
                 # derived from transcript only opportunity
-                 c("genome", "exome", "unknown"),
+               choiceValues = list("genome", "exome"),
                selected = character(0))
 }
 

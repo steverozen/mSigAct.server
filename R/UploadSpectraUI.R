@@ -10,7 +10,7 @@ UploadSpectraUI <- function() {
         
         # Add radio buttons for user to specify the genomic region
         # from where the catalogs were generated
-        column(6, AddRegion2())
+        column(6, AddRegionForSpectra())
       ),
       
       fluidRow(
