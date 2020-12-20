@@ -60,7 +60,17 @@ TutorialUI <- function() {
 #' @import shiny
 AttributionResultsUI <- function() {
   fixedPage(
-    DT::dataTableOutput(outputId = "exposureTable")
+    br(),
+    fixedRow(splitLayout(cellWidths = c("20%", "14%", "20%"),
+                         downloadButton(outputId = "downloadExposureTable", 
+                                        label = "Download exposure counts"),
+                         downloadButton(outputId = "downloadPdf",
+                                        label = "Download PDF"),
+                         downloadButton(outputId = "downloadMAPTable",
+                                        label = "Download diagnostics"))),
+    br(),
+    DT::dataTableOutput(outputId = "exposureTable"),
+    
   )
 }
 

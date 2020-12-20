@@ -21,7 +21,6 @@ SignatureAttributionUI <- function() {
       mainPanel(
         # Must use DT::dataTableOutput instead of dataTableOutput,
         # otherwise, the data table will not show up
-        #DT::dataTableOutput(outputId = "mytable"),
         DT::dataTableOutput(outputId = "sigAetiologyTable")
       )
     )

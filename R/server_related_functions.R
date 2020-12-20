@@ -736,17 +736,14 @@ ProcessVCFs <- function(input, output, file, ids) {
 #' @keywords internal
 PrepareAttributionResults2 <- 
   function (input, output, session, input.catalog.type, plotdata) {
-    
-      output$downloaBestResults <- renderUI({
-        downloadButton(outputId = "downloadBestResults", 
-                       label = "Download best results")
-      })
-      
       cossim <- plotdata$cossim
       spect <- plotdata$spect
       best.MAP.exp <- plotdata$best.MAP.exp
       reconstructed.catalog <- plotdata$reconstructed.catalog
       sig.universe <- plotdata$sig.universe
+      
+      # Sort best.MAP.exp by exposure counts
+      best.MAP.exp <- dplyr::arrange(best.MAP.exp, dplyr::desc(count))
       
       sigs.names <- best.MAP.exp$sig.id
       sigs <- sig.universe[, sigs.names, drop = FALSE]
@@ -769,6 +766,8 @@ PrepareAttributionResults2 <-
       
       table.file.name <- paste0("mSigAct-", spect.name, "-",
                                 input.catalog.type, "-exposures.csv")
+      MAP.all.test.name <- paste0("mSigAct-", spect.name, "-",
+                                  input.catalog.type, "-all-tested.csv")
       pdf.file.name <- paste0("mSigAct-", spect.name, "-",
                               input.catalog.type, "-attribution-plot.pdf")
       results.file.name <- paste0("mSigAct-", spect.name, "-",
@@ -782,6 +781,7 @@ PrepareAttributionResults2 <-
       
       pdf.file.path <- paste0(output.file.path, "/", pdf.file.name)
       table.file.path <- paste0(output.file.path, "/", table.file.name)
+      MAP.all.test.path <- paste0(output.file.path, "/", MAP.all.test.name)
       png.spectrum.file.path <- paste0(output.file.path, "/", png.spectrum.file.name)
       png.reconstructed.file.path <- paste0(output.file.path, "/", png.reconstructed.file.name)
       
@@ -790,17 +790,10 @@ PrepareAttributionResults2 <-
                          cosine.similarity = c(1, cossim))
       tbl2 <- data.frame(name = best.MAP.exp$sig.id, 
                          count = best.MAP.exp$count)
-      tbl2 <- dplyr::arrange(tbl2, dplyr::desc(count))
       
       tbl <- dplyr::bind_rows(tbl1, tbl2)
-      utils::write.csv(tbl, file = table.file.path, na = "", row.names = FALSE)
       PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
-      
       src.file.path <- paste0("results", "/", pdf.file.name)
-      output$pdfview <- renderUI({
-        tags$iframe(style="height:1000px; width:100%;scrolling=yes", 
-                    src= src.file.path)
-      })
       
       dt <- plotdata$dat
       dt$count <- 0
@@ -826,30 +819,58 @@ PrepareAttributionResults2 <-
       ICAMS::PlotCatalog(reconstructed.catalog)
       grDevices::dev.off()
       
-      tbl1$spectrum <- c(paste0('<img src="results/', png.spectrum.file.name, '" height="52"></img>'),
-                         paste0('<img src="results/', png.reconstructed.file.name, '" height="52"></img>'))
+      tbl1$spectrum <- c(paste0('<img src="results/', png.spectrum.file.name, 
+                                '" height="52"></img>'),
+                         paste0('<img src="results/', png.reconstructed.file.name, 
+                                '" height="52"></img>'))
       
       dt1 <- dplyr::bind_rows(tbl1, dt0)
       
-      #tbl2$names[-1] <- refs
+      # Write the exposure counts table to CSV file
+      tbl$proposed.aetiology <- c(NA, NA, dt1[best.MAP.exp$sig.id, ]$proposed.aetiology)
+      utils::write.csv(tbl, file = table.file.path, na = "",  row.names = FALSE)
+      
+      # Write all tested combination of signatures in MAP to CSV file
+      all.tested.df <- plotdata$retval$all.tested
+      data.table::fwrite(all.tested.df, file = MAP.all.test.path)
       
       output$exposureTable <- DT::renderDataTable({
-        DT::datatable(dt1, escape = FALSE, rownames = FALSE,
+        DT::datatable(dt1, 
+                      escape = FALSE, 
+                      rownames = FALSE,
                       colnames = c("Name", "Count", "Cosine similarity", 
                                    "Spectrum", "Proposed aetiology"),
+                      extensions = c("Buttons"),
                       options = list(lengthMenu = c(25, 50, 75), 
                                      pageLength = 25)) %>%
           DT::formatRound(columns = 2, digits = 1) %>%
           DT::formatRound(columns = 3, digits = 5)
       })
       
-      
+      # Download attribution results when user clicks the button
       output$downloadExposureTable <- downloadHandler(
-        filename = table.file.name,
+        filename = function() {
+          table.file.name
+        },
         content = function(file) {
           file.copy(from = table.file.path, to = file)
-        }
-      )
+        })
+      
+      output$downloadPdf <- downloadHandler(
+        filename = function() {
+          pdf.file.name
+        },
+        content = function(file) {
+          file.copy(from = pdf.file.path, to = file)
+        })
+      
+      output$downloadMAPTable <- downloadHandler(
+        filename = function() {
+          MAP.all.test.name
+        },
+        content = function(file) {
+          file.copy(from = MAP.all.test.path, to = file)
+        })
       
       file.names <- c(table.file.path, pdf.file.path)
       
