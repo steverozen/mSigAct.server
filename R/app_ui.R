@@ -96,9 +96,9 @@ HomeUI <- function() {
     # br(),
 
     # Add a short description of msigact
-    h5("This web site has two main functions:"),
+    h4("This web site has two main functions:"),
 
-    h5(tags$ol(
+    h4(tags$ol(
       tags$li(actionLink(
         inputId = "linkToGenerateCatalogTab",
         label = "Generate mutational spectrum catalogs from VCFs* and plot them")),
@@ -111,7 +111,7 @@ HomeUI <- function() {
     )),
     
     
-    h5(a(href = "https://tinyurl.com/rdzwnxd", "*VCFs", target = "_blank"),
+    h4(a(href = "https://tinyurl.com/rdzwnxd", "*VCFs", target = "_blank"),
        " are file that contain one mutation per line, and are created ",
       "by variant callers such as ",
       a(href = "https://github.com/Illumina/strelka", "Strelka", target = "_blank"), 
@@ -131,7 +131,7 @@ HomeUI <- function() {
         width = "500", height = "370"),
     
     # Add a link to the PCAWG7 paper about mutational signatures
-    h5("For background see ",
+    h4("For background see ",
        a(href = "https://doi.org/10.1038/s41586-020-1943-3",
          "\"The repertoire of mutational signatures in human cancer\"", target = "_blank"),
        " and ", a(href = "https://cancer.sanger.ac.uk/cosmic/signatures",
