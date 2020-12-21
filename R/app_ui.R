@@ -117,13 +117,14 @@ HomeUI <- function() {
       a(href = "https://github.com/Illumina/strelka", "Strelka", target = "_blank"), 
       " or ",
       a(href = "https://github.com/broadgsa/gatk", "Mutect", target = "_blank")),
-
-    h5("Report issues, make suggestions, or request help by posting on ",
+    
+    h4("To report issues, make suggestions, and request help, ",
+       "post on ",
        a(href = "https://github.com/steverozen/mSigAct.server/issues",
          "GitHub", target = "_blank"),
-       " or by contacting ",
+       " or contact ",
        a(href = "mailto:steverozen@gmail.com", "steverozen@gmail.com",
-         target = "_blankd")),
+         target = "_blank")),
     
     # Impressionistic collage
     img(src = "www/rozen-mut-sig-collage.png", 
