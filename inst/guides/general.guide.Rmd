@@ -1,5 +1,5 @@
 ---
-title: "Guide to the [mSigAct web app](https://msigact.ai)"
+title: "Guide to the [mSigAct web server](https://msigact.ai)"
 author: "Steve Rozen and Nanhai Jiang"
 output:
   md_document
@@ -9,7 +9,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Introduction
+## Introduction to the [mSigAct web server](https://msigact.ai)
 
 The [mSigAct web server](https://msigact.ai){target="_blank"} provides methods for analyzing mutational 
 signatures. "mSigAct" is an abbreviation of 
