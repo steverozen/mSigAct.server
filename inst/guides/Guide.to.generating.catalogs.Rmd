@@ -1,7 +1,7 @@
 ---
 title: "Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web app](https://msigact.ai)"
 author: "Steve Rozen and Nanhai Jiang"
-output: md_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -20,6 +20,9 @@ The main input area is this
 knitr::include_graphics("VCF.input.screen.png")
 ```
 
+There is also some pre-loaded example data and several test VCFs that
+you can download and then re-upload.
+ 
 It is necessary to select one item from each input
 radio button, and then select one or more
 VCF Files (variant call files) for upload.
