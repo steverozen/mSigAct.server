@@ -1,58 +1,100 @@
-Guide to signature attribution in the [mSigAct web server](https://msigact.ai)
-------------------------------------------------------------------------------
+Table of contents
+=================
+
+-   [Input](#input)
+-   [Pre-loaded example spectra](#preloadExample)
+-   [Use which signatures for attribution?](#chooseSigs)
+-   [What reference genome to use?](#chooseRefGenome)
+-   [Upload spectra](#uploadSpectra)
+-   [Show the spectra or start the attribution analysis](#startAnalysis)
+-   [Choose cancer type](#chooseCancerType)
+-   [Add or delete signatures from the analysis?](#AddOrDeleteSigs)
+-   [Look at the mutational signatures under consideration](#lookAtSigs)
+-   [Start attribution analysis](#startButton)
+-   [Examine the analysis results](#examineResults)
+-   [Attribution for other mutation types](#otherAnalysis)
+
+<hr />
+
+Guide to signature attribution in the <a href="https://msigact.ai" target="_blank">mSigAct web server</a>
+---------------------------------------------------------------------------------------------------------
 
 The tab “Signature attribution” provides analytical tools to estimate
 which mutational signatures have contributed to the mutational spectrum
 of a single tumor or tissue sample.
 
-### The input area for uploading spectra catalogs
+<hr />
+
+### <a id="input"></a> The input area for uploading spectra catalogs
 
 You can also analyze spectra catalogs generated from VCFs in the mSigAct
 web server.
 
 <img src="attribution.guide/Slide1.PNG" width="60%" />
 
-### Pre-loaded example spectra and example spectra catalogs to download then update
+<hr />
+
+### <a id="preloadExample"></a> Pre-loaded example spectra and example spectra catalogs to download then update
 
 <img src="attribution.guide/Slide2.PNG" width="60%" />
 
-### Important: genome or exome data?
+<hr />
+
+### <a id="chooseSigs"></a> Important: genome or exome data?
 
 <img src="attribution.guide/Slide3.PNG" width="60%" />
 
-### What reference genome to use?
+<hr />
+
+### <a id="chooseRefGenome"></a>What reference genome to use?
 
 <img src="attribution.guide/Slide4.PNG" width="60%" />
 
-### Upload the spectra from a .csv file
+<hr />
+
+### <a id="uploadSpectra"></a> Upload the spectra from a .csv file
 
 <img src="attribution.guide/Slide5.PNG" width="60%" />
 
-### You can show the spectra or start the attribution analysis
+<hr />
+
+### <a id="startAnalysis"></a> You can show the spectra or start the attribution analysis
 
 <img src="attribution.guide/Slide6.PNG" width="60%" />
 
-### mSigAct needs to know the cancer type to decide what signatures to consider
+<hr />
+
+### <a id="chooseCancerType"></a> mSigAct needs to know the cancer type to decide what signatures to consider
 
 <img src="attribution.guide/Slide7.PNG" width="60%" />
 
-### Add or delete signatures from the analysis?
+<hr />
+
+### <a id="AddOrDeleteSigs"></a> Add or delete signatures from the analysis?
 
 <img src="attribution.guide/Slide8.PNG" width="60%" />
 
-### Look at the mutational signatures under consideration
+<hr />
+
+### <a id="lookAtSigs"></a> Look at the mutational signatures under consideration
 
 <img src="attribution.guide/Slide9.PNG" width="60%" />
 
-### Start the analysis
+<hr />
+
+### <a id="startButton"></a> Start the analysis
 
 <img src="attribution.guide/Slide10.PNG" width="60%" />
 
-### Examine the analysis results
+<hr />
+
+### <a id="examineResults"></a> Examine the analysis results
 
 <img src="attribution.guide/Slide11.PNG" width="60%" />
 
-### Attribution for other mutation types is similar
+<hr />
+
+### <a id="otherAnalysis"></a> Attribution for other mutation types is similar
 
 Here is an analysis of insertion and deletion signature attribution.
 
