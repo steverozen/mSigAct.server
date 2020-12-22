@@ -1,7 +1,7 @@
 Table of contents
 =================
 
--   [Introduction](#indtroduction)
+-   [Introduction](#introduction)
 -   [Mutational signature examples](#examples)
 -   [Background](#background)
 -   [Workflow](#workflow)
