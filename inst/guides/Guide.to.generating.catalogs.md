@@ -1,11 +1,12 @@
-### Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web server](https://msigact.ai)
+Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web server](https://msigact.ai)
+---------------------------------------------------------------------------------------------------------
 
 ### Introduction
 
 The function of the tab “Generate spectrum catalogs from VCFs” is, to
 generate spectrum catalogs from VCFs and also to plot the spectra.
 
-### The main input area for uploading VCFs
+### The input area for uploading VCFs
 
 <img src="VCF-to-spectra.guide-images/Slide1.PNG" width="60%" />
 
@@ -28,9 +29,41 @@ that you can download and then re-upload.
 
 <img src="VCF-to-spectra.guide-images/Slide5.PNG" width="60%" />
 
+### Optionally rename the samples
+
+<img src="VCF-to-spectra.guide-images/Slide7.PNG" width="60%" />
+
 ### Select and upload one or more VCFs
 
 VCF formats are only partly standardized; please contact us if mSigAct
 has difficulty analyzing your VCF.
 
 <img src="VCF-to-spectra.guide-images/Slide6.PNG" width="60%" />
+
+### After the upload is complete, create the spectra catalogs
+
+<img src="VCF-to-spectra.guide-images/Slide8.PNG" width="60%" />
+
+### Once the catalogs are created, optionally examine the spectra
+
+<img src="VCF-to-spectra.guide-images/Slide9.PNG" width="60%" />
+
+### SBS96 and SBS192 spectra
+
+<img src="VCF-to-spectra.guide-images/Slide10.PNG" width="60%" />
+
+### SBS1536 and DBS79 spectra
+
+<img src="VCF-to-spectra.guide-images/Slide11.PNG" width="60%" />
+
+### DBS136 spectrum
+
+<img src="VCF-to-spectra.guide-images/Slide12.PNG" width="60%" />
+
+### Simplified DBS144 spectrum and indel spectrum
+
+<img src="VCF-to-spectra.guide-images/Slide13.PNG" width="60%" />
+
+### You can go to signature attribution any time after the catalogs are created
+
+<img src="VCF-to-spectra.guide-images/Slide14.PNG" width="60%" />

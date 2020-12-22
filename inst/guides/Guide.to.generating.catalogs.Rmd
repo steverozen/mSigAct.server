@@ -8,7 +8,7 @@ output: md_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web server](https://msigact.ai)
+## Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web server](https://msigact.ai)
 
 ### Introduction
 
@@ -16,7 +16,7 @@ The function of the tab "Generate spectrum catalogs from VCFs" is,
 to generate spectrum catalogs from VCFs and also to plot
 the spectra.
 
-### The main input area for uploading VCFs
+### The input area for uploading VCFs
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide1.PNG")
@@ -49,6 +49,12 @@ knitr::include_graphics("VCF-to-spectra.guide-images/Slide4.PNG")
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide5.PNG")
 ```
 
+### Optionally rename the samples
+
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF-to-spectra.guide-images/Slide7.PNG")
+```
+
 ### Select and upload one or more VCFs
 
 VCF formats are only partly standardized; please contact us if mSigAct has
@@ -56,5 +62,47 @@ difficulty analyzing your VCF.
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide6.PNG")
+```
+
+### After the upload is complete, create the spectra catalogs
+
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF-to-spectra.guide-images/Slide8.PNG")
+```
+
+### Once the catalogs are created, optionally examine the spectra
+
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF-to-spectra.guide-images/Slide9.PNG")
+```
+
+### SBS96 and SBS192 spectra
+
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF-to-spectra.guide-images/Slide10.PNG")
+```
+
+### SBS1536 and DBS79 spectra
+
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF-to-spectra.guide-images/Slide11.PNG")
+```
+
+### DBS136 spectrum
+
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF-to-spectra.guide-images/Slide12.PNG")
+```
+
+### Simplified DBS144 spectrum and indel spectrum
+
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF-to-spectra.guide-images/Slide13.PNG")
+```
+
+### You can go to signature attribution any time after the catalogs are created
+
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("VCF-to-spectra.guide-images/Slide14.PNG")
 ```
 

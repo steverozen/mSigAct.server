@@ -118,6 +118,12 @@ The a list and plots of the the currently known mutational signatures, please
 see
 [https://cancer.sanger.ac.uk/cosmic/signatures/index.tt](https://cancer.sanger.ac.uk/cosmic/signatures/index.tt){target="_blank"}.
 
+## Overall workflow
+
+```{r worflow_overview, echo=FALSE, out.width="100%"}
+knitr::include_graphics("mSigActWebServer.png")
+```
+
 ## Using the [mSigAct web server](https://msigact.ai){target="_blank"} to create mutational spectrum catalogs from variant call files and plot them
 
 Please see the "Generate spectrum catalogs from VCFs"
@@ -173,3 +179,10 @@ server includes [mSigAct](https://github.com/steverozen/mSigAct){target="_blank"
 [ICAMSxtra](https://github.com/steverozen/ICAMSxtra){target="_blank"}, and 
 [PCAWG7](https://github.com/steverozen/PCAWG7){target="_blank"}, all released
 under the GPL3 open source license.
+
+## Getting help
+
+To report issues, make suggestions, and request help post on
+[the mSigAct webserver github site](https://github.com/steverozen/mSigAct.server/issues)
+or contact [steverozen@gmail.com](mailto:steverozen@gmail.com).
+    

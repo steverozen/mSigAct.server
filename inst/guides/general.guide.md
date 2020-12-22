@@ -82,6 +82,11 @@ The a list and plots of the the currently known mutational signatures,
 please see
 <a href="https://cancer.sanger.ac.uk/cosmic/signatures/index.tt" target="_blank">https://cancer.sanger.ac.uk/cosmic/signatures/index.tt</a>.
 
+Overall workflow
+----------------
+
+<img src="mSigActWebServer.png" width="100%" />
+
 Using the <a href="https://msigact.ai" target="_blank">mSigAct web server</a> to create mutational spectrum catalogs from variant call files and plot them
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -166,3 +171,11 @@ the web server includes
 and
 <a href="https://github.com/steverozen/PCAWG7" target="_blank">PCAWG7</a>,
 all released under the GPL3 open source license.
+
+Getting help
+------------
+
+To report issues, make suggestions, and request help post on [the
+mSigAct webserver github
+site](https://github.com/steverozen/mSigAct.server/issues) or contact
+<steverozen@gmail.com>.
