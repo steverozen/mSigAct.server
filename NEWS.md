@@ -2,8 +2,11 @@
 ## Changed
 * Don't preselect catalog type for signature attribution.
 
+* Hide the "Choose catalog type" UI after using preloaded spectra.
+
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.
+
 
 <br>
 

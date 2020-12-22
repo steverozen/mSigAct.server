@@ -531,6 +531,9 @@ app_server <- function(input, output, session) {
     
     observeEvent(input$preloadSBS96Spectra, {
       
+      # Hide the UI element previously triggered by uploaded VCF
+      shinyjs::hide(id = "chooseCatalogType")
+      
       shinyWidgets::updatePickerInput(session = session,
                                       inputId = "ref.genome2",
                                       selected = "hg19")
@@ -545,6 +548,9 @@ app_server <- function(input, output, session) {
     })
     
     observeEvent(input$preloadSBS192Spectra, {
+      # Hide the UI element previously triggered by uploaded VCF
+      shinyjs::hide(id = "chooseCatalogType")
+      
       shinyWidgets::updatePickerInput(session = session,
                                       inputId = "ref.genome2",
                                       selected = "hg19")
@@ -559,6 +565,9 @@ app_server <- function(input, output, session) {
     })
     
     observeEvent(input$preloadDBS78Spectra, {
+      # Hide the UI element previously triggered by uploaded VCF
+      shinyjs::hide(id = "chooseCatalogType")
+      
       shinyWidgets::updatePickerInput(session = session,
                                       inputId = "ref.genome2",
                                       selected = "hg19")
@@ -573,6 +582,9 @@ app_server <- function(input, output, session) {
     })
     
     observeEvent(input$preloadIDSpectra, {
+      # Hide the UI element previously triggered by uploaded VCF
+      shinyjs::hide(id = "chooseCatalogType")
+      
       shinyWidgets::updatePickerInput(session = session,
                                       inputId = "ref.genome2",
                                       selected = "hg19")
