@@ -1116,6 +1116,9 @@ PrepareSigsAetiologyTable <-
 #' @keywords internal
 ShowPreselectedSigs <- function(input, output, input.catalog.type) {
   sig.universe <- NULL
+  if(is.null(input.catalog.type)) {
+    return()
+  }
   output$chooseSigSubset <- renderUI(
     { 
       if (input.catalog.type == "SBS96") {

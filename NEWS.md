@@ -1,4 +1,6 @@
 # mSigAct.server 0.0.6.90xx
+## Changed
+* Don't preselect catalog type for signature attribution.
 
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.

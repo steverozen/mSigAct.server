@@ -82,6 +82,10 @@ app_server <- function(input, output, session) {
     
     total.signatures <- reactive(
       {
+        if (is.null(input.catalog.type())) {
+          return()
+        }
+        
         if (input.catalog.type() == "ID") {
           # The abudance information is not available for ID spectra, so 
           # we always use the human genome signatures for attribution analysis
@@ -197,9 +201,14 @@ app_server <- function(input, output, session) {
       shinyjs::hide(id = "sigAttributionFromVCF")
     })
     
-    # When user clicks "Generate catalog" button, then show the "Show spectra"
-    # and "Signature attribution" button
+    # When user has generated catalog from VCF, then show the "Show spectra" and
+    # "Signature attribution" button
     observeEvent(rv$downloadFlag, {
+      # Make the input.catalog.type value to be NULL
+      # After newly generating catalogs from VCF, wait for the user to select
+      # catalog type for attribution analysis
+      input.catalog.type(NULL)
+      
       output$showSpectraFromVCF <- renderUI({
         actionButton(inputId = "showSpectraOfVCF", label = "Show spectra",
                      style= "color: #fff; background-color: #337ab7;
@@ -765,6 +774,10 @@ app_server <- function(input, output, session) {
       })
     
     observeEvent(input$selectedCancerType, {
+      if (is.null(input.catalog.type())) {
+        return()
+      }
+      
       if (!input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
         showNotification(ui = "Error:", 
                          action = paste0("Can only do signature attribution ", 
@@ -830,6 +843,10 @@ app_server <- function(input, output, session) {
             selectizeInput(inputId = "selectCatalogType", 
                         label = "Select catalog type",
                         choices = c("SBS96", "SBS192", "DBS78", "ID"),
+                        options = list(
+                          placeholder = 'Please select an option below',
+                          onInitialize = I('function() { this.setValue(""); }')
+                        )
                         )
           }
         )
