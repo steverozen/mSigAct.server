@@ -8,21 +8,41 @@ output: md_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Table of contents
+
+  * [Introduction](#introduction)
+  * [Input](#input)
+  * [Test and example data](#testAndExample)
+  * [Select the reference genome](#selectRefGenome)
+  * [Select the genomic region](#selectRegion)
+  * [Select the variant caller](#selectVariantCaller)
+  * [Optionally rename the samples](#renameSamples)
+  * [Select and upload one or more VCFs](#uploadVCFs)
+  * [Create the spectra catalogs](#createCatalogs)
+  * [Examine the spectra](#examineSpectra)
+  * [Signature attribution](#sigAttribution)
+
+<hr />
+
 ## Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web server](https://msigact.ai){target="_blank"}
 
-### Introduction
+### <a id="introduction"></a> Introduction
 
 The function of the tab "Generate spectrum catalogs from VCFs" is,
 to generate spectrum catalogs from VCFs and also to plot
 the spectra.
 
-### The input area for uploading VCFs
+<hr />
+
+### <a id="input"></a> The input area for uploading VCFs
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide1.PNG")
 ```
 
-### Test and example data
+<hr />
+
+### <a id="testAndExample"></a> Test and example data
 
 These buttons provide some pre-loaded example data and several test VCFs that
 you can download and then re-upload.
@@ -31,31 +51,41 @@ you can download and then re-upload.
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide2.PNG")
 ```
 
-### Select the reference genome
+<hr />
+
+### <a id="selectRefGenome"></a> Select the reference genome
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide3.PNG")
 ```
 
-### Select the genomic region
+<hr />
+
+### <a id="selectRegion"></a> Select the genomic region
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide4.PNG")
 ```
 
-### Select the variant caller
+<hr />
+
+### <a id="selectVariantCaller"></a> Select the variant caller
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide5.PNG")
 ```
 
-### Optionally rename the samples
+<hr />
+
+### <a id="renameSamples"></a> Optionally rename the samples
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide7.PNG")
 ```
 
-### Select and upload one or more VCFs
+<hr />
+
+### <a id="uploadVCFs"></a> Select and upload one or more VCFs
 
 VCF formats are only partly standardized; please contact us if mSigAct has
 difficulty analyzing your VCF.
@@ -64,17 +94,23 @@ difficulty analyzing your VCF.
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide6.PNG")
 ```
 
-### After the upload is complete, create the spectra catalogs
+<hr />
+
+### <a id="createCatalogs"></a> After the upload is complete, create the spectra catalogs
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide8.PNG")
 ```
 
-### Once the catalogs are created, optionally examine the spectra
+<hr />
+
+### <a id="examineSpectra"></a> Once the catalogs are created, optionally examine the spectra
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide9.PNG")
 ```
+
+<hr />
 
 ### SBS96 and SBS192 spectra
 
@@ -100,7 +136,9 @@ knitr::include_graphics("VCF-to-spectra.guide-images/Slide12.PNG")
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide13.PNG")
 ```
 
-### You can go to signature attribution any time after the catalogs are created
+<hr />
+
+### <a id="sigAttribution"></a> You can go to signature attribution any time after the catalogs are created
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("VCF-to-spectra.guide-images/Slide14.PNG")

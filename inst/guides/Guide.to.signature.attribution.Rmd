@@ -8,6 +8,23 @@ output: md_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Table of contents
+
+  * [Input](#input)
+  * [Pre-loaded example spectra](#preloadExample)
+  * [Use which signatures for attribution?](#chooseSigs)
+  * [What reference genome to use?](#chooseRefGenome)
+  * [Upload spectra](#uploadSpectra)
+  * [Show the spectra or start the attribution analysis](#startAnalysis)
+  * [Choose cancer type](#chooseCancerType)
+  * [Add or delete signatures from the analysis?](#AddOrDeleteSigs)
+  * [Look at the mutational signatures under consideration](#lookAtSigs)
+  * [Start attribution analysis](#startButton)
+  * [Examine the analysis results](#examineResults)
+  * [Attribution for other mutation types](#otherAnalysis)
+
+<hr />
+
 ## Guide to signature attribution in the [mSigAct web server](https://msigact.ai){target="_blank"}
 
 The tab "Signature attribution" 
@@ -15,7 +32,9 @@ provides analytical tools to estimate which mutational
 signatures have contributed to the mutational
 spectrum of a single tumor or tissue sample.
 
-### The input area for uploading spectra catalogs
+<hr />
+
+### <a id="input"></a> The input area for uploading spectra catalogs
 
 You can also analyze spectra catalogs generated from VCFs in the
 mSigAct web server.
@@ -24,68 +43,90 @@ mSigAct web server.
 knitr::include_graphics("attribution.guide/Slide1.PNG")
 ```
 
-### Pre-loaded example spectra and example spectra catalogs to download then update
+<hr />
+
+### <a id="preloadExample"></a> Pre-loaded example spectra and example spectra catalogs to download then update
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide2.PNG")
 ```
 
-### Important: genome or exome data?
+<hr />
+
+### <a id="chooseSigs"></a> Important: genome or exome data?
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide3.PNG")
 ```
 
-### What reference genome to use?
+<hr />
+
+### <a id="chooseRefGenome"></a>What reference genome to use?
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide4.PNG")
 ```
 
-### Upload the spectra from a .csv file
+<hr />
+
+### <a id="uploadSpectra"></a> Upload the spectra from a .csv file
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide5.PNG")
 ```
 
-### You can show the spectra or start the attribution analysis
+<hr />
+
+### <a id="startAnalysis"></a> You can show the spectra or start the attribution analysis
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide6.PNG")
 ```
 
-### mSigAct needs to know the cancer type to decide what signatures to consider
+<hr />
+
+### <a id="chooseCancerType"></a> mSigAct needs to know the cancer type to decide what signatures to consider
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide7.PNG")
 ```
 
-### Add or delete signatures from the analysis?
+<hr />
+
+### <a id="AddOrDeleteSigs"></a> Add or delete signatures from the analysis?
 
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide8.PNG")
 ```
 
-### Look at the mutational signatures under consideration
+<hr />
+
+### <a id="lookAtSigs"></a> Look at the mutational signatures under consideration
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide9.PNG")
 ```
 
-### Start the analysis
+<hr />
+
+### <a id="startButton"></a> Start the analysis
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide10.PNG")
 ```
 
-### Examine the analysis results
+<hr />
+
+### <a id="examineResults"></a> Examine the analysis results
 
 ```{r, echo=FALSE, out.width="60%"}
 knitr::include_graphics("attribution.guide/Slide11.PNG")
 ```
 
-### Attribution for other mutation types is similar
+<hr />
+
+### <a id="otherAnalysis"></a> Attribution for other mutation types is similar
 
 Here is an analysis of insertion and deletion signature attribution.
 
@@ -94,5 +135,3 @@ knitr::include_graphics("attribution.guide/Slide13.PNG")
 knitr::include_graphics("attribution.guide/Slide14.PNG")
 knitr::include_graphics("attribution.guide/Slide15.PNG")
 ```
-
-
