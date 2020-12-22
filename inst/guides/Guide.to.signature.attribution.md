@@ -1,5 +1,5 @@
-Guide to signature attribution in the [mSigAct web server](https://msigact.ai)
-------------------------------------------------------------------------------
+Guide to signature attribution in the <a href="https://msigact.ai" target="_blank">mSigAct web server</a>
+---------------------------------------------------------------------------------------------------------
 
 The tab “Signature attribution” provides analytical tools to estimate
 which mutational signatures have contributed to the mutational spectrum

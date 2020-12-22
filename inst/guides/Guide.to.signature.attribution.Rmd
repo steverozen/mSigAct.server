@@ -8,7 +8,7 @@ output: md_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Guide to signature attribution in the [mSigAct web server](https://msigact.ai)
+## Guide to signature attribution in the [mSigAct web server](https://msigact.ai){target="_blank"}
 
 The tab "Signature attribution" 
 provides analytical tools to estimate which mutational

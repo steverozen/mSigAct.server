@@ -1,5 +1,5 @@
-Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web server](https://msigact.ai)
----------------------------------------------------------------------------------------------------------
+Guide to generating spectrum catalogs and plots from VCFs in the <a href="https://msigact.ai" target="_blank">mSigAct web server</a>
+------------------------------------------------------------------------------------------------------------------------------------
 
 ### Introduction
 

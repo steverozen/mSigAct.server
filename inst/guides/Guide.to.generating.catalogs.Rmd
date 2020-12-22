@@ -8,7 +8,7 @@ output: md_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web server](https://msigact.ai)
+## Guide to generating spectrum catalogs and plots from VCFs in the [mSigAct web server](https://msigact.ai){target="_blank"}
 
 ### Introduction
 
