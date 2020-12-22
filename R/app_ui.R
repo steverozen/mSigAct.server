@@ -1,7 +1,6 @@
 jscode <- "
 shinyjs.init = function() {
   $('#panels li a[data-value=showSpectraTab]').hide();
-  $('#panels li a[data-value=sigAttributionTab]').hide();
   $('#panels li a[data-value=sigAttributionTab2]').hide();
   $('#panels li a[data-value=attributionResultsTab]').hide();
 }"
@@ -50,7 +49,7 @@ TutorialUI <- function() {
   #                                  package = "mSigAct.server")
   fixedPage(
     tabsetPanel(
-      id = "helpPages",
+      id = "helpPages", 
       tabPanel(title = tags$b("General guide"),
                includeMarkdown(path = "inst/guides/general.guide.md")),
       tabPanel(title = tags$b("Guide to generating catalogs"),

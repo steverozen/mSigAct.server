@@ -50,6 +50,8 @@ app_server <- function(input, output, session) {
     
     input.catalog.type <- reactiveVal(NULL)
     
+    mutation.type <- NULL
+    
     input.region <- reactiveVal(NULL)
       
     input.ref.genome <- reactiveVal(NULL)
@@ -189,6 +191,8 @@ app_server <- function(input, output, session) {
     # When user uploads new VCF, hide the "Show spectra" and "Signature
     # attribution" button
     observeEvent(input$vcf.files, {
+      output$showSpectraFromVCF <- NULL
+      output$sigAttributionFromVCF <- NULL
       shinyjs::hide(id = "showSpectraFromVCF")
       shinyjs::hide(id = "sigAttributionFromVCF")
     })
@@ -454,6 +458,7 @@ app_server <- function(input, output, session) {
                                            ref.genome = input$ref.genome2,
                                            region = my.region)
             input.catalog.type(CheckCatalogType(catalog)) 
+            mutation.type <<- CheckCatalogType(catalog)
             
             sample.names <- colnames(catalog)
             
@@ -526,6 +531,7 @@ app_server <- function(input, output, session) {
       catalog.path <<- system.file("extdata/SBS96-mSigAct-example-spectra.csv", 
                                    package = "mSigAct.server")
       input.catalog.type("SBS96") 
+      mutation.type <<- "SBS96"
       ShowTwoButtons()
     })
     
@@ -535,10 +541,11 @@ app_server <- function(input, output, session) {
                                       selected = "hg19")
       shinyWidgets::updatePickerInput(session = session,
                                       inputId = "region2",
-                                      selected = "transcript")
+                                      selected = "genome")
       catalog.path <<- system.file("extdata/SBS192-mSigAct-example-spectra.csv", 
                                    package = "mSigAct.server")
       input.catalog.type("SBS192") 
+      mutation.type <<- "SBS192"
       ShowTwoButtons()
     })
     
@@ -552,6 +559,7 @@ app_server <- function(input, output, session) {
       catalog.path <<- system.file("extdata/DBS78-mSigAct-example-spectra.csv", 
                                    package = "mSigAct.server")
       input.catalog.type("DBS78") 
+      mutation.type <<- "DBS78"
       ShowTwoButtons()
     })
     
@@ -565,6 +573,7 @@ app_server <- function(input, output, session) {
       catalog.path <<- system.file("extdata/ID-mSigAct-example-spectra.csv", 
                                    package = "mSigAct.server")
       input.catalog.type("ID")
+      mutation.type <<- "ID"
       ShowTwoButtons()
     })
     
@@ -612,8 +621,8 @@ app_server <- function(input, output, session) {
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
                              region = my.region)
-        
         input.catalog.type(CheckCatalogType(catalog))
+        mutation.type <<- CheckCatalogType(catalog)
         
         # Hide the widgets for previous uploaded VCF
         output$spectraPlotFromVCF <- NULL
@@ -648,7 +657,8 @@ app_server <- function(input, output, session) {
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
                              region = my.region)
-       input.catalog.type(CheckCatalogType(catalog))
+        input.catalog.type(CheckCatalogType(catalog))
+        mutation.type <<- CheckCatalogType(catalog)
         
         if (!input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
           showNotification(ui = "Error:", 
@@ -658,9 +668,17 @@ app_server <- function(input, output, session) {
           return()
         }
         # Hide the widgets for previous uploaded VCF
+        output$spectraPlotFromVCF <- NULL
+        output$selectSampleFromUploadedVCF <- NULL
         shinyjs::hide(id = "spectraPlotFromVCF")
         shinyjs::hide(id = "selectSampleFromUploadedVCF")
         
+        
+        output$uploadedCatalogType <- renderUI(
+          {
+            p(tags$b(paste0("Mutation type: ", mutation.type)))
+          }
+        )
         shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
         shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
         shinydashboard::updateTabItems(session = session, inputId = "panels", 
@@ -675,7 +693,6 @@ app_server <- function(input, output, session) {
     # "Signature attribution" on UploadSpectraUI page, then update
     # the shiny widgets used for attribution analysis
     CheckArgumentsForSpectra <- reactive({
-      
       list(input$showSpectraOfCatalog, input$sigAttributionOfCatalog)
     })
     
@@ -710,6 +727,7 @@ app_server <- function(input, output, session) {
                                            ref.genome = input$ref.genome2,
                                            region = my.region)
             input.catalog.type(CheckCatalogType(catalog))
+            mutation.type <<- CheckCatalogType(catalog)
             sample.names <- colnames(catalog)
             selectInput(inputId = "selectedSampleForAttribution",
                         label = "Select sample",
@@ -726,19 +744,24 @@ app_server <- function(input, output, session) {
                         choices = cancer.types)
           }
         )
-        output$uploadedCatalogType <- renderUI(
-          {
-            p(tags$b("Mutation type: "), input.catalog.type())
-          }
-        )
-        shinyjs::show(id = "uploadedCatalogType")
         
         # Hide the UI element previously generated by uploading VCFs
+        output$chooseCatalogType <- NULL
         shinyjs::hide(id = "chooseCatalogType")
         
+        
         # Hide the previous signature aetiology table
-        #output$sigAetiologyTable <- NULL
+        output$sigAetiologyTable <- NULL
         shinyjs::hide(id = "sigAetiologyTable")
+        
+        
+        output$uploadedCatalogType <- renderUI(
+          {
+            p(tags$b(paste0("Mutation type: ", mutation.type)))
+          }
+        )
+        
+        shinyjs::show(id = "uploadedCatalogType")
       })
     
     observeEvent(input$selectedCancerType, {
@@ -804,35 +827,54 @@ app_server <- function(input, output, session) {
         
         output$chooseCatalogType <- renderUI(
           {
-            selectInput(inputId = "selectCatalogType", 
+            selectizeInput(inputId = "selectCatalogType", 
                         label = "Select catalog type",
-                        choices = c("SBS96", "SBS192", "DBS78", "ID"))
+                        choices = c("SBS96", "SBS192", "DBS78", "ID"),
+                        )
           }
         )
         
         shinyjs::show(id = "chooseCatalogType")
         
         # Hide the UI element previously generated by uploading spectra
+        output$uploadedCatalogType <- NULL
         shinyjs::hide(id = "uploadedCatalogType")
         
         # Hide the previous signature aetiology table
-        #output$sigAetiologyTable <- NULL
+        output$sigAetiologyTable <- NULL
         shinyjs::hide(id = "sigAetiologyTable")
       }) # end of observeEvent
     
-    CheckArgumentsForAttribution <- reactive({
-      list(input$selectedCancerType, input$selectCatalogType)
-    })
     
-    observeEvent(CheckArgumentsForAttribution(), {
-      req(input$selectedCancerType, input$selectCatalogType)
+    observeEvent(input$selectedCancerType, {
+      req(input$selectedCancerType)
+      
+      # Don't update the input.catalog.type using input$selectCatalogType
+      # We are doing analysis using uploaded spectra, however input$selectCatalogType
+      # is related to uploaded VCF
+      if (is.null(catalog)) {
+        catalog.name <- paste0("cat", input.catalog.type())
+        catalog <<- list.of.catalogs[[catalog.name]]
+      }
+      ShowPreselectedSigs(input, output, input.catalog.type())
+      
+      # Show the actionButton for user to add more signatures
+      output$addSig <- renderUI(
+        actionButton(inputId = "addMoreSigs", label = "Add more signatures",
+                     style= "color: #fff; background-color: #337ab7;
+                              border-color: #2e6da4; ")
+      )
+      
+    }, ignoreInit = TRUE) # end of observeEvent
+    
+    observeEvent(input$selectCatalogType, {
+      req(input$selectCatalogType)
       
       input.catalog.type(input$selectCatalogType) 
       if (is.null(catalog)) {
         catalog.name <- paste0("cat", input.catalog.type())
         catalog <<- list.of.catalogs[[catalog.name]]
       }
-      
       ShowPreselectedSigs(input, output, input.catalog.type())
       
       # Show the actionButton for user to add more signatures
@@ -896,6 +938,7 @@ app_server <- function(input, output, session) {
         sigs.in.correct.order <- NULL
       }
       
+      
       dat <<- PrepareSigsAetiologyTable(input.catalog.type(), 
                                         input.ref.genome(), input.region())
       plotdata$dat <<- dat[sigs.in.correct.order, ]
@@ -907,6 +950,7 @@ app_server <- function(input, output, session) {
       })
       
       if (is.null(sigsForAttribution())) {
+        output$sigAetiologyTable <- NULL
         shinyjs::hide(id = "sigAetiologyTable")
       } else {
         shinyjs::show(id = "sigAetiologyTable")

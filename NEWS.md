@@ -1,4 +1,12 @@
-# ICAMS.shiny 0.0.4.90**
+# mSigAct.server 0.0.6.90xx
+
+## Fixed
+* Fixed a bug when mutation type change after attribution is not working.
+
+<br>
+
+
+# mSigAct.server 0.0.5
 ## Added
 * Added thumbnail pictures for signature attribution results.
 
@@ -11,14 +19,12 @@ attribution based on user input.
 * Create new temporary directory each time when user generate catalogs and do
 signature attribution.
 
-*
-
 ## Fixed
 * Fixed a bug in generating zip archive when the input region is "unknown".
 
 <br>
 
-# ICAMS.shiny 0.0.4
+# mSigAct.server 0.0.4
 ## Added
 * Added signature presence test for **SBS96** artifact and rare signatures.
 
@@ -30,13 +36,13 @@ signature attribution.
 
 <br>
 
-# ICAMS.shiny 0.0.3
+# mSigAct.server 0.0.3
 ## Added
 * Added functionality to do signature attribution.
 
 <br>
 
-# ICAMS.shiny 0.0.2
+# mSigAct.server 0.0.2
 ## Added
 * Added new *exported* functions for getting signature assignment
 `GetExposureWithConfidence` and `GetExposureAndPlotToPdf`.
@@ -46,5 +52,5 @@ specified cancer type from a specified tumor cohort `CancerTypeToSigSubset`.
 
 <br>
 
-# ICAMS.shiny 0.0.1
+# mSigAct.server 0.0.1
 * Initial interface for uploading VCFs and generating and downloading zip archive.
