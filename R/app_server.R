@@ -166,7 +166,7 @@ app_server <- function(input, output, session) {
       filename = function() {
         errors <- CheckInputsForVCF(input)
         ids$error <<- append(ids$error, AddErrorMessage(errors))
-        paste0(input$zipfile.name, ".zip")
+        "mSigAct-catalogs-output.zip"
       },
       
       content = function(file) {

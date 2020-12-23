@@ -4,6 +4,8 @@
 
 * Hide the "Choose catalog type" UI after using preloaded spectra.
 
+* Removed widget for use to specify the downloadable zip file name.
+
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.
 

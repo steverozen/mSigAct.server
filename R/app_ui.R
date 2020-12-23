@@ -176,17 +176,7 @@ UploadVCFUI <- function() {
       # Add text input for user to specify the sample names
       # representing different VCF files
       column(6, AddSampleNames()),
-
-      # Add text input for user to specify the base filename
-      # of the CSV and PDF files generated
-      # column(6, AddBaseFilename())
      ),
-
-    # Add the next row of control widgets
-    fluidRow(
-      # Add text input for user to specify the zip file name
-      column(6, AddZipfileName())
-      ),
 
     br(),
     # Add a download button for user to download VCF files to test
