@@ -626,6 +626,10 @@ app_server <- function(input, output, session) {
       input.catalog.type("SBS96") 
       mutation.type <<- "SBS96"
       ShowTwoButtons()
+      
+      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
     observeEvent(input$preloadSBS192Spectra, {
@@ -643,6 +647,10 @@ app_server <- function(input, output, session) {
       input.catalog.type("SBS192") 
       mutation.type <<- "SBS192"
       ShowTwoButtons()
+      
+      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
     observeEvent(input$preloadDBS78Spectra, {
@@ -660,6 +668,10 @@ app_server <- function(input, output, session) {
       input.catalog.type("DBS78") 
       mutation.type <<- "DBS78"
       ShowTwoButtons()
+      
+      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
     observeEvent(input$preloadIDSpectra, {
@@ -677,6 +689,10 @@ app_server <- function(input, output, session) {
       input.catalog.type("ID")
       mutation.type <<- "ID"
       ShowTwoButtons()
+      
+      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
     observeEvent(input$upload.spectra, {
@@ -689,6 +705,10 @@ app_server <- function(input, output, session) {
       catalog.info <- input$upload.spectra
       catalog.path <<- catalog.info$datapath
       ShowTwoButtons()
+      
+      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
     # Check the arguments for uploaded spectra

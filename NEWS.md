@@ -9,6 +9,10 @@
 * Provided a download button for downloading the .zip file generated from
 uploaded VCF.
 
+* Automatically hide the "Show spectra", "Get signature attributions" and
+"Results" tab when user uploads new VCF/spectra or run example analysis of VCF
+or use preloaded spectra.
+
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.
 
