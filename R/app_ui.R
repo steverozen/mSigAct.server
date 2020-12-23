@@ -163,6 +163,8 @@ UploadVCFUI <- function() {
         column(6, UploadVCFFiles()),
         column(
           6, 
+          uiOutput(outputId = "clickToCreateCatalogs"),
+          br(),
           uiOutput(outputId = "downloadZipFile"),
           br(),
           uiOutput(outputId = "showSpectraFromVCF"),
@@ -184,18 +186,19 @@ UploadVCFUI <- function() {
                     wellPanel(
                       h5(strong("Example data and analysis", style = "color: #337ab7")),
                       br(),
+                      
                       downloadButton(outputId = "downloadsampleVCFs",
                                      label = "Download example VCFs"),
                       rep_br(2),
-                      MyDownloadButton(outputId = "runstrelkasbsvcfs",
-                                       label =
-                                         paste0("Example analysis on  ",
-                                                "Strelka VCFs")),
+                      
+                      actionButton(inputId = "runStrelkaVCFs", 
+                                   label = paste0("Example analysis on  ",
+                                                  "Strelka VCFs")),
+                      
                       rep_br(2),
-                      MyDownloadButton(outputId = "runmutectvcfs",
-                                       label =
-                                         paste0("Example analysis on ",
-                                                "Mutect VCFs")),
+                      actionButton(inputId = "runMutectVCFs",
+                                   label = paste0("Example analysis on ",
+                                            "Mutect VCFs")),
                       rep_br(1))
                     ) # end of column
              ), width = 6) # end of mainPanel

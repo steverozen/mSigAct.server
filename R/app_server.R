@@ -19,10 +19,10 @@ app_server <- function(input, output, session) {
     
     # Create reactiveValues object
     # and set flag to 0 to prevent errors with adding NULL
-    rv <- reactiveValues(downloadFlag = 0)
+    rv <- reactiveValues(catalogGeneratedFlag = 0)
     
     # Increase the file upload limit to 100MB
-    options(shiny.maxRequestSize=100*1024^2)
+    options(shiny.maxRequestSize = 100*1024^2)
     
     # When user clicks the action link on Home page, direct user to the relevant tab
     observeEvent(input$linkToGenerateCatalogTab, {
@@ -44,7 +44,11 @@ app_server <- function(input, output, session) {
     retval <- list()
     
     # Create variables which can be used to store values later
-    catalog <- sig.universe <-NULL
+    catalog <- sig.universe <- zip.file.path <- NULL
+    
+    vcf.file.analyzed <- example.strelka.vcf.analyzed <- NULL
+      
+    example.mutect.vcf.analyzed <- NULL  
     
     list.of.catalogs <- catalog.path <- NA
     
@@ -101,17 +105,6 @@ app_server <- function(input, output, session) {
     #######################################################################
     # Functions related to UploadVCFUI(), the first tab
     #######################################################################
-    # When user uploads VCF files, then show the action button "Generate catalogs"
-    observeEvent(input$vcf.files, {
-      output$downloadZipFile  <- renderUI({
-        MyDownloadButton(
-          outputId = "download",
-          label = "Create catalogs",
-          style="color: #fff;
-                   background-color: #337ab7;
-                   border-color: #2e6da4;")
-      })
-    }) 
     
     # Download sample VCFs when user clicks the button
     output$downloadsampleVCFs <- downloadHandler(
@@ -122,88 +115,167 @@ app_server <- function(input, output, session) {
         PrepareExampleVCFs(file)
       })
     
-    # Download sample catalogs when user clicks the button
-    output$downloadSampleSpectra <- downloadHandler(
-      filename = function() {
-        "mSigAct-example-spectra.zip"
-      },
-      content = function(file) {
-        PrepareExampleSpectra(file)
-      })
     
-    # Run analysis on sample Strelka SBS VCFs when user clicks the button
-    output$runstrelkasbsvcfs <- downloadHandler(
-      filename = function() {
-        "mSigAct-test-run-Strelka-VCFs-output.zip"
-      },
-      content = function(file) {
-        results <- RunICAMSOnSampleStrelkaVCFs(session, output, file, ids)
-        list.of.catalogs <<- results$counts
-        input.region("genome")
-        input.ref.genome("hg19")
-        # When the downloadHandler function runs, increment rv$downloadFlag
-        rv$downloadFlag <- rv$downloadFlag + 1
-      })
-    
-    # Run analysis on sample Mutect VCFs when user clicks the button
-    output$runmutectvcfs <- downloadHandler(
-      filename = function() {
-        "mSigAct-test-run-Mutect-VCFs-output.zip"
-      },
-      content = function(file) {
-        results <- RunICAMSOnSampleMutectVCFs(session, output, file, ids)
-        list.of.catalogs <<- results$counts
-        input.region("genome")
-        input.ref.genome("hg19")
-        # When the downloadHandler function runs, increment rv$downloadFlag
-        rv$downloadFlag <- rv$downloadFlag + 1
-      })
-    
-    # When user submits VCF to analysis, then the program will try to
-    # generate a zip archive based on the input files and parameters
-    output$download <- downloadHandler(
+    observeEvent(input$runStrelkaVCFs, {
+      # Create a temp path for the zip archive generated
+      tmpdir <- tempfile()
+      dir.create(tmpdir)
+      zip.file.path <<- 
+        file.path(tmpdir, "mSigAct-test-run-Strelka-VCFs-output.zip")
       
-      filename = function() {
-        errors <- CheckInputsForVCF(input)
-        ids$error <<- append(ids$error, AddErrorMessage(errors))
-        "mSigAct-catalogs-output.zip"
-      },
+      results <- RunICAMSOnSampleStrelkaVCFs(session = session, output = output, 
+                                             file = zip.file.path, ids = ids)
+      list.of.catalogs <<- results$counts
+      input.region("genome")
+      input.ref.genome("hg19")
       
-      content = function(file) {
-        req(input$variantCaller, input$ref.genome, input$region, input$vcf.files)
-        if (input$variantCaller == "unknown") {
-          if (is.null(input$mergeSBS)) {
-            return()
-          }
+      # When the catalogs have been generated, increment rv$catalogGeneratedFlag
+      rv$catalogGeneratedFlag <- rv$catalogGeneratedFlag + 1
+      
+      example.strelka.vcf.analyzed <<- TRUE
+      example.mutect.vcf.analyzed <<- NULL
+      vcf.file.analyzed <<- NULL
+      
+      shinyjs::hide(id = "clickToCreateCatalogs")
+      shinyjs::hide(id = "spectraPlotFromVCF")
+      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      
+      output$downloadZipFile <- renderUI({
+        downloadButton(outputId = "downloadCatalogs",
+                       label = "Download catalogs")
+      })
+    })
+    
+    observeEvent(input$runMutectVCFs, {
+      # Create a temp path for the zip archive generated
+      tmpdir <- tempfile()
+      dir.create(tmpdir)
+      zip.file.path <<- 
+        file.path(tmpdir, "mSigAct-test-run-Mutect-VCFs-output.zip")
+      
+      results <- RunICAMSOnSampleMutectVCFs(session = session, output = output, 
+                                            file = zip.file.path, ids = ids)
+      list.of.catalogs <<- results$counts
+      input.region("genome")
+      input.ref.genome("hg19")
+      
+      # When the catalogs have been generated, increment rv$catalogGeneratedFlag
+      rv$catalogGeneratedFlag <- rv$catalogGeneratedFlag + 1
+      
+      example.mutect.vcf.analyzed <<- TRUE
+      example.strelka.vcf.analyzed <<- NULL
+      vcf.file.analyzed <<- NULL
+      
+      shinyjs::hide(id = "clickToCreateCatalogs")  
+      shinyjs::hide(id = "spectraPlotFromVCF")
+      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      
+      output$downloadZipFile <- renderUI({
+        downloadButton(outputId = "downloadCatalogs",
+                       label = "Download catalogs")
+      })
+    })
+    
+    # When user uploads VCF files, then show the action button "Create catalogs"
+    observeEvent(input$vcf.files, {
+      output$clickToCreateCatalogs  <- renderUI({
+        actionButton(inputId = "createCatalogs",
+                     label = "Create catalogs",
+                     style = "color: #fff; background-color: #337ab7;
+                             border-color: #2e6da4;")
+      })
+      
+      shinyjs::show(id = "clickToCreateCatalogs")  
+      shinyjs::hide(id = "spectraPlotFromVCF")
+      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+    }) 
+    
+    # When user clicks "Create catalogs" button, generate catalogs and show
+    # "Download catalogs" button
+    observeEvent(input$createCatalogs, {
+      
+      # Check the arguments for generating catalogs from VCF
+      errors <- CheckInputsForVCF(input)
+      ids$error <<- append(ids$error, AddErrorMessage(errors))
+      
+      req(input$variantCaller, input$ref.genome, input$region, input$vcf.files)
+      if (input$variantCaller == "unknown") {
+        if (is.null(input$mergeSBS)) {
+          return()
         }
-        input.ref.genome(input$ref.genome)
-        input.region(input$region)
-        result <- ProcessVCFs(input, output, file, ids)
-        retval <<- result$retval
-        old.error.ids <- ids$error
-        ids <<- result$ids
-        ids$error <- append(ids$error, old.error.ids)
-        
-        list.of.catalogs <<- retval$counts
-        #density.catalog <- retval$density
-        
-        # When the downloadHandler function runs, increment rv$downloadFlag
-        rv$downloadFlag <- rv$downloadFlag + 1
-
+      }
+      input.ref.genome(input$ref.genome)
+      input.region(input$region)
+      
+      # Create a temp path for the zip archive generated
+      tmpdir <- tempfile()
+      dir.create(tmpdir)
+      zip.file.path <<- file.path(tmpdir, "mSigAct-catalogs-output.zip")
+      
+      result <- ProcessVCFs(input = input, output = output, 
+                            file = zip.file.path, ids = ids)
+      retval <<- result$retval
+      old.error.ids <- ids$error
+      ids <<- result$ids
+      ids$error <- append(ids$error, old.error.ids)
+      
+      list.of.catalogs <<- retval$counts
+      #density.catalog <- retval$density
+      
+      # When catalogs have been generated, increment rv$catalogGeneratedFlag
+      rv$catalogGeneratedFlag <- rv$catalogGeneratedFlag + 1
+      
+      vcf.file.analyzed <<- TRUE
+      example.strelka.vcf.analyzed <<- NULL
+      example.mutect.vcf.analyzed <<- NULL
+      
+      output$downloadZipFile <- renderUI({
+        downloadButton(outputId = "downloadCatalogs",
+                       label = "Download catalogs")
+      })
+      
+      shinyjs::show(id = "downloadZipFile")
+      shinyjs::show(id = "selectSampleFromUploadedVCF")
+    })
+    
+    # When user clicks "Download catalogs" button, prepare the zip file for
+    # downloading
+    output$downloadCatalogs <- downloadHandler(
+      filename = function() {
+        if (is.null(vcf.file.analyzed)) {
+          if (is.null(example.strelka.vcf.analyzed)) {
+            return("mSigAct-test-run-Mutect-VCFs-output.zip")
+          } else {
+            return("mSigAct-test-run-Strelka-VCFs-output.zip")
+          }
+        } else {
+          return("mSigAct-catalogs-output.zip")
+        } 
+      },
+      content = function(file) {
+        file.copy(from = zip.file.path, to = file)
       })
     
-    # When user uploads new VCF, hide the "Show spectra" and "Signature
-    # attribution" button
+    # When user uploads new VCF, hide the "Download catalogs",  "Show spectra"
+    # and "Signature attribution" button
     observeEvent(input$vcf.files, {
       output$showSpectraFromVCF <- NULL
       output$sigAttributionFromVCF <- NULL
+      output$downloadZipFile <- NULL
       shinyjs::hide(id = "showSpectraFromVCF")
       shinyjs::hide(id = "sigAttributionFromVCF")
+      shinyjs::hide(id = "downloadZipFile")
     })
     
     # When user has generated catalog from VCF, then show the "Show spectra" and
     # "Signature attribution" button
-    observeEvent(rv$downloadFlag, {
+    observeEvent(rv$catalogGeneratedFlag, {
       # Make the input.catalog.type value to be NULL
       # After newly generating catalogs from VCF, wait for the user to select
       # catalog type for attribution analysis
@@ -280,6 +352,15 @@ app_server <- function(input, output, session) {
     #######################################################################
     # Start of functions related to ShowSpectraUI
     #######################################################################
+    
+    # Download sample catalogs when user clicks the button
+    output$downloadExampleSpectra <- downloadHandler(
+      filename = function() {
+        "mSigAct-example-spectra.zip"
+      },
+      content = function(file) {
+        PrepareExampleSpectra(file)
+      })
     
     # When user selects the sample from uploaded VCF, show
     # the sample's mutational spectrum

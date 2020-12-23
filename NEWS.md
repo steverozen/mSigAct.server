@@ -6,6 +6,9 @@
 
 * Removed widget for use to specify the downloadable zip file name.
 
+* Provided a download button for downloading the .zip file generated from
+uploaded VCF.
+
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.
 

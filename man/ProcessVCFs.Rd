@@ -15,8 +15,7 @@ of all of the widgets in the app.}
 for building the R objects in the app.}
 
 \item{file}{A file path (string) of a nonexistent temp file, using which the
-function writes the content to that file path. See
-\code{\link[shiny]{downloadHandler}} for more details.}
+function writes the content to that file path.}
 
 \item{ids}{A list containing the existing notification ids for error, warning
 and message.}

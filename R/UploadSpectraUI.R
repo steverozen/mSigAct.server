@@ -40,7 +40,7 @@ UploadSpectraUI <- function() {
                              actionButton(inputId = "preloadIDSpectra", 
                                           label = "ID")),
                  br(),
-                 downloadButton(outputId = "downloadSampleSpectra",
+                 downloadButton(outputId = "downloadExampleSpectra",
                                 label = "Download example spectra"),
                ) # End wellPanel
         ) # end column

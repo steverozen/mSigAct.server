@@ -265,7 +265,7 @@ AddRunInformation <-
                  "https://cran.rstudio.com/web/packages/ICAMS/index.html"), run.info)
     writeLines("", run.info)
     writeLines(c("Shiny interface of ICAMS is available at ",
-                 "https://www.msigact.ai/"), run.info)
+                 "https://msigact.ai"), run.info)
 
     # Add ICAMS and R version used
     writeLines("", run.info)
@@ -656,8 +656,7 @@ GenerateZipFileFromVCFs <- function(files,
 #'   for building the R objects in the app.
 #'
 #' @param file A file path (string) of a nonexistent temp file, using which the
-#'   function writes the content to that file path. See
-#'   \code{\link[shiny]{downloadHandler}} for more details.
+#'   function writes the content to that file path.
 #'
 #' @param ids A list containing the existing notification ids for error, warning
 #'   and message.
