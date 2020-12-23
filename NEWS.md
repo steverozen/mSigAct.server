@@ -13,6 +13,8 @@ uploaded VCF.
 "Results" tab when user uploads new VCF/spectra or run example analysis of VCF
 or use preloaded spectra.
 
+* Changed the "Search:" label to "Search in signatures ID and  etiologies:".
+
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.
 

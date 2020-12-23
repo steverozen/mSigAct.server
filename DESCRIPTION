@@ -1,6 +1,6 @@
 Package: mSigAct.server
 Title: Shiny Server for Analyzing Mutational Signature Activities
-Version: 0.0.6.9004
+Version: 0.0.6.9005
 Author: Nanhai Jiang, Steven G. Rozen
 Maintainer: Nanhai Jiang <jiangnanhai@hotmail.com>
 Description: Shiny server for analyzing mutational signature activities; 

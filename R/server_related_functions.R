@@ -838,10 +838,13 @@ PrepareAttributionResults2 <-
                       escape = FALSE, 
                       rownames = FALSE,
                       colnames = c("Name", "Count", "Cosine similarity", 
-                                   "Spectrum", "Proposed aetiology"),
+                                   "Spectrum", "Proposed etiology"),
                       extensions = c("Buttons"),
                       options = list(lengthMenu = c(25, 50, 75), 
-                                     pageLength = 25)) %>%
+                                     pageLength = 25,
+                                     language = list(
+                                       search = "Search in signatures ID and etiologies:"
+                                     ))) %>%
           DT::formatRound(columns = 2, digits = 1) %>%
           DT::formatRound(columns = 3, digits = 5)
       })

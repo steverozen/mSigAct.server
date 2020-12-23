@@ -1074,9 +1074,14 @@ app_server <- function(input, output, session) {
       plotdata$dat <<- dat[sigs.in.correct.order, ]
       output$sigAetiologyTable <- DT::renderDataTable({
         DT::datatable(dat[sigs.in.correct.order, ], escape = FALSE, rownames = FALSE,
-                      colnames = c("Name", "Signature profile", "Proposed aetiology"), 
+                      colnames = c("Name", "Signature profile", "Proposed etiology"), 
                       options = list(lengthMenu = c(25, 50, 75), 
-                                     pageLength = 25)) 
+                                     pageLength = 25,
+                                     language = list(
+                                       search = "Search in signatures ID and etiologies:"
+                                     )
+                      )
+        )
       })
       
       if (is.null(sigsForAttribution())) {
@@ -1150,6 +1155,7 @@ app_server <- function(input, output, session) {
       progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
                                          message = "Analysis in progress",
                                          detail = "This may take a while...")
+      
       result_val(NULL)
       fut <- future::future(
         {
