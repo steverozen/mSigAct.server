@@ -15,6 +15,8 @@ or use preloaded spectra.
 
 * Changed the "Search:" label to "Search in signatures ID and  etiologies:".
 
+* Changed plan to resolve a future to multicore(not supported on Windows).
+
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.
 

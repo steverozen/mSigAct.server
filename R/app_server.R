@@ -1152,17 +1152,19 @@ app_server <- function(input, output, session) {
                                          detail = "This may take a while...")
       
       result_val(NULL)
+      #future.planned <<- TRUE
       
-      # Cannot use plan(multicore), otherwise the progress bar for asynchronous
-      # process will not work properly
-      if (!future.planned) {
-        future.start.time <- system.time(
-          future::plan(future::multisession(workers = min(64, future::availableCores())))
-        )
-        print(future.start.time)
+      # future::multicore is not supported on Windows
+      if (.Platform$OS.type != "windows") {
+        if (!future.planned) {
+          future.planning.time <- system.time(
+            future::plan(future::multicore(workers = min(64, future::availableCores())))
+          )
+          print(future.planning.time)
+        }
+        
+        future.planned <<- TRUE
       }
-      
-      future.planned <<- TRUE
       
       fut <- future::future(
         {
