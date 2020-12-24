@@ -1,7 +1,3 @@
-# Cannot use plan(multicore), otherwise the progress bar for asynchronous
-# process will not work properly
-future::plan(future::multisession(workers = min(64, future::availableCores())))
-
 #' @import mSigAct
 #' @import promises
 #' @import ipc
@@ -10,12 +6,12 @@ future::plan(future::multisession(workers = min(64, future::availableCores())))
 app_server <- function(input, output, session) {
   # List the first level callModules here
   tryCatch({
-    
     # Predefine some values for later use
     fut <- NULL
     result_val <- reactiveVal()
     running <- reactiveVal(FALSE)
     interruptor <- ipc::AsyncInterruptor$new()
+    future.planned <- FALSE
     
     # Create reactiveValues object
     # and set flag to 0 to prevent errors with adding NULL
@@ -1111,7 +1107,6 @@ app_server <- function(input, output, session) {
     
     # Asynchronous programming starts from here
     observeEvent(input$startAnalysis, {
-      
       if(length(sigsForAttribution()) == 0) {
         showNotification(ui = "Error:", 
                          action = "No signatures selected for attribution analysis",
@@ -1157,6 +1152,18 @@ app_server <- function(input, output, session) {
                                          detail = "This may take a while...")
       
       result_val(NULL)
+      
+      # Cannot use plan(multicore), otherwise the progress bar for asynchronous
+      # process will not work properly
+      if (!future.planned) {
+        future.start.time <- system.time(
+          future::plan(future::multisession(workers = min(64, future::availableCores())))
+        )
+        print(future.start.time)
+      }
+      
+      future.planned <<- TRUE
+      
       fut <- future::future(
         {
           # Close the progress when this reactive exits (even if there's an error)
