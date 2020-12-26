@@ -20,6 +20,8 @@ or use preloaded spectra.
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.
 
+* Fixed a bug of rounding reconstructed catalog.
+
 
 <br>
 

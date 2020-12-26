@@ -1216,11 +1216,10 @@ app_server <- function(input, output, session) {
             
             colnames(reconstructed.catalog0) <- 
               paste0("reconstructed (cosine similarity = ", cossim, ")")
-            reconstructed.catalog <- round(reconstructed.catalog0)
             
             plotdata$cossim <<- cossim
             plotdata$spect <<- spect
-            plotdata$reconstructed.catalog <<- reconstructed.catalog
+            plotdata$reconstructed.catalog <<- reconstructed.catalog0
             plotdata$sig.universe <<- sig.universe
             plotdata$best.MAP.exp <<- MAP.best.exp
             
