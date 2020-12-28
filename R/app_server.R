@@ -135,7 +135,7 @@ app_server <- function(input, output, session) {
       shinyjs::hide(id = "clickToCreateCatalogs")
       shinyjs::hide(id = "spectraPlotFromVCF")
       shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
       shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
       
       output$downloadZipFile <- renderUI({
@@ -167,7 +167,7 @@ app_server <- function(input, output, session) {
       shinyjs::hide(id = "clickToCreateCatalogs")  
       shinyjs::hide(id = "spectraPlotFromVCF")
       shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
       shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
       
       output$downloadZipFile <- renderUI({
@@ -188,7 +188,7 @@ app_server <- function(input, output, session) {
       shinyjs::show(id = "clickToCreateCatalogs")  
       shinyjs::hide(id = "spectraPlotFromVCF")
       shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
       shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     }) 
     
@@ -340,9 +340,9 @@ app_server <- function(input, output, session) {
       shinyjs::show(id = "selectSampleFromUploadedVCF")
       
       shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                     selected = "sigAttributionTab2")
+                                     selected = "sigAttributionTab")
     })
     
     #######################################################################
@@ -568,15 +568,15 @@ app_server <- function(input, output, session) {
     
     # When user clicks the action button on Show spectra page, direct user to the relevant tab
     observeEvent(input$clickToSigAttributionForSpectra, {
-      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                     selected = "sigAttributionTab2")
+                                     selected = "sigAttributionTab")
     })
     
     observeEvent(input$clickToSigAttributionForVCF, {
-      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                     selected = "sigAttributionTab2")
+                                     selected = "sigAttributionTab")
     })
     
     # When user submit new catalog for analysis, remove the previous plots
@@ -624,7 +624,7 @@ app_server <- function(input, output, session) {
       ShowTwoButtons()
       
       shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
       shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
@@ -645,7 +645,7 @@ app_server <- function(input, output, session) {
       ShowTwoButtons()
       
       shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
       shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
@@ -666,7 +666,7 @@ app_server <- function(input, output, session) {
       ShowTwoButtons()
       
       shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
       shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
@@ -687,7 +687,7 @@ app_server <- function(input, output, session) {
       ShowTwoButtons()
       
       shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
       shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
@@ -703,7 +703,7 @@ app_server <- function(input, output, session) {
       ShowTwoButtons()
       
       shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab2]')
+      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
       shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
     })
     
@@ -751,7 +751,7 @@ app_server <- function(input, output, session) {
         shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
         
         if (input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
-          shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+          shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
         }
         shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                        selected = "showSpectraTab")
@@ -798,9 +798,9 @@ app_server <- function(input, output, session) {
           }
         )
         shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
-        shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab2]')
+        shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
         shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                       selected = "sigAttributionTab2")
+                                       selected = "sigAttributionTab")
       }
     })
     

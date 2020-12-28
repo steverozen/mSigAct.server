@@ -1,7 +1,7 @@
 jscode <- "
 shinyjs.init = function() {
   $('#panels li a[data-value=showSpectraTab]').hide();
-  $('#panels li a[data-value=sigAttributionTab2]').hide();
+  $('#panels li a[data-value=sigAttributionTab]').hide();
   $('#panels li a[data-value=attributionResultsTab]').hide();
 }"
 
@@ -28,7 +28,7 @@ app_ui <- function(request) {
                value = "showSpectraTab"),
       tabPanel(title = tags$b("Get signature attributions"), 
                SignatureAttributionUI(), 
-               value = "sigAttributionTab2"),
+               value = "sigAttributionTab"),
       tabPanel(title = tags$b("Results"), 
                AttributionResultsUI(),
                value = "attributionResultsTab"),
