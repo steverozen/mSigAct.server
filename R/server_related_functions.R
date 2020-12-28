@@ -739,6 +739,8 @@ PrepareAttributionResults <-
       spect <- plotdata$spect
       best.MAP.exp <- plotdata$best.MAP.exp
       reconstructed.catalog <- plotdata$reconstructed.catalog
+      reconstructed.catalog.rounded <- round(reconstructed.catalog)
+      
       sig.universe <- plotdata$sig.universe
       
       # Sort best.MAP.exp by exposure counts
@@ -750,7 +752,7 @@ PrepareAttributionResults <-
         paste0(colnames(sigs), " (exposure = ", 
                round(best.MAP.exp$count), ")")
       
-      list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
+      list.of.catalogs <- list(spect, reconstructed.catalog.rounded, sigs)
       
       # Generate a random string for resource path
       resource.path <- stringi::stri_rand_strings(n = 1, length = 5)
@@ -821,7 +823,7 @@ PrepareAttributionResults <-
       
       grDevices::png(filename = png.reconstructed.file.path, width = width, 
                      height = height)
-      ICAMS::PlotCatalog(reconstructed.catalog)
+      ICAMS::PlotCatalog(reconstructed.catalog.rounded)
       grDevices::dev.off()
       
       tbl1$spectrum <- c(paste0('<img src="', resource.path, '/', 
