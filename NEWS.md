@@ -17,6 +17,8 @@ or use preloaded spectra.
 
 * Changed plan to resolve a future to multicore(not supported on Windows).
 
+* More informative errors for malformed catalog spectra.
+
 ## Fixed
 * Fixed a bug when mutation type change after attribution is not working.
 

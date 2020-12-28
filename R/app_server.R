@@ -538,11 +538,19 @@ app_server <- function(input, output, session) {
         renderUI(
           {
             # Change the region information for SBS192 catalog
-            my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
+            # my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
             
             catalog <<- ICAMS::ReadCatalog(file = catalog.path,
                                            ref.genome = input$ref.genome2,
-                                           region = my.region)
+                                           region = input.region(),
+                                           stop.on.error = FALSE)
+            if (!is.null(attr(catalog, "error"))) {
+              showNotification(
+                paste(basename(catalog.path), 
+                      "does not seem to be a spectra catalog; details3:\n",
+                      attr(catalog, "error")), duration = NULL)
+              return()
+            }
             input.catalog.type(CheckCatalogType(catalog)) 
             mutation.type <<- CheckCatalogType(catalog)
             
@@ -593,6 +601,7 @@ app_server <- function(input, output, session) {
     ########################################################################
     # Start of functions related to UploadSpectraUI
     ########################################################################
+    
     ShowTwoButtons <- function() {
       output$showSpectraFromCatalog <- renderUI(
         actionButton(inputId = "showSpectraOfCatalog", label = "Show spectra",
@@ -732,13 +741,23 @@ app_server <- function(input, output, session) {
         req(input$ref.genome2, input$region2)
         input.ref.genome(input$ref.genome2)
         input.region(input$region2)
-        
+        # browser()
         # Change the region information for SBS192 catalog
-        my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
+        # my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
         
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
-                             region = my.region)
+                             region = input.region(), stop.on.error = FALSE)
+        if (!is.null(attr(catalog, "error"))) {
+          file.info <- input$upload.spectra
+          file.name <- file.info$name
+          showNotification(
+            paste(file.name, 
+                  "does not seem to be a spectra catalog; details4:\n",
+                  attr(catalog, "error")), duration = NULL)
+          return()
+        }
+        
         input.catalog.type(CheckCatalogType(catalog))
         mutation.type <<- CheckCatalogType(catalog)
         
@@ -770,11 +789,18 @@ app_server <- function(input, output, session) {
         input.region(input$region2)
         
         # Change the region information for SBS192 catalog
-        my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
+        # my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
         
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
-                             region = my.region)
+                             region = input.region(), stop.on.error = FALSE)
+        if (!is.null(attr(catalog, "error"))) {
+          showNotification(
+            paste(basename(catalog.path), 
+                  "does not seem to be a spectra catalog; details1:\n",
+                  attr(catalog, "error")), duration = NULL)
+          return()
+        }
         input.catalog.type(CheckCatalogType(catalog))
         mutation.type <<- CheckCatalogType(catalog)
         
@@ -840,10 +866,18 @@ app_server <- function(input, output, session) {
         output$selectSampleForAttribution <- renderUI(
           { 
             # Change the region information for SBS192 catalog
-            my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
+            # my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
             catalog <<- ICAMS::ReadCatalog(file = catalog.path,
                                            ref.genome = input$ref.genome2,
-                                           region = my.region)
+                                           region = input.region(),
+                                           stop.on.error = FALSE)
+            if (!is.null(attr(catalog, "error"))) {
+              showNotification(
+                paste(basename(catalog.path), 
+                      "does not seem to be a spectra catalog; details2:\n",
+                      attr(catalog, "error")), duration = NULL)
+              return()
+            }
             input.catalog.type(CheckCatalogType(catalog))
             mutation.type <<- CheckCatalogType(catalog)
             sample.names <- colnames(catalog)
