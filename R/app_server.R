@@ -1230,7 +1230,7 @@ app_server <- function(input, output, session) {
             plotdata$sig.universe <<- sig.universe
             plotdata$best.MAP.exp <<- MAP.best.exp
             
-            retval <- PrepareAttributionResults2(input, output, session, 
+            retval <- PrepareAttributionResults(input, output, session, 
                                                  input.catalog.type(), 
                                                  plotdata)
             attribution.results <<- retval$attribution.results

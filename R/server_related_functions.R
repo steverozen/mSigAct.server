@@ -733,7 +733,7 @@ ProcessVCFs <- function(input, output, file, ids) {
 
 #' @importFrom dplyr bind_rows
 #' @keywords internal
-PrepareAttributionResults2 <- 
+PrepareAttributionResults <- 
   function (input, output, session, input.catalog.type, plotdata) {
       cossim <- plotdata$cossim
       spect <- plotdata$spect
