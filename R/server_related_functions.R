@@ -78,7 +78,11 @@ CheckInputsForSpectra <- function(input, catalog.path) {
     error <- append(error, "Genomic region must be provided")
   }
   
-  catalog <- ICAMS::ReadCatalog(catalog.path)
+  catalog <- ICAMS::ReadCatalog(catalog.path, stop.on.error = FALSE)
+  
+  if (FALSE && !is.null(attr(catalog, "error"))) {
+          error <- append(error, attr(catalog, "error"))
+  }
   
   return(list(error = error, SBS192.check = SBS192.check))
 }
@@ -1225,19 +1229,4 @@ ShowPreselectedSigs <- function(input, output, input.catalog.type) {
         )) # end of tagList
     }) # end of renderUI
   return(sig.universe)
-}
-
-#' @keywords internal
-ChangeRegionForSBS192Catalog <- function(input, catalog.path) {
-  dt <- data.table::fread(catalog.path)
-  if (nrow(dt) == 192) {
-    if (input$region2 == "genome") {
-      my.region <- "transcript"
-    } else {
-      my.region <- input$region2
-    }
-  } else {
-    my.region <- input$region2
-  }
-  return(my.region)
 }
