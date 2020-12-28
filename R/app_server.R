@@ -1067,10 +1067,16 @@ app_server <- function(input, output, session) {
       
       dat <<- PrepareSigsAetiologyTable(input.catalog.type(), 
                                         input.ref.genome(), input.region())
-      plotdata$dat <<- dat[sigs.in.correct.order, ]
+      dat1 <- dat[sigs.in.correct.order, ]
+      plotdata$dat <<- dat1
+      
+      df <- PrepareThumbnailForSample(input = input, catalog = catalog,
+                                      input.catalog.type = input.catalog.type())
+      
+      dat2 <- rbind(df, dat1)
       output$sigAetiologyTable <- DT::renderDataTable({
-        DT::datatable(dat[sigs.in.correct.order, ], escape = FALSE, rownames = FALSE,
-                      colnames = c("Name", "Signature profile", "Proposed etiology"), 
+        DT::datatable(dat2, escape = FALSE, rownames = FALSE,
+                      colnames = c("Name", "Spectrum", "Proposed etiology"), 
                       options = list(lengthMenu = c(25, 50, 75), 
                                      pageLength = 25,
                                      language = list(
@@ -1080,6 +1086,7 @@ app_server <- function(input, output, session) {
         )
       })
       
+      # If no signatures were selected, hide the signature etiology table
       if (is.null(sigsForAttribution())) {
         output$sigAetiologyTable <- NULL
         shinyjs::hide(id = "sigAetiologyTable")

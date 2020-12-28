@@ -810,11 +810,13 @@ PrepareAttributionResults2 <-
         height <- 300
       }
       
-      grDevices::png(filename=png.spectrum.file.path, width = width, height = height)
+      grDevices::png(filename = png.spectrum.file.path, width = width, 
+                     height = height)
       ICAMS::PlotCatalog(spect)
       grDevices::dev.off()
       
-      grDevices::png(filename=png.reconstructed.file.path, width = width, height = height)
+      grDevices::png(filename = png.reconstructed.file.path, width = width, 
+                     height = height)
       ICAMS::PlotCatalog(reconstructed.catalog)
       grDevices::dev.off()
       
@@ -1114,6 +1116,53 @@ PrepareSigsAetiologyTable <-
     
     return(dat)
   }
+
+#' @keywords internal
+PrepareThumbnailForSample <- function(input, catalog, input.catalog.type) {
+  # Get the spectrum for the sample selected
+  spect <- catalog[, input$selectedSampleForAttribution, drop = FALSE]
+  
+  # Generate a random string for resource path
+  resource.path <- stringi::stri_rand_strings(n = 1, length = 5)
+  
+  # Create a temp directory for storing png file of the thumbnail picture
+  tmpdir <- tempfile()
+  dir.create(tmpdir)
+  addResourcePath(prefix = resource.path, directoryPath = tmpdir)
+  
+  output.file.path <- resourcePaths()[resource.path]
+  
+  # Specify the file path for plotting the selected sample to png file
+  spect.name <- colnames(spect)
+  
+  # We cannot use "::" in the file path, otherwise zip::zipr will throw an error
+  spect.name <- gsub(pattern = "::", replacement = "-", spect.name)
+  
+  png.spectrum.file.name <- paste0("mSigAct-", spect.name, "-",
+                                   input.catalog.type, "-spectrum.png")
+  
+  png.spectrum.file.path <- paste0(output.file.path, "/", png.spectrum.file.name)
+  
+  # Print the spectrum of selected sample to png file
+  if (input.catalog.type %in% c("SBS96", "ID")) {
+    width <- 1700
+    height <- 250
+  } else {
+    width <- 2000
+    height <- 300
+  }
+  
+  grDevices::png(filename = png.spectrum.file.path, width = width, height = height)
+  ICAMS::PlotCatalog(spect)
+  grDevices::dev.off()
+  
+  df <- data.frame(name = colnames(spect), 
+                    spectrum = paste0('<img src="', resource.path, '/', 
+                                      png.spectrum.file.name, 
+                                      '" height="52"></img>'),
+                    proposed.aetiology = NA)
+  return(df)
+}
 
 #' @keywords internal
 ShowPreselectedSigs <- function(input, output, input.catalog.type) {

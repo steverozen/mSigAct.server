@@ -1,4 +1,10 @@
-# mSigAct.server 0.0.6.90xx
+# mSigAct.server 0.0.7.90xx
+## Added
+* Added thumbnail picture for selected sample in "Get signature attributions" tab.
+
+<br>
+
+# mSigAct.server 0.0.6
 ## Changed
 * Don't preselect catalog type for signature attribution.
 
@@ -22,9 +28,7 @@ or use preloaded spectra.
 
 * Fixed a bug of rounding reconstructed catalog.
 
-
 <br>
-
 
 # mSigAct.server 0.0.5
 ## Added
