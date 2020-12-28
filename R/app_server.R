@@ -91,8 +91,14 @@ app_server <- function(input, output, session) {
           # we always use the human genome signatures for attribution analysis
           total.signatures <- COSMIC.v3.hg19.genome.ID.sigs
         } else {
-          total.signatures <-
-            COSMIC.v3.sigs[[input.ref.genome()]][[input.region()]][[input.catalog.type()]]
+          # If input.region() is "unknown", use genome signatures for attribution analysis
+          if (input.region() == "unknown") {
+            total.signatures <-
+              COSMIC.v3.sigs[[input.ref.genome()]][["genome"]][[input.catalog.type()]]
+          } else {
+            total.signatures <-
+              COSMIC.v3.sigs[[input.ref.genome()]][[input.region()]][[input.catalog.type()]]
+          }
         }
         return(total.signatures)
       }
@@ -1063,7 +1069,6 @@ app_server <- function(input, output, session) {
       } else {
         sigs.in.correct.order <- NULL
       }
-      
       
       dat <<- PrepareSigsAetiologyTable(input.catalog.type(), 
                                         input.ref.genome(), input.region())

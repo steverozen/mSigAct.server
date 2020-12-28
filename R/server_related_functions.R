@@ -752,12 +752,16 @@ PrepareAttributionResults <-
       
       list.of.catalogs <- list(spect, reconstructed.catalog, sigs)
       
-      # Create a temp directory for storing attribution results
+      # Generate a random string for resource path
+      resource.path <- stringi::stri_rand_strings(n = 1, length = 5)
+      
+      # Create a temp directory for storing png file of the thumbnail picture
       tmpdir <- tempfile()
       dir.create(tmpdir)
-      addResourcePath(prefix = "results", directoryPath = tmpdir)
+      addResourcePath(prefix = resource.path, directoryPath = tmpdir)
       
-      output.file.path <- resourcePaths()["results"]
+      output.file.path <- resourcePaths()[resource.path]
+      
       spect.name <- colnames(spect)
       
       # We cannot use "::" in the file path, otherwise zip::zipr will throw an error
@@ -820,10 +824,10 @@ PrepareAttributionResults <-
       ICAMS::PlotCatalog(reconstructed.catalog)
       grDevices::dev.off()
       
-      tbl1$spectrum <- c(paste0('<img src="results/', png.spectrum.file.name, 
-                                '" height="52"></img>'),
-                         paste0('<img src="results/', png.reconstructed.file.name, 
-                                '" height="52"></img>'))
+      tbl1$spectrum <- c(paste0('<img src="', resource.path, '/', 
+                                png.spectrum.file.name, '" height="52"></img>'),
+                         paste0('<img src="', resource.path, '/', 
+                                png.reconstructed.file.name, '" height="52"></img>'))
       
       dt1 <- dplyr::bind_rows(tbl1, dt0)
       
@@ -1081,6 +1085,11 @@ PrepareSigsAetiologyTable <-
       
       return(dat)
     } 
+    
+    # If the input.region is "unknown", use the genome signatures for attribution analysis
+    if (input.region == "unknown") {
+      input.region <- "genome"
+    }
     
     prefix.name <- paste(input.ref.genome, input.region, input.catalog.type, sep = "-")
     tmp <- file.path("/app/COSMIC", input.ref.genome, input.region, input.catalog.type)

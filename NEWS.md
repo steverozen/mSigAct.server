@@ -2,6 +2,10 @@
 ## Added
 * Added thumbnail picture for selected sample in "Get signature attributions" tab.
 
+## Fixed
+* Fixed a bug when user uploads a VCF with "unknown" region and proceed to do signature 
+attribution.
+
 <br>
 
 # mSigAct.server 0.0.6
