@@ -551,10 +551,12 @@ app_server <- function(input, output, session) {
                                            region = input.region(),
                                            stop.on.error = FALSE)
             if (!is.null(attr(catalog, "error"))) {
+              file.info <- input$upload.spectra
+              file.name <- file.info$name
               showNotification(
-                paste(basename(catalog.path), 
-                      "does not seem to be a spectra catalog; details3:\n",
-                      attr(catalog, "error")), duration = NULL)
+                paste(file.name, 
+                      "does not seem to be a spectra catalog; details:\n",
+                      attr(catalog, "error")), duration = NULL, type = "error")
               return()
             }
             input.catalog.type(CheckCatalogType(catalog)) 
@@ -759,8 +761,8 @@ app_server <- function(input, output, session) {
           file.name <- file.info$name
           showNotification(
             paste(file.name, 
-                  "does not seem to be a spectra catalog; details4:\n",
-                  attr(catalog, "error")), duration = NULL)
+                  "does not seem to be a spectra catalog; details:\n",
+                  attr(catalog, "error")), duration = NULL, type = "error")
           return()
         }
         
@@ -801,10 +803,12 @@ app_server <- function(input, output, session) {
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
                              region = input.region(), stop.on.error = FALSE)
         if (!is.null(attr(catalog, "error"))) {
+          file.info <- input$upload.spectra
+          file.name <- file.info$name
           showNotification(
-            paste(basename(catalog.path), 
-                  "does not seem to be a spectra catalog; details1:\n",
-                  attr(catalog, "error")), duration = NULL)
+            paste(file.name, 
+                  "does not seem to be a spectra catalog; details:\n",
+                  attr(catalog, "error")), duration = NULL, type = "error")
           return()
         }
         input.catalog.type(CheckCatalogType(catalog))
@@ -878,10 +882,12 @@ app_server <- function(input, output, session) {
                                            region = input.region(),
                                            stop.on.error = FALSE)
             if (!is.null(attr(catalog, "error"))) {
+              file.info <- input$upload.spectra
+              file.name <- file.info$name
               showNotification(
-                paste(basename(catalog.path), 
-                      "does not seem to be a spectra catalog; details2:\n",
-                      attr(catalog, "error")), duration = NULL)
+                paste(file.name, 
+                      "does not seem to be a spectra catalog; details:\n",
+                      attr(catalog, "error")), duration = NULL, type = "error")
               return()
             }
             input.catalog.type(CheckCatalogType(catalog))
