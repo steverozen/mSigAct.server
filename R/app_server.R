@@ -1064,7 +1064,6 @@ app_server <- function(input, output, session) {
         sigs.in.correct.order <- NULL
       }
       
-      
       dat <<- PrepareSigsAetiologyTable(input.catalog.type(), 
                                         input.ref.genome(), input.region())
       dat1 <- dat[sigs.in.correct.order, ]
