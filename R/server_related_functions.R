@@ -855,7 +855,7 @@ PrepareAttributionResults <-
                       options = list(lengthMenu = c(25, 50, 75), 
                                      pageLength = 25,
                                      language = list(
-                                       search = "Search in signatures ID and etiologies:"
+                                       search = "Search in signatures and etiologies:"
                                      ))) %>%
           DT::formatRound(columns = 2, digits = 1) %>%
           DT::formatRound(columns = 3, digits = 5)

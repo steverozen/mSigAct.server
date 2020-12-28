@@ -1125,7 +1125,7 @@ app_server <- function(input, output, session) {
                       options = list(lengthMenu = c(25, 50, 75), 
                                      pageLength = 25,
                                      language = list(
-                                       search = "Search in signatures ID and etiologies:"
+                                       search = "Search in signatures and etiologies:"
                                      )
                       )
         )
