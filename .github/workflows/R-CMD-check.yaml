@@ -68,10 +68,12 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
         
+      - name: Install dependencies from GitHub 
         if: runner.os == 'Windows'
         run: |
           remotes::install_github("steverozen/ICAMS", ref = "master")
           remotes::install_github("steverozen/mSigAct", ref = "master")
+        shell: Rscript {0}
 
       - name: Check
         env:
