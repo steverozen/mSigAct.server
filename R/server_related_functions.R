@@ -1193,8 +1193,7 @@ ShowPreselectedSigs <- function(input, output, input.catalog.type) {
         sig.universe <<- 
           colnames(PCAWG7::signature[["genome"]][[input.catalog.type]])
       }
-      
-      if (input$selectedCancerType == "Unknown") {
+      if (input$selectedCancerType == "") {
         selected.sig.universe <- NULL
       } else {
         tmp <- 
@@ -1228,5 +1227,27 @@ ShowPreselectedSigs <- function(input, output, input.catalog.type) {
                                   multiple = TRUE
         )) # end of tagList
     }) # end of renderUI
+  
+  shinyjs::show(id = "chooseSigSubset")
   return(sig.universe)
+}
+
+#' @keywords internal
+DetermineCatalogTypesForAttribution <- function(list.of.catalogs, sample.name) {
+  catalog.types.with.mutations <- NULL
+  for (name in names(list.of.catalogs)) {
+    if (colSums(list.of.catalogs[[name]][, sample.name, drop = FALSE]) != 0) {
+      catalog.types.with.mutations <- c(catalog.types.with.mutations, name)
+    }
+  }
+  
+  catalog.types.with.mutations <- 
+    gsub(pattern = "cat", replacement = "", catalog.types.with.mutations)
+  
+  overall.catalog.types <- c("SBS96", "SBS192", "DBS78", "ID")
+  
+  catalog.types.for.attribution <- 
+    intersect(overall.catalog.types, catalog.types.with.mutations)
+  
+  return(catalog.types.for.attribution)
 }

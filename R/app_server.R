@@ -43,6 +43,14 @@ app_server <- function(input, output, session) {
     catalog <- sig.universe <- zip.file.path <- NULL
     
     vcf.file.analyzed <- example.strelka.vcf.analyzed <- NULL
+    
+    preselected.sigs <- reactiveVal(NULL)
+    
+    selected.more.sigs <- reactiveVal(NULL)
+    
+    sigsForAttribution <- reactiveVal(NULL)
+    
+    analysis.for.uploaded.spectra <- reactiveVal(FALSE)
       
     example.mutect.vcf.analyzed <- NULL  
     
@@ -76,7 +84,7 @@ app_server <- function(input, output, session) {
     # Reactive expressions
     #######################################################################
     choose.more.sigs <- reactive({
-      more.sigs <- setdiff(colnames(total.signatures()), input$preselectedSigs)
+      more.sigs <- setdiff(colnames(total.signatures()), preselected.sigs())
       return(more.sigs)
     }) 
     
@@ -130,6 +138,9 @@ app_server <- function(input, output, session) {
       list.of.catalogs <<- results$counts
       input.region("genome")
       input.ref.genome("hg19")
+      preselected.sigs(NULL)
+      selected.more.sigs(NULL)
+      analysis.for.uploaded.spectra(TRUE)
       
       # When the catalogs have been generated, increment rv$catalogGeneratedFlag
       rv$catalogGeneratedFlag <- rv$catalogGeneratedFlag + 1
@@ -162,6 +173,9 @@ app_server <- function(input, output, session) {
       list.of.catalogs <<- results$counts
       input.region("genome")
       input.ref.genome("hg19")
+      preselected.sigs(NULL)
+      selected.more.sigs(NULL)
+      analysis.for.uploaded.spectra(TRUE)
       
       # When the catalogs have been generated, increment rv$catalogGeneratedFlag
       rv$catalogGeneratedFlag <- rv$catalogGeneratedFlag + 1
@@ -214,6 +228,10 @@ app_server <- function(input, output, session) {
       }
       input.ref.genome(input$ref.genome)
       input.region(input$region)
+      
+      preselected.sigs(NULL)
+      selected.more.sigs(NULL)
+      analysis.for.uploaded.spectra(TRUE)
       
       # Create a temp path for the zip archive generated
       tmpdir <- tempfile()
@@ -367,72 +385,56 @@ app_server <- function(input, output, session) {
     # When user selects the sample from uploaded VCF, show
     # the sample's mutational spectrum
     observeEvent(input$sampleNameFromUploadedVCF, {
+      my.list <- list()
+      
+      tab.names <- 
+        c("SBS96", "SBS192", "SBS1536", "DBS78", "DBS136", "DBS144", "ID")
+      
+      names.of.tabs <- NULL
+      
+      heights.of.plots <- list(230, 250, 800, 250, 500, 350, 230)
+      widths.of.plots <- list(800, 800, 800, 800, 700, 350, 800)
+      names(heights.of.plots) <- names(widths.of.plots) <- tab.names
+      
+      for (j in tab.names) {
+        local({
+          i <- j
+          cat.name <- paste0("cat", i)
+          catalog <- 
+            list.of.catalogs[[cat.name]][, input$sampleNameFromUploadedVCF, drop = FALSE]
+          if (colSums(catalog) != 0) {
+            plot.name <- paste0(i, "plot")
+            output[[plot.name]] <- renderPlot({
+              ICAMS::PlotCatalog(catalog)
+            }, height = heights.of.plots[[i]], width = widths.of.plots[[i]])
+            
+            names.of.tabs <<- c(names.of.tabs, i)
+          }
+        })
+      }
+      
+      if (FALSE) {
+        output$SBS12plot <- renderPlot({
+          ICAMS::PlotCatalog(catSBS192, plot.SBS12 = TRUE)
+        }, height = 350, width = 350)
+        
+      }
+        
+      #tmp <- c("SBS96", "SBS192", "DBS78", "ID")
+      #catalog.types.for.attribution(intersect(tmp, names.of.tabs))
+        
       output$spectraPlotFromVCF <- renderUI (
         {
-          output$SBS96plot <- renderPlot({
-            catSBS96 <-
-              list.of.catalogs$catSBS96[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            ICAMS::PlotCatalog(catSBS96)
-          }, height = 230, width = 800)
+          tabs <- lapply(names.of.tabs, FUN = function(x) {
+            output.name <- paste0(x, "plot")
+            tabPanel(title = x, plotOutput(output.name))
+          })
           
-          
-          output$SBS192plot <- renderPlot({
-            catSBS192 <-
-              list.of.catalogs$catSBS192[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            ICAMS::PlotCatalog(catSBS192)
-          }, height = 250, width = 800)
-          
-          if (FALSE) {
-            output$SBS12plot <- renderPlot({
-              catSBS192 <-
-                list.of.catalogs$catSBS192[, input$sampleNameFromUploadedVCF, drop = FALSE]
-              ICAMS::PlotCatalog(catSBS192, plot.SBS12 = TRUE)
-            }, height = 350, width = 350)
-            
-          }
-           
-          output$SBS1536plot <- renderPlot({
-            catSBS1536 <-
-              list.of.catalogs$catSBS1536[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            ICAMS::PlotCatalog(catSBS1536)
-          }, height = 800, width = 800)
-          
-          output$DBS78plot <- renderPlot({
-            catDBS78 <-
-              list.of.catalogs$catDBS78[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            PlotCatalog(catDBS78)
-          }, height = 250, width = 800)
-          
-          output$DBS136plot <- renderPlot({
-            catDBS136 <-
-              list.of.catalogs$catDBS136[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            ICAMS::PlotCatalog(catDBS136)
-          }, height = 500, width = 700)
-          
-          output$DBS144plot <- renderPlot({
-            catDBS144 <-
-              list.of.catalogs$catDBS144[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            ICAMS::PlotCatalog(catDBS144)
-          }, height = 350, width = 350)
-          
-          output$IDplot <- renderPlot({
-            catID <-
-              list.of.catalogs$catID[, input$sampleNameFromUploadedVCF, drop = FALSE]
-            ICAMS::PlotCatalog(catID)
-          }, height = 230, width = 800)
-          
-          tabsetPanel(type = "tabs",
-                      tabPanel("SBS96", plotOutput("SBS96plot")),
-                      tabPanel("SBS192", plotOutput("SBS192plot")),
-                      #tabPanel("SBS12", plotOutput("SBS12plot")),
-                      tabPanel("SBS1536", plotOutput("SBS1536plot")),
-                      tabPanel("DBS78", plotOutput("DBS78plot")),
-                      tabPanel("DBS136", plotOutput("DBS136plot")),
-                      tabPanel("DBS144", plotOutput("DBS144plot")),
-                      tabPanel("ID", plotOutput("IDplot"))
-          )
+          do.call(tabsetPanel, tabs)
         })
+      
       shinyjs::show(id = "spectraPlotFromVCF")
+      
     })
     
     # When user selects the sample from uploaded catalog, show
@@ -637,6 +639,7 @@ app_server <- function(input, output, session) {
       catalog.path <<- system.file("extdata/SBS96-mSigAct-example-spectra.csv", 
                                    package = "mSigAct.server")
       input.catalog.type("SBS96") 
+      analysis.for.uploaded.spectra(TRUE)
       mutation.type <<- "SBS96"
       ShowTwoButtons()
       
@@ -658,6 +661,7 @@ app_server <- function(input, output, session) {
       catalog.path <<- system.file("extdata/SBS192-mSigAct-example-spectra.csv", 
                                    package = "mSigAct.server")
       input.catalog.type("SBS192") 
+      analysis.for.uploaded.spectra(TRUE)
       mutation.type <<- "SBS192"
       ShowTwoButtons()
       
@@ -679,6 +683,7 @@ app_server <- function(input, output, session) {
       catalog.path <<- system.file("extdata/DBS78-mSigAct-example-spectra.csv", 
                                    package = "mSigAct.server")
       input.catalog.type("DBS78") 
+      analysis.for.uploaded.spectra(TRUE)
       mutation.type <<- "DBS78"
       ShowTwoButtons()
       
@@ -700,6 +705,7 @@ app_server <- function(input, output, session) {
       catalog.path <<- system.file("extdata/ID-mSigAct-example-spectra.csv", 
                                    package = "mSigAct.server")
       input.catalog.type("ID")
+      analysis.for.uploaded.spectra(TRUE)
       mutation.type <<- "ID"
       ShowTwoButtons()
       
@@ -749,10 +755,6 @@ app_server <- function(input, output, session) {
         req(input$ref.genome2, input$region2)
         input.ref.genome(input$ref.genome2)
         input.region(input$region2)
-        # browser()
-        # Change the region information for SBS192 catalog
-        # my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
-        
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
                              region = input.region(), stop.on.error = FALSE)
@@ -795,9 +797,6 @@ app_server <- function(input, output, session) {
         req(input$ref.genome2, input$region2)
         input.ref.genome(input$ref.genome2)
         input.region(input$region2)
-        
-        # Change the region information for SBS192 catalog
-        # my.region <- ChangeRegionForSBS192Catalog(input, catalog.path)
         
         catalog <<- 
           ICAMS::ReadCatalog(file = catalog.path, ref.genome = input$ref.genome2,
@@ -893,9 +892,13 @@ app_server <- function(input, output, session) {
             input.catalog.type(CheckCatalogType(catalog))
             mutation.type <<- CheckCatalogType(catalog)
             sample.names <- colnames(catalog)
-            selectInput(inputId = "selectedSampleForAttribution",
-                        label = "Select sample",
-                        choices = sample.names)
+            selectizeInput(inputId = "selectedSampleForAttribution",
+                           label = "Select sample",
+                           choices = sample.names,
+                           options = list(
+                             placeholder = 'Please select an option below',
+                             onInitialize = I('function() { this.setValue(""); }')
+                           ))
           }
         )
         
@@ -903,9 +906,13 @@ app_server <- function(input, output, session) {
           {
             cancer.types <-
               c("Unknown", colnames(CancerTypeToExposureStatData()))
-            selectInput(inputId = "selectedCancerType",
-                        label = "Select cancer type",
-                        choices = cancer.types)
+            selectizeInput(inputId = "selectedCancerType",
+                           label = "Select cancer type",
+                           choices = cancer.types,
+                           options = list(
+                             placeholder = 'Please select an option below',
+                             onInitialize = I('function() { this.setValue(""); }')
+                           ))
           }
         )
         
@@ -941,9 +948,11 @@ app_server <- function(input, output, session) {
         return()
       }
       
-      if (input$selectedCancerType != "Unknown") {
-        ShowPreselectedSigs(input, output,input.catalog.type())
-        } # end of if statement
+      if (input$selectedSampleForAttribution == "") {
+        return()
+      }
+      
+      ShowPreselectedSigs(input, output,input.catalog.type())
     
       # Show the actionButton for user to add more signatures
       output$addSig <- renderUI(
@@ -951,6 +960,7 @@ app_server <- function(input, output, session) {
                      style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4; ")
       )
+      shinyjs::show(id = "addSig")
     }, ignoreInit = TRUE) # end of observeEvent
     
     
@@ -974,12 +984,22 @@ app_server <- function(input, output, session) {
     observeEvent(
       CheckArgumentsForVCF(),
       {
+        # Hide the widgets from previous analysis
+        shinyjs::hide(id = "chooseCatalogType")
+        shinyjs::hide(id = "addSig")
+        shinyjs::hide(id = "chooseMoreSigs")
+        shinyjs::hide(id = "chooseSigSubset")
+        shinyjs::hide(id = "analysisButton")
         output$selectSampleForAttribution <- renderUI(
           { 
             sample.names <- colnames(list.of.catalogs[[1]])
-            selectInput(inputId = "selectedSampleForAttribution",
-                        label = "Select sample",
-                        choices = sample.names)
+            selectizeInput(inputId = "selectedSampleForAttribution",
+                           label = "Select sample",
+                           choices = sample.names,
+                           options = list(
+                             placeholder = 'Please select an option below',
+                             onInitialize = I('function() { this.setValue(""); }')
+                           ))
           }
         )
         
@@ -987,26 +1007,15 @@ app_server <- function(input, output, session) {
           {
             cancer.types <-
               c("Unknown", colnames(CancerTypeToExposureStatData()))
-            selectInput(inputId = "selectedCancerType",
-                        label = "Select cancer type",
-                        choices = cancer.types)
+            selectizeInput(inputId = "selectedCancerType",
+                           label = "Select cancer type",
+                           choices = cancer.types,
+                           options = list(
+                             placeholder = 'Please select an option below',
+                             onInitialize = I('function() { this.setValue(""); }')
+                           ))
           }
         )
-        
-        output$chooseCatalogType <- renderUI(
-          {
-            selectizeInput(inputId = "selectCatalogType", 
-                        label = "Select catalog type",
-                        choices = c("SBS96", "SBS192", "DBS78", "ID"),
-                        options = list(
-                          placeholder = 'Please select an option below',
-                          onInitialize = I('function() { this.setValue(""); }')
-                        )
-                        )
-          }
-        )
-        
-        shinyjs::show(id = "chooseCatalogType")
         
         # Hide the UI element previously generated by uploading spectra
         output$uploadedCatalogType <- NULL
@@ -1017,9 +1026,81 @@ app_server <- function(input, output, session) {
         shinyjs::hide(id = "sigAetiologyTable")
       }) # end of observeEvent
     
+    # Only when user selects the sample, then show the widget to choose catalog
+    # type for signature attribution
+    observeEvent(input$selectedSampleForAttribution, {
+      req(input$selectedSampleForAttribution)
+      
+      if (analysis.for.uploaded.spectra() == TRUE) {
+        shinyjs::hide(id = "addSig")
+        shinyjs::hide(id = "chooseMoreSigs")
+        shinyjs::hide(id = "chooseSigSubset")
+        shinyjs::hide(id = "analysisButton")
+        output$sigAetiologyTable <- NULL
+        shinyjs::hide(id = "sigAetiologyTable")
+        preselected.sigs(NULL)
+        selected.more.sigs(NULL)
+        
+        output$selectCancerType <- renderUI(
+          {
+            cancer.types <-
+              c("Unknown", colnames(CancerTypeToExposureStatData()))
+            selectizeInput(inputId = "selectedCancerType",
+                           label = "Select cancer type",
+                           choices = cancer.types,
+                           options = list(
+                             placeholder = 'Please select an option below',
+                             onInitialize = I('function() { this.setValue(""); }')
+                           ))
+          }
+        )
+        return()
+      }
+      
+      # Remove the values from previous sample
+      input.catalog.type(NULL)
+      
+      shinyjs::hide(id = "addSig")
+      shinyjs::hide(id = "chooseMoreSigs")
+      shinyjs::hide(id = "chooseSigSubset")
+      shinyjs::hide(id = "analysisButton")
+      output$selectCancerType <- renderUI(
+        {
+          cancer.types <-
+            c("Unknown", colnames(CancerTypeToExposureStatData()))
+          selectizeInput(inputId = "selectedCancerType",
+                         label = "Select cancer type",
+                         choices = cancer.types,
+                         options = list(
+                           placeholder = 'Please select an option below',
+                           onInitialize = I('function() { this.setValue(""); }')
+                         ))
+        }
+      )
+      
+      # Determine the catalog types available for attribution for selected sample
+      catalog.types.for.attribution <-
+        DetermineCatalogTypesForAttribution(list.of.catalogs = list.of.catalogs,
+                                            sample.name = input$selectedSampleForAttribution)
+      
+      output$chooseCatalogType <- renderUI(
+        {
+          selectizeInput(inputId = "selectCatalogType", 
+                         label = "Select catalog type",
+                         choices = catalog.types.for.attribution,
+                         options = list(
+                           placeholder = 'Please select an option below',
+                           onInitialize = I('function() { this.setValue(""); }')
+                         ))
+        }
+      )
+      
+      shinyjs::show(id = "chooseCatalogType")
+    })
     
-    observeEvent(input$selectedCancerType, {
-      req(input$selectedCancerType)
+    
+    observeEvent(input$selectCatalogType, {
+      req(input$selectCatalogType)
       
       # Don't update the input.catalog.type using input$selectCatalogType
       # We are doing analysis using uploaded spectra, however input$selectCatalogType
@@ -1036,6 +1117,8 @@ app_server <- function(input, output, session) {
                      style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4; ")
       )
+      
+      shinyjs::show(id = "addSig")
       
     }, ignoreInit = TRUE) # end of observeEvent
     
@@ -1055,7 +1138,7 @@ app_server <- function(input, output, session) {
                      style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4; ")
       )
-      
+      shinyjs::show(id = "addSig")
     }, ignoreInit = TRUE) # end of observeEvent
     
     # Update the catalog used for attribution if user selects another catalog type
@@ -1079,20 +1162,44 @@ app_server <- function(input, output, session) {
                                     multiple = TRUE)
         }
       )
+      shinyjs::show(id = "chooseMoreSigs")
+    })
+    
+    # Update the reactive value when user clicks the widget
+    # Must use observer() instead of observeEvent because
+    # observeEvent does not react to NULL by default
+    observe({
+      preselected.sigs(input$preselectedSigs)
+    })
+    
+    observe({
+      selected.more.sigs(input$selectedMoreSigs)
     })
     
     # Create a reactive expression to determine the signatures used for
     # attribution and then show the signatures aetiology information table
-    sigsForAttribution <- reactive({
-      list(input$selectCatalogType ,input$preselectedSigs, input$selectedMoreSigs)
-      return(c(input$preselectedSigs, input$selectedMoreSigs))
+    sigsForAttributionChanged <- reactive({
+      list(input$selectCatalogType, input$preselectedSigs, input$selectedMoreSigs)
     })
     
-    observeEvent(sigsForAttribution(), {
+    observeEvent(input$selectCatalogType, {
+      sigsForAttribution(NULL)
+      output$sigAetiologyTable <- NULL
+      shinyjs::hide(id = "sigAetiologyTable")
+    })
+    
+    observeEvent(sigsForAttributionChanged(), {
+      shinyjs::hide(id = "sigAetiologyTable")
+      sigsForAttribution(c(preselected.sigs(), selected.more.sigs()))
       
       if (is.null(input.catalog.type())) {
         return()
       }
+      
+      if (input$selectedSampleForAttribution == "") {
+        return()
+      }
+      
       
       if (input.catalog.type() == "SBS96") {
         sigs.in.correct.order <- 
@@ -1131,11 +1238,7 @@ app_server <- function(input, output, session) {
         )
       })
       
-      # If no signatures were selected, hide the signature etiology table
-      if (is.null(sigsForAttribution())) {
-        output$sigAetiologyTable <- NULL
-        shinyjs::hide(id = "sigAetiologyTable")
-      } else {
+      if (!is.null(sigsForAttribution())) {
         shinyjs::show(id = "sigAetiologyTable")
       }
       
@@ -1146,6 +1249,7 @@ app_server <- function(input, output, session) {
                        style= "color: #fff; background-color: #337ab7;
                               border-color: #2e6da4; ")
         })
+        shinyjs::show(id = "analysisButton")
       } # Need to use ignoreNULL here otherwise sigAetiologyTable will not change
         # if user deselect all signatures
     }, ignoreNULL = FALSE,  ignoreInit = TRUE)

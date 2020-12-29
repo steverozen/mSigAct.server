@@ -1,4 +1,12 @@
-# mSigAct.server 0.0.7.90xx
+# mSigAct.server 0.0.8.90xx
+## Changed
+* Only show spectra plots for catalog types which have mutations.
+
+* Only show catalog types for signature attribution which have mutations.
+
+<br>
+
+# mSigAct.server 0.0.7
 ## Added
 * Added thumbnail picture for selected sample in "Get signature attributions" tab.
 
