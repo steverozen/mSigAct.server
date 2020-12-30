@@ -468,17 +468,6 @@ app_server <- function(input, output, session) {
                                      selected = "sigAttributionTab")
     })
     
-    # When user submit new catalog for analysis, remove the previous plots
-    observeEvent(input$showSpectraOfCatalog, {
-      output$SBS96plot <- NULL
-      output$SBS192plot <- NULL
-      output$SBS1536plot <- NULL
-      output$DBS78plot <- NULL
-      output$DBS136plot <- NULL
-      output$DBS144plot <- NULL
-      output$IDplot <- NULL
-    })
-    
     ########################################################################
     # Start of functions related to UploadSpectraUI
     ########################################################################
@@ -850,16 +839,6 @@ app_server <- function(input, output, session) {
     CheckArgumentsForVCF <- reactive({
       list(input$showSpectraOfVCF, input$sigAttributionOfVCF)
     })
-    
-    TwoVCFActionButtonsClicked <- function(input) {
-      if(is.null(input$showSpectraOfVCF) && is.null(input$sigAttributionOfVCF)){
-        return(FALSE)
-      }
-      if(input$showSpectraOfVCF == 0 && input$sigAttributionOfVCF == 0){
-        return(FALSE)
-      }
-      return(TRUE)
-    }
     
     observeEvent(
       CheckArgumentsForVCF(),
