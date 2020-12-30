@@ -385,56 +385,8 @@ app_server <- function(input, output, session) {
     # When user selects the sample from uploaded VCF, show
     # the sample's mutational spectrum
     observeEvent(input$sampleNameFromUploadedVCF, {
-      my.list <- list()
-      
-      tab.names <- 
-        c("SBS96", "SBS192", "SBS1536", "DBS78", "DBS136", "DBS144", "ID")
-      
-      names.of.tabs <- NULL
-      
-      heights.of.plots <- list(230, 250, 800, 250, 500, 350, 230)
-      widths.of.plots <- list(800, 800, 800, 800, 700, 350, 800)
-      names(heights.of.plots) <- names(widths.of.plots) <- tab.names
-      
-      for (j in tab.names) {
-        local({
-          i <- j
-          cat.name <- paste0("cat", i)
-          catalog <- 
-            list.of.catalogs[[cat.name]][, input$sampleNameFromUploadedVCF, drop = FALSE]
-          if (colSums(catalog) != 0) {
-            plot.name <- paste0(i, "plot")
-            output[[plot.name]] <- renderPlot({
-              ICAMS::PlotCatalog(catalog)
-            }, height = heights.of.plots[[i]], width = widths.of.plots[[i]])
-            
-            names.of.tabs <<- c(names.of.tabs, i)
-          }
-        })
-      }
-      
-      if (FALSE) {
-        output$SBS12plot <- renderPlot({
-          ICAMS::PlotCatalog(catSBS192, plot.SBS12 = TRUE)
-        }, height = 350, width = 350)
-        
-      }
-        
-      #tmp <- c("SBS96", "SBS192", "DBS78", "ID")
-      #catalog.types.for.attribution(intersect(tmp, names.of.tabs))
-        
-      output$spectraPlotFromVCF <- renderUI (
-        {
-          tabs <- lapply(names.of.tabs, FUN = function(x) {
-            output.name <- paste0(x, "plot")
-            tabPanel(title = x, plotOutput(output.name))
-          })
-          
-          do.call(tabsetPanel, tabs)
-        })
-      
-      shinyjs::show(id = "spectraPlotFromVCF")
-      
+      PrepareSpectraPlotFromVCF(input = input, output = output,
+                                list.of.catalogs = list.of.catalogs)
     })
     
     # When user selects the sample from uploaded catalog, show
