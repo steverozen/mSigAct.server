@@ -1251,3 +1251,78 @@ DetermineCatalogTypesForAttribution <- function(list.of.catalogs, sample.name) {
   
   return(catalog.types.for.attribution)
 }
+
+#' @keywords internal
+PrepareSpectraPlotFromVCF <- function(input, output, list.of.catalogs) {
+  tab.names <- 
+    c("SBS96", "SBS192", "SBS1536", "DBS78", "DBS136", "DBS144", "ID")
+  
+  names.of.tabs <- NULL
+  
+  heights.of.plots <- list(230, 250, 800, 250, 500, 350, 230)
+  widths.of.plots <- list(800, 800, 800, 800, 700, 350, 800)
+  names(heights.of.plots) <- names(widths.of.plots) <- tab.names
+  
+  for (j in tab.names) {
+    # Need local so that each item gets its own number. Without it, the value
+    # of i in the renderPlot() will be the same across all instances, because
+    # of when the expression is evaluated.
+    local({
+      i <- j
+      cat.name <- paste0("cat", i)
+      catalog <- 
+        list.of.catalogs[[cat.name]][, input$sampleNameFromUploadedVCF, drop = FALSE]
+      if (colSums(catalog) != 0) {
+        plot.name <- paste0(i, "plot")
+        output[[plot.name]] <- renderPlot({
+          ICAMS::PlotCatalog(catalog)
+        }, height = heights.of.plots[[i]], width = widths.of.plots[[i]])
+        
+        names.of.tabs <<- c(names.of.tabs, i)
+      }
+    })
+  }
+  
+  if (FALSE) {
+    output$SBS12plot <- renderPlot({
+      ICAMS::PlotCatalog(catSBS192, plot.SBS12 = TRUE)
+    }, height = 350, width = 350)
+    
+  }
+  
+  output$spectraPlotFromVCF <- renderUI (
+    {
+      tabs <- lapply(names.of.tabs, FUN = function(x) {
+        output.name <- paste0(x, "plot")
+        tabPanel(title = x, plotOutput(output.name))
+      })
+      
+      do.call(tabsetPanel, tabs)
+    })
+  
+  shinyjs::show(id = "spectraPlotFromVCF")
+}
+
+#' @keywords internal
+PrepareSpectraPlotFromCatalog <- 
+  function(input, output, input.catalog.type, catalog) {
+    catalog.type <- 
+      c("SBS96", "SBS192", "SBS1536", "DBS78", "DBS136", "DBS144", "ID")
+    
+    heights.of.plots <- list(230, 250, 800, 250, 500, 350, 230)
+    widths.of.plots <- list(800, 800, 800, 800, 700, 350, 800)
+    names(heights.of.plots) <- names(widths.of.plots) <- catalog.type
+    
+    output$spectraPlotFromCatalog <- renderUI(
+      {
+        output$spectrum <- renderPlot(
+          {
+            PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
+                                drop = FALSE])
+          }, height = heights.of.plots[[input.catalog.type]],
+          width = widths.of.plots[[input.catalog.type]])
+        plotOutput(outputId = "spectrum")
+      }
+    )
+    shinyjs::show(id = "spectraPlotFromCatalog")
+  }

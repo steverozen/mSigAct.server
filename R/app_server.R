@@ -385,145 +385,16 @@ app_server <- function(input, output, session) {
     # When user selects the sample from uploaded VCF, show
     # the sample's mutational spectrum
     observeEvent(input$sampleNameFromUploadedVCF, {
-      my.list <- list()
-      
-      tab.names <- 
-        c("SBS96", "SBS192", "SBS1536", "DBS78", "DBS136", "DBS144", "ID")
-      
-      names.of.tabs <- NULL
-      
-      heights.of.plots <- list(230, 250, 800, 250, 500, 350, 230)
-      widths.of.plots <- list(800, 800, 800, 800, 700, 350, 800)
-      names(heights.of.plots) <- names(widths.of.plots) <- tab.names
-      
-      for (j in tab.names) {
-        local({
-          i <- j
-          cat.name <- paste0("cat", i)
-          catalog <- 
-            list.of.catalogs[[cat.name]][, input$sampleNameFromUploadedVCF, drop = FALSE]
-          if (colSums(catalog) != 0) {
-            plot.name <- paste0(i, "plot")
-            output[[plot.name]] <- renderPlot({
-              ICAMS::PlotCatalog(catalog)
-            }, height = heights.of.plots[[i]], width = widths.of.plots[[i]])
-            
-            names.of.tabs <<- c(names.of.tabs, i)
-          }
-        })
-      }
-      
-      if (FALSE) {
-        output$SBS12plot <- renderPlot({
-          ICAMS::PlotCatalog(catSBS192, plot.SBS12 = TRUE)
-        }, height = 350, width = 350)
-        
-      }
-        
-      #tmp <- c("SBS96", "SBS192", "DBS78", "ID")
-      #catalog.types.for.attribution(intersect(tmp, names.of.tabs))
-        
-      output$spectraPlotFromVCF <- renderUI (
-        {
-          tabs <- lapply(names.of.tabs, FUN = function(x) {
-            output.name <- paste0(x, "plot")
-            tabPanel(title = x, plotOutput(output.name))
-          })
-          
-          do.call(tabsetPanel, tabs)
-        })
-      
-      shinyjs::show(id = "spectraPlotFromVCF")
-      
+      PrepareSpectraPlotFromVCF(input = input, output = output,
+                                list.of.catalogs = list.of.catalogs)
     })
     
     # When user selects the sample from uploaded catalog, show
     # the sample's mutational spectrum
     observeEvent(input$selectedSampleFromUploadedCatalog, {
-      output$SBS96plot <- renderPlot({
-        catSBS96 <-
-          list.of.catalogs$catSBS96[, input$sampleNameFromUploadedVCF, drop = FALSE]
-        ICAMS::PlotCatalog(catSBS96)
-      }, height = 230, width = 800)
-      
-      
-      output$SBS192plot <- renderPlot({
-        catSBS192 <-
-          list.of.catalogs$catSBS192[, input$sampleNameFromUploadedVCF, drop = FALSE]
-        ICAMS::PlotCatalog(catSBS192)
-      }, height = 250, width = 800)
-      
-      output$SBS12plot <- renderPlot({
-        catSBS192 <-
-          list.of.catalogs$catSBS192[, input$sampleNameFromUploadedVCF, drop = FALSE]
-        ICAMS::PlotCatalog(catSBS192, plot.SBS12 = TRUE)
-      }, height = 350, width = 350)
-      
-      output$SBS1536plot <- renderPlot({
-        catSBS1536 <-
-          list.of.catalogs$catSBS1536[, input$sampleNameFromUploadedVCF, drop = FALSE]
-        ICAMS::PlotCatalog(catSBS1536)
-      }, height = 800, width = 800)
-      
-      output$DBS78plot <- renderPlot({
-        catDBS78 <-
-          list.of.catalogs$catDBS78[, input$sampleNameFromUploadedVCF, drop = FALSE]
-        PlotCatalog(catDBS78)
-      }, height = 250)
-      
-      output$DBS136plot <- renderPlot({
-        catDBS136 <-
-          list.of.catalogs$catDBS136[, input$sampleNameFromUploadedVCF, drop = FALSE]
-        ICAMS::PlotCatalog(catDBS136)
-      }, height = 500, width = 700)
-      
-      output$DBS144plot <- renderPlot({
-        catDBS144 <-
-          list.of.catalogs$catDBS144[, input$sampleNameFromUploadedVCF, drop = FALSE]
-        ICAMS::PlotCatalog(catDBS144)
-      }, height = 350, width = 350)
-      
-      output$IDplot <- renderPlot({
-        catID <-
-          list.of.catalogs$catID[, input$sampleNameFromUploadedVCF, drop = FALSE]
-        ICAMS::PlotCatalog(catID)
-      }, height = 230, width = 800)
-      
-      
-      if (input.catalog.type() == "SBS96") {
-        height <- 230
-        width <- 800
-      } else if (input.catalog.type() == "SBS192") {
-        height <- 250
-        width <- 800
-      } else if (input.catalog.type() == "SBS1536") {
-        height <- 800
-        width <- 800
-      } else if (input.catalog.type() == "DBS78") {
-        height <- 250
-        width <- 800
-      } else if (input.catalog.type() == "DBS136") {
-        height <- 500
-        width <- 700
-      } else if (input.catalog.type() == "DBS144") {
-        height <- 350
-        width <- 350
-      } else if (input.catalog.type() == "ID") {
-        height <- 230
-        width <- 800
-      } 
-      
-      output$spectraPlotFromCatalog <- renderUI(
-        {
-          output$spectrum <- renderPlot(
-            {
-              PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
-                                  drop = FALSE])
-            }, width = width, height = height)
-          plotOutput(outputId = "spectrum")
-        }
-      )
-      shinyjs::show(id = "spectraPlotFromCatalog")
+      PrepareSpectraPlotFromCatalog(input = input,  output = output,
+                                    input.catalog.type = input.catalog.type(),
+                                    catalog = catalog)
     })
     
     # After showing the spectra plot from catalog, show an actionButton to redirect
