@@ -570,6 +570,7 @@ app_server <- function(input, output, session) {
       catalog.info <- input$upload.spectra
       catalog.path <<- catalog.info$datapath
       ShowTwoButtons()
+      analysis.for.uploaded.spectra(TRUE)
       
       HideThreeOptionalTabs()
     })
@@ -793,6 +794,10 @@ app_server <- function(input, output, session) {
         return()
       }
       
+      if (input$selectedCancerType == "") {
+        return()
+      }
+      
       if (!input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
         showNotification(ui = "Error:", 
                          action = paste0("Can only do signature attribution ", 
@@ -872,14 +877,13 @@ app_server <- function(input, output, session) {
     # Only when user selects the sample, then show the widget to choose catalog
     # type for signature attribution
     observeEvent(input$selectedSampleForAttribution, {
-      
       req(input$selectedSampleForAttribution)
-      
       if (analysis.for.uploaded.spectra() == TRUE) {
         shinyjs::hide(id = "addSig")
         shinyjs::hide(id = "chooseMoreSigs")
         shinyjs::hide(id = "chooseSigSubset")
         shinyjs::hide(id = "analysisButton")
+        shinyjs::hide(id = "chooseCatalogType")
         output$sigAetiologyTable <- NULL
         shinyjs::hide(id = "sigAetiologyTable")
         preselected.sigs(NULL)
@@ -899,49 +903,48 @@ app_server <- function(input, output, session) {
           }
         )
         return()
+      } else {
+        # Remove the values from previous sample
+        input.catalog.type(NULL)
+        
+        shinyjs::hide(id = "addSig")
+        shinyjs::hide(id = "chooseMoreSigs")
+        shinyjs::hide(id = "chooseSigSubset")
+        shinyjs::hide(id = "analysisButton")
+        output$selectCancerType <- renderUI(
+          {
+            cancer.types <-
+              c("Unknown", colnames(CancerTypeToExposureStatData()))
+            selectizeInput(inputId = "selectedCancerType",
+                           label = "Select cancer type",
+                           choices = cancer.types,
+                           options = list(
+                             placeholder = 'Please select an option below',
+                             onInitialize = I('function() { this.setValue(""); }')
+                           ))
+          }
+        )
+        
+        # Determine the catalog types available for attribution for selected sample
+        catalog.types.for.attribution <-
+          DetermineCatalogTypesForAttribution(list.of.catalogs = list.of.catalogs,
+                                              sample.name = input$selectedSampleForAttribution)
+        
+        output$chooseCatalogType <- renderUI(
+          {
+            selectizeInput(inputId = "selectCatalogType", 
+                           label = "Select catalog type",
+                           choices = catalog.types.for.attribution,
+                           options = list(
+                             placeholder = 'Please select an option below',
+                             onInitialize = I('function() { this.setValue(""); }')
+                           ))
+          }
+        )
+        
+        shinyjs::show(id = "chooseCatalogType")
       }
-      
-      # Remove the values from previous sample
-      input.catalog.type(NULL)
-      
-      shinyjs::hide(id = "addSig")
-      shinyjs::hide(id = "chooseMoreSigs")
-      shinyjs::hide(id = "chooseSigSubset")
-      shinyjs::hide(id = "analysisButton")
-      output$selectCancerType <- renderUI(
-        {
-          cancer.types <-
-            c("Unknown", colnames(CancerTypeToExposureStatData()))
-          selectizeInput(inputId = "selectedCancerType",
-                         label = "Select cancer type",
-                         choices = cancer.types,
-                         options = list(
-                           placeholder = 'Please select an option below',
-                           onInitialize = I('function() { this.setValue(""); }')
-                         ))
-        }
-      )
-      
-      # Determine the catalog types available for attribution for selected sample
-      catalog.types.for.attribution <-
-        DetermineCatalogTypesForAttribution(list.of.catalogs = list.of.catalogs,
-                                            sample.name = input$selectedSampleForAttribution)
-      
-      output$chooseCatalogType <- renderUI(
-        {
-          selectizeInput(inputId = "selectCatalogType", 
-                         label = "Select catalog type",
-                         choices = catalog.types.for.attribution,
-                         options = list(
-                           placeholder = 'Please select an option below',
-                           onInitialize = I('function() { this.setValue(""); }')
-                         ))
-        }
-      )
-      
-      shinyjs::show(id = "chooseCatalogType")
     })
-    
     
     observeEvent(input$selectCatalogType, {
       req(input$selectCatalogType)
@@ -988,6 +991,9 @@ app_server <- function(input, output, session) {
     # Update the catalog used for attribution if user selects another catalog type
     # for analysis
     observeEvent(input$selectCatalogType, {
+      if (input$selectCatalogType == "") {
+        return()
+      }
       catalog.name <- paste0("cat", input$selectCatalogType)
       catalog <<- list.of.catalogs[[catalog.name]]
     })
@@ -1097,13 +1103,6 @@ app_server <- function(input, output, session) {
       } # Need to use ignoreNULL here otherwise sigAetiologyTable will not change
         # if user deselect all signatures
     }, ignoreNULL = FALSE,  ignoreInit = TRUE)
-    
-    # When user changes input for sample selected and catalog type
-    # hide the previous signatuer aetiology table
-    hideAetiologyTable <- reactive(
-      list(input$selectedSampleForAttribution,
-           input$selectCatalogType)
-    )
     
     # Asynchronous programming starts from here
     observeEvent(input$startAnalysis, {
