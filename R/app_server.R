@@ -140,7 +140,7 @@ app_server <- function(input, output, session) {
       input.ref.genome("hg19")
       preselected.sigs(NULL)
       selected.more.sigs(NULL)
-      analysis.for.uploaded.spectra(TRUE)
+      analysis.for.uploaded.spectra(FALSE)
       
       # When the catalogs have been generated, increment rv$catalogGeneratedFlag
       rv$catalogGeneratedFlag <- rv$catalogGeneratedFlag + 1
@@ -175,7 +175,7 @@ app_server <- function(input, output, session) {
       input.ref.genome("hg19")
       preselected.sigs(NULL)
       selected.more.sigs(NULL)
-      analysis.for.uploaded.spectra(TRUE)
+      analysis.for.uploaded.spectra(FALSE)
       
       # When the catalogs have been generated, increment rv$catalogGeneratedFlag
       rv$catalogGeneratedFlag <- rv$catalogGeneratedFlag + 1
@@ -231,7 +231,7 @@ app_server <- function(input, output, session) {
       
       preselected.sigs(NULL)
       selected.more.sigs(NULL)
-      analysis.for.uploaded.spectra(TRUE)
+      analysis.for.uploaded.spectra(FALSE)
       
       # Create a temp path for the zip archive generated
       tmpdir <- tempfile()
@@ -1029,6 +1029,7 @@ app_server <- function(input, output, session) {
     # Only when user selects the sample, then show the widget to choose catalog
     # type for signature attribution
     observeEvent(input$selectedSampleForAttribution, {
+      
       req(input$selectedSampleForAttribution)
       
       if (analysis.for.uploaded.spectra() == TRUE) {
