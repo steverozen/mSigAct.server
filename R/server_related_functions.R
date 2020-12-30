@@ -71,11 +71,12 @@ CheckInputsForSpectra <- function(input, catalog.path) {
   error <- NULL
   SBS192.check <- TRUE
   if (is.null(input$ref.genome2)) {
-    error <- append(error, "Reference genome must be provided")
+    error <- append(error, "Reference genome must be specified")
   }
   
   if (is.null(input$region2)) {
-    error <- append(error, "Genomic region must be provided")
+    error <- 
+      append(error, "Use which signatures for attribution must be specified")
   }
   
   catalog <- ICAMS::ReadCatalog(catalog.path, stop.on.error = FALSE)
@@ -92,17 +93,17 @@ CheckInputsForVCF <- function(input) {
   error <- NULL
   
   if (is.null(input$ref.genome)) {
-    error <- append(error, "Reference genome must be provided")
+    error <- append(error, "Reference genome must be specified")
     return(error)
   }
   
   if (is.null(input$region)) {
-    error <- append(error, "Genomic region must be provided")
+    error <- append(error, "Genomic region must be specified")
     return(error)
   }
   
   if (is.null(input$variantCaller)) {
-    error <- append(error, "Variant caller information must be provided")
+    error <- append(error, "Variant caller must be specified")
     return(error)
   }
   
