@@ -1333,3 +1333,20 @@ HideThreeOptionalTabs <- function() {
   shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
   shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
 }
+
+#' @keywords internal
+CreateSelectCancerTypeWidget <- function(output) {
+  output$selectCancerType <- renderUI(
+    {
+      cancer.types <-
+        c("Unknown", colnames(CancerTypeToExposureStatData()))
+      selectizeInput(inputId = "selectedCancerType",
+                     label = "Select cancer type",
+                     choices = cancer.types,
+                     options = list(
+                       placeholder = 'Please select an option below',
+                       onInitialize = I('function() { this.setValue(""); }')
+                     ))
+    }
+  )
+}
