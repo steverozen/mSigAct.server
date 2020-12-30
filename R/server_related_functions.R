@@ -1326,3 +1326,10 @@ PrepareSpectraPlotFromCatalog <-
     )
     shinyjs::show(id = "spectraPlotFromCatalog")
   }
+
+#' @keywords internal
+HideThreeOptionalTabs <- function() {
+  shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
+  shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
+  shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+}

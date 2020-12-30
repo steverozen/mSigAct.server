@@ -151,9 +151,7 @@ app_server <- function(input, output, session) {
       
       shinyjs::hide(id = "clickToCreateCatalogs")
       shinyjs::hide(id = "spectraPlotFromVCF")
-      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      HideThreeOptionalTabs()
       
       output$downloadZipFile <- renderUI({
         downloadButton(outputId = "downloadCatalogs",
@@ -186,9 +184,7 @@ app_server <- function(input, output, session) {
       
       shinyjs::hide(id = "clickToCreateCatalogs")  
       shinyjs::hide(id = "spectraPlotFromVCF")
-      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      HideThreeOptionalTabs()
       
       output$downloadZipFile <- renderUI({
         downloadButton(outputId = "downloadCatalogs",
@@ -207,9 +203,7 @@ app_server <- function(input, output, session) {
       
       shinyjs::show(id = "clickToCreateCatalogs")  
       shinyjs::hide(id = "spectraPlotFromVCF")
-      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      HideThreeOptionalTabs()
     }) 
     
     # When user clicks "Create catalogs" button, generate catalogs and show
@@ -503,9 +497,7 @@ app_server <- function(input, output, session) {
       mutation.type <<- "SBS96"
       ShowTwoButtons()
       
-      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      HideThreeOptionalTabs()
     })
     
     observeEvent(input$preloadSBS192Spectra, {
@@ -525,9 +517,7 @@ app_server <- function(input, output, session) {
       mutation.type <<- "SBS192"
       ShowTwoButtons()
       
-      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      HideThreeOptionalTabs()
     })
     
     observeEvent(input$preloadDBS78Spectra, {
@@ -547,9 +537,7 @@ app_server <- function(input, output, session) {
       mutation.type <<- "DBS78"
       ShowTwoButtons()
       
-      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      HideThreeOptionalTabs()
     })
     
     observeEvent(input$preloadIDSpectra, {
@@ -569,9 +557,7 @@ app_server <- function(input, output, session) {
       mutation.type <<- "ID"
       ShowTwoButtons()
       
-      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      HideThreeOptionalTabs()
     })
     
     observeEvent(input$upload.spectra, {
@@ -585,9 +571,7 @@ app_server <- function(input, output, session) {
       catalog.path <<- catalog.info$datapath
       ShowTwoButtons()
       
-      shinyjs::hide(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::hide(selector = '#panels li a[data-value=attributionResultsTab]')
+      HideThreeOptionalTabs()
     })
     
     # Check the arguments for uploaded spectra
@@ -1274,4 +1258,3 @@ app_server <- function(input, output, session) {
     
   }) # end of tryCatch
 }
-  
