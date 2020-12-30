@@ -1350,3 +1350,22 @@ CreateSelectCancerTypeWidget <- function(output) {
     }
   )
 }
+
+#' @keywords internal
+ReadAndCheckCatalog <- function(input, catalog.path, input.region) {
+  catalog <- ICAMS::ReadCatalog(file = catalog.path,
+                                 ref.genome = input$ref.genome2,
+                                 region = input.region,
+                                 stop.on.error = FALSE)
+  if (!is.null(attr(catalog, "error"))) {
+    file.info <- input$upload.spectra
+    file.name <- file.info$name
+    showNotification(
+      paste(file.name, 
+            "does not seem to be a spectra catalog. Details:\n",
+            attr(catalog, "error")), duration = NULL, type = "error")
+    return(NULL)
+  } else {
+    return(catalog)
+  }
+}
