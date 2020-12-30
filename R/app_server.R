@@ -777,6 +777,11 @@ app_server <- function(input, output, session) {
         shinyjs::hide(id = "spectraPlotFromVCF")
         shinyjs::hide(id = "selectSampleFromUploadedVCF")
         
+        shinyjs::hide(id = "addSig")
+        shinyjs::hide(id = "chooseMoreSigs")
+        shinyjs::hide(id = "chooseSigSubset")
+        shinyjs::hide(id = "analysisButton")
+        
         shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
         
         if (input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
@@ -826,6 +831,10 @@ app_server <- function(input, output, session) {
         shinyjs::hide(id = "spectraPlotFromVCF")
         shinyjs::hide(id = "selectSampleFromUploadedVCF")
         
+        shinyjs::hide(id = "addSig")
+        shinyjs::hide(id = "chooseMoreSigs")
+        shinyjs::hide(id = "chooseSigSubset")
+        shinyjs::hide(id = "analysisButton")
         
         output$uploadedCatalogType <- renderUI(
           {
