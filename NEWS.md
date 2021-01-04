@@ -11,6 +11,10 @@
 
 * Preserved the file path extensions for example analysis on Strelka and Mutect VCFs.
 
+## Fixed
+* Fixed a bug when user uploads multiple files in "Upload spectra for signature
+attribution" page.
+
 <br>
 
 # mSigAct.server 0.0.7

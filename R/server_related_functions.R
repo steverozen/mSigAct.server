@@ -1353,20 +1353,34 @@ CreateSelectCancerTypeWidget <- function(output) {
 
 #' @keywords internal
 ReadAndCheckCatalog <- function(input, catalog.path, input.region) {
-  catalog <- ICAMS::ReadCatalog(file = catalog.path,
-                                 ref.genome = input$ref.genome2,
-                                 region = input.region,
-                                 stop.on.error = FALSE)
-  if (!is.null(attr(catalog, "error"))) {
-    file.info <- input$upload.spectra
-    file.name <- file.info$name
-    showNotification(
-      paste(file.name, 
-            "does not seem to be a spectra catalog. Details:\n",
-            attr(catalog, "error")), duration = NULL, type = "error")
-    return(NULL)
+  # file.info is a data frame that contains one row for each uploaded file,
+  # and four columns "name", "size", "type" and "datapath".
+  # "name": The filename provided by the web browser.
+  # "size": The size of the uploaded data, in bytes.
+  # "type": The MIME type reported by the browser.
+  # "datapath": The path to a temp file that contains the data that was uploaded.
+  file.info <- input$upload.spectra
+  file.name <- file.info$name
+  num.of.files <- length(file.name)
+  
+  if (num.of.files == 1) {
+    catalog <- ICAMS::ReadCatalog(file = catalog.path,
+                                  ref.genome = input$ref.genome2,
+                                  region = input.region,
+                                  stop.on.error = FALSE)
+    if (!is.null(attr(catalog, "error"))) {
+      showNotification(
+        paste(file.name, 
+              "does not seem to be a spectra catalog. Details:\n",
+              attr(catalog, "error")), duration = NULL, type = "error")
+      return(NULL)
+    } else {
+      return(catalog)
+    }
   } else {
-    return(catalog)
+    showNotification("Please only upload one file at a time ", duration = NULL, 
+                     type = "error")
+    return(NULL)
   }
 }
 
@@ -1385,7 +1399,6 @@ ReadAndCheckVCF <- function(input) {
   num.of.files <- length(file.names)
   
   ReadVCFs <- utils::getFromNamespace(x = "ReadVCFs", ns = "ICAMS")
-  
   retval <- tryCatch({
       ReadVCFs(files = file.paths, 
                num.of.cores = min(10, num.of.files),
