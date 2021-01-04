@@ -1397,7 +1397,6 @@ ReadAndCheckVCF <- function(input) {
   file.paths <- vcfs.info$datapath
   file.names <- vcfs.info$name
   num.of.files <- length(file.names)
-  
   ReadVCFs <- utils::getFromNamespace(x = "ReadVCFs", ns = "ICAMS")
   retval <- tryCatch({
       ReadVCFs(files = file.paths, 
@@ -1413,29 +1412,37 @@ ReadAndCheckVCF <- function(input) {
       }
   )
   
-  if (num.of.files == 1 && !is.null(attr(retval, "error"))) {
-    showNotification(attr(retval, "error"), duration = NULL, type = "error")
-    return(NULL)
-  }
-  
-  
-  if (num.of.files != 1 && attr(retval[[1]], "class") == "try-error") {
-    lapply(1:length(retval), FUN = function(x) {
-      
-      # As there is stop() inside tryCatch() in function MakeDataFrameFromVCF()
-      # which is called by ReadVCFs(). Internally, when an error condition is
-      # raised, tryCatch() calls the error handler provided which is the third
-      # element in a list (internal to tryCatch). It calls that that handler
-      # passing condition cond via: value[[3L]](cond).
-      
-      # Will need to get rid of the "Error in value[[3L]](cond) : " message
-      message <- gsub(pattern = "Error in value[[3L]](cond) : ", 
-                      replacement = "", 
-                      x = retval[[x]],
-                      fixed = TRUE)
-      showNotification(message, duration = NULL, type = "error")
-    })
-    return(NULL)
+  if (.Platform$OS.type == "windows") {
+    # On Windows, only 1 core will be used by ReadVCFs, thus only one error message
+    if (!is.null(attr(retval, "error"))) {
+      showNotification(attr(retval, "error"), duration = NULL, type = "error")
+      return(NULL)
+    } else {
+      return(retval)
+    }
+  } else {
+    if (num.of.files == 1 && !is.null(attr(retval, "error"))) {
+      showNotification(attr(retval, "error"), duration = NULL, type = "error")
+      return(NULL)
+    }
+    
+    if (num.of.files != 1 && attr(retval[[1]], "class") == "try-error") {
+      lapply(1:length(retval), FUN = function(x) {
+        # As there is stop() inside tryCatch() in function MakeDataFrameFromVCF()
+        # which is called by ReadVCFs(). Internally, when an error condition is
+        # raised, tryCatch() calls the error handler provided which is the third
+        # element in a list (internal to tryCatch). It calls that that handler
+        # passing condition cond via: value[[3L]](cond).
+        
+        # Will need to get rid of the "Error in value[[3L]](cond) : " message
+        message <- gsub(pattern = "Error in value[[3L]](cond) : ", 
+                        replacement = "", 
+                        x = retval[[x]],
+                        fixed = TRUE)
+        showNotification(message, duration = NULL, type = "error")
+      })
+      return(NULL)
+    }
   }
   
   return(retval)
