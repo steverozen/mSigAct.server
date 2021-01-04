@@ -209,7 +209,6 @@ app_server <- function(input, output, session) {
     # When user clicks "Create catalogs" button, generate catalogs and show
     # "Download catalogs" button
     observeEvent(input$createCatalogs, {
-      
       # Check the arguments for generating catalogs from VCF
       errors <- CheckInputsForVCF(input)
       ids$error <<- append(ids$error, AddErrorMessage(errors))

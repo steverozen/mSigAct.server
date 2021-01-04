@@ -6,7 +6,7 @@
 
 * Changed header information in run-information.txt from generated zip file.
 
-* Preserved the file path extensions for 
+* Preserved the file path extensions for example analysis on Strelka and Mutect VCFs.
 
 <br>
 
