@@ -1,4 +1,7 @@
 # mSigAct.server 0.0.8.90xx
+## Added
+* Added informative error reporting when uploading non-VCFs as VCFs.
+
 ## Changed
 * Only show spectra plots for catalog types which have mutations.
 
