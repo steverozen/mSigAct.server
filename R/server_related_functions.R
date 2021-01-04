@@ -943,7 +943,7 @@ RunICAMSOnSampleStrelkaVCFs <- function(session, output, file, ids) {
   input$variantCaller <- "strelka"
   input$vcf.files <-
     data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)
-  input$names.of.VCFs <- paste(name, collapse = ", ")
+  input$names.of.VCFs <- paste(tools::file_path_sans_ext(name), collapse = ", ")
   input$base.filename <- "HepG2"
   input$zipfile.name <- "mSigAct-test-run-Strelka-VCFs-output"
   input$ref.genome <- "hg19"
@@ -972,7 +972,7 @@ RunICAMSOnSampleMutectVCFs <- function(session, output, file, ids) {
   input$variantCaller <- "mutect"
   input$vcf.files <-
     data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)
-  input$names.of.VCFs <- paste(name, collapse = ", ")
+  input$names.of.VCFs <- paste(tools::file_path_sans_ext(name), collapse = ", ")
   input$tumor.col.names <- "NA"
   input$base.filename <- "HepG2"
   input$zipfile.name <- "mSigAct-test-run-Mutect-VCFs-output"
