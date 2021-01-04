@@ -1369,3 +1369,40 @@ ReadAndCheckCatalog <- function(input, catalog.path, input.region) {
     return(catalog)
   }
 }
+
+#' @keywords internal
+ReadAndCheckVCF <- function(input) {
+  # vcfs.info is a data frame that contains one row for each uploaded file,
+  # and four columns "name", "size", "type" and "datapath".
+  # "name": The filename provided by the web browser.
+  # "size": The size of the uploaded data, in bytes.
+  # "type": The MIME type reported by the browser.
+  # "datapath": The path to a temp file that contains the data that was uploaded.
+  vcfs.info <- input$vcf.files
+  vcfs.info <- input$vcf.files
+  file.paths <- vcfs.info$datapath
+  file.names <- vcfs.info$name
+  
+  ReadVCFs <- utils::getFromNamespace(x = "ReadVCFs", ns = "ICAMS")
+  
+  retval <- tryCatch({
+      ReadVCFs(files = file.paths, 
+               num.of.cores = min(10, length(file.names)),
+               names.of.VCFs = file.names)},
+      error = function(error.info) {
+        if(!is.null(error.info$message)) {
+          err.message <- error.info$message
+          null.list <- list()
+          attr(null.list, "error") <- err.message
+          return(null.list)
+        }
+      }
+  )
+  
+  if (!is.null(attr(retval, "error"))) {
+    showNotification(attr(retval, "error"), duration = NULL, type = "error")
+    return(NULL)
+  } else {
+    return(retval)
+  }
+}

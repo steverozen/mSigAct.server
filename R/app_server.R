@@ -214,6 +214,13 @@ app_server <- function(input, output, session) {
       ids$error <<- append(ids$error, AddErrorMessage(errors))
       
       req(input$variantCaller, input$ref.genome, input$region, input$vcf.files)
+      
+      # Check whether the uploaded files are really VCFs
+      retval1 <- ReadAndCheckVCF(input)
+      if (is.null(retval1)) {
+        return()
+      }
+      
       if (input$variantCaller == "unknown") {
         if (is.null(input$mergeSBS)) {
           return()

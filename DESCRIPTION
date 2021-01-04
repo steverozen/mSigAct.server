@@ -1,6 +1,6 @@
 Package: mSigAct.server
 Title: Shiny Server for Analyzing Mutational Signature Activities
-Version: 0.0.8.9002
+Version: 0.0.8.9003
 Author: Nanhai Jiang, Steven G. Rozen
 Maintainer: Nanhai Jiang <jiangnanhai@hotmail.com>
 Description: Shiny server for analyzing mutational signature activities; 
@@ -22,7 +22,7 @@ Imports: BSgenome.Hsapiens.1000genomes.hs37d5,
     DT,
     future,
     golem,
-    ICAMS (>= 2.2.8.9008),
+    ICAMS (>= 2.3.0.9000),
     ICAMSxtra,
     htmltools,
     ipc,
