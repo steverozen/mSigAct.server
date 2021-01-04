@@ -939,7 +939,7 @@ RunICAMSOnSampleStrelkaVCFs <- function(session, output, file, ids) {
   input <- reactiveValues()
   dir <- system.file("extdata/Strelka-SBS-vcf", package = "ICAMS")
   datapath <- list.files(dir, full.names = TRUE)
-  name <- tools::file_path_sans_ext(basename(datapath))
+  name <- basename(datapath)
   input$variantCaller <- "strelka"
   input$vcf.files <-
     data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)
@@ -968,7 +968,7 @@ RunICAMSOnSampleMutectVCFs <- function(session, output, file, ids) {
   input <- reactiveValues()
   dir <- system.file("extdata/Mutect-vcf", package = "ICAMS")
   datapath <- list.files(dir, full.names = TRUE)
-  name <- tools::file_path_sans_ext(basename(datapath))
+  name <- basename(datapath)
   input$variantCaller <- "mutect"
   input$vcf.files <-
     data.frame(name = name, datapath = datapath, stringsAsFactors = FALSE)

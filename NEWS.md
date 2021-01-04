@@ -4,6 +4,10 @@
 
 * Only show catalog types for signature attribution which have mutations.
 
+* Changed header information in run-information.txt from generated zip file.
+
+* Preserved the file path extensions for 
+
 <br>
 
 # mSigAct.server 0.0.7
