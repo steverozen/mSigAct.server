@@ -1,4 +1,11 @@
-# mSigAct.server 0.0.8.90xx
+# mSigAct.server 0.0.9.90xx
+## Fixed
+* Fixed a bug not showing thumbnail pictures when user selects the same cancer type and
+catalog type.
+
+<br>
+
+# mSigAct.server 0.0.8
 ## Added
 * Added informative error reporting when uploading non-VCFs as VCFs.
 

@@ -779,6 +779,9 @@ app_server <- function(input, output, session) {
       }
       
       ShowPreselectedSigs(input, output,input.catalog.type())
+      # Each time when we call ShowPreselectedSigs(), must remember to update
+      # the reactive value preselected.sigs
+      preselected.sigs(input$preselectedSigs)
     
       # Show the actionButton for user to add more signatures
       output$addSig <- renderUI(
@@ -889,7 +892,11 @@ app_server <- function(input, output, session) {
         catalog.name <- paste0("cat", input.catalog.type())
         catalog <<- list.of.catalogs[[catalog.name]]
       }
+      
       ShowPreselectedSigs(input, output, input.catalog.type())
+      # Each time when we call ShowPreselectedSigs(), must remember to update
+      # the reactive value preselected.sigs
+      preselected.sigs(input$preselectedSigs)
       
       # Show the actionButton for user to add more signatures
       output$addSig <- renderUI(
@@ -911,6 +918,9 @@ app_server <- function(input, output, session) {
         catalog <<- list.of.catalogs[[catalog.name]]
       }
       ShowPreselectedSigs(input, output, input.catalog.type())
+      # Each time when we call ShowPreselectedSigs(), must remember to update
+      # the reactive value preselected.sigs
+      preselected.sigs(input$preselectedSigs)
       
       # Show the actionButton for user to add more signatures
       output$addSig <- renderUI(
