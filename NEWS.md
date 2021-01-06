@@ -3,6 +3,8 @@
 * Fixed a bug not showing thumbnail pictures when user selects the same cancer type and
 catalog type.
 
+* Fixed a bug not showing thumbnail pictures after restarting R session.
+
 <br>
 
 # mSigAct.server 0.0.8

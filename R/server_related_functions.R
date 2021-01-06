@@ -1181,38 +1181,32 @@ PrepareThumbnailForSample <- function(input, catalog, input.catalog.type) {
 
 #' @keywords internal
 ShowPreselectedSigs <- function(input, output, input.catalog.type) {
-  sig.universe <- NULL
   if(is.null(input.catalog.type)) {
     return()
   }
+  
+  if (input$selectedCancerType == "") {
+    selected.sig.universe <- NULL
+  } else {
+    tmp <- 
+      mSigAct::ExposureProportions(mutation.type = input.catalog.type,
+                                   cancer.type = input$selectedCancerType)
+    selected.sig.universe0 <- names(tmp)
+    
+    # Exclude possible artifact signatures
+    possible.artifacts <- mSigAct::PossibleArtifacts()
+    
+    selected.sig.universe1 <- 
+      setdiff(selected.sig.universe0, possible.artifacts)
+    
+    # Exclude rare signatures
+    rare.sigs <- mSigAct::RareSignatures()
+    selected.sig.universe <-
+      setdiff(selected.sig.universe1, rare.sigs)
+  }
+  
   output$chooseSigSubset <- renderUI(
     { 
-      if (input.catalog.type == "SBS96") {
-        sig.universe <<- colnames(COSMIC.v3.genome.SBS96.sigs)
-      } else {
-        sig.universe <<- 
-          colnames(PCAWG7::signature[["genome"]][[input.catalog.type]])
-      }
-      if (input$selectedCancerType == "") {
-        selected.sig.universe <- NULL
-      } else {
-        tmp <- 
-          mSigAct::ExposureProportions(mutation.type = input.catalog.type,
-                                            cancer.type = input$selectedCancerType)
-        selected.sig.universe0 <- names(tmp)
-        
-        # Exclude possible artifact signatures
-        possible.artifacts <- mSigAct::PossibleArtifacts()
-        
-        selected.sig.universe1 <- 
-          setdiff(selected.sig.universe0, possible.artifacts)
-        
-        # Exclude rare signatures
-        rare.sigs <- mSigAct::RareSignatures()
-        selected.sig.universe <-
-          setdiff(selected.sig.universe1, rare.sigs)
-      }
-      
       tagList(
         shinyWidgets::pickerInput(inputId = "preselectedSigs",
                                   label = paste0("These signatures were preselected based ",  
@@ -1229,7 +1223,7 @@ ShowPreselectedSigs <- function(input, output, input.catalog.type) {
     }) # end of renderUI
   
   shinyjs::show(id = "chooseSigSubset")
-  return(sig.universe)
+  return(selected.sig.universe)
 }
 
 #' @keywords internal
