@@ -1046,7 +1046,17 @@ PlotListOfCatalogsToPdf <- function(list.of.catalogs,
     graphics::par(tck = old.par.tck.value)
     
     num.of.catalogs <- length(list.of.catalogs)
-    opar <- graphics::par(mfrow = c(8, 1), mar = c(4, 5.5, 2, 1), oma = c(1, 1, 2, 1))
+    catalog.type <- attr(list.of.catalogs[[1]], "catalog.type")
+    if (nrow(list.of.catalogs[[1]]) == 96) {
+      opar <- graphics::par(mfrow = c(8, 1), mar = c(4, 5.5, 2, 1), oma = c(1, 1, 2, 1))
+    } else if (nrow(list.of.catalogs[[1]]) == 192) {
+      opar <- graphics::par(mfrow = c(8, 1), mar = c(2, 4, 2, 2), oma = c(3, 2, 1, 1))
+    } else if (nrow(list.of.catalogs[[1]]) == 78) {
+      opar <- graphics::par(mfrow = c(8, 1), mar = c(2, 4, 2, 2), oma = c(3, 3, 2, 2))
+    } else if (nrow(list.of.catalogs[[1]]) == 83) {
+      opar <- graphics::par(mfrow = c(8, 1), mar = c(3, 4, 2.5, 2), oma = c(3, 3, 2, 2))
+    } 
+    
     on.exit(graphics::par(opar))
     
     for (i in 1:num.of.catalogs) {
