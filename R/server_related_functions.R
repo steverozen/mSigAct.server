@@ -796,9 +796,11 @@ PrepareAttributionResults <-
       
       tbl1 <- data.frame(name = c(colnames(spect), "Reconstructed spectrum"), 
                          count = c(colSums(spect), colSums(reconstructed.catalog)), 
+                         contribution = c(NA, NA),
                          cosine.similarity = c(1, cossim))
       tbl2 <- data.frame(name = best.MAP.exp$sig.id, 
-                         count = best.MAP.exp$count)
+                         count = best.MAP.exp$count,
+                         contribution = best.MAP.exp$count / sum(best.MAP.exp$count))
       
       tbl <- dplyr::bind_rows(tbl1, tbl2)
       PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
@@ -835,6 +837,10 @@ PrepareAttributionResults <-
                          paste0('<img src="', resource.path, '/', 
                                 png.reconstructed.file.name, '" height="52"></img>'))
       
+      # Add the proportions of each signature contributing to the reconstructed
+      # spectrum
+      dt0$contribution <- dt0$count/ sum(dt0$count)
+      
       dt1 <- dplyr::bind_rows(tbl1, dt0)
       
       # Write the exposure counts table to CSV file
@@ -849,8 +855,8 @@ PrepareAttributionResults <-
         DT::datatable(dt1, 
                       escape = FALSE, 
                       rownames = FALSE,
-                      colnames = c("Name", "Count", "Cosine similarity", 
-                                   "Spectrum", "Proposed etiology"),
+                      colnames = c("Name", "Mutations", "Contribution",
+                                   "Cosine similarity", "Spectrum", "Proposed etiology"),
                       extensions = c("Buttons"),
                       options = list(lengthMenu = c(25, 50, 75), 
                                      pageLength = 25,
@@ -858,7 +864,8 @@ PrepareAttributionResults <-
                                        search = "Search in signatures and etiologies:"
                                      ))) %>%
           DT::formatRound(columns = 2, digits = 1) %>%
-          DT::formatRound(columns = 3, digits = 5)
+          DT::formatRound(columns = 3, digits = 5) %>%
+          DT::formatRound(columns = 4, digits = 5)
       })
       
       # Download attribution results when user clicks the button

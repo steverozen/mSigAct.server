@@ -1,4 +1,8 @@
 # mSigAct.server 0.0.9.90xx
+## Added
+* Added contribution percentage of each signature to the reconstructed spectrum
+in the attribution results.
+
 ## Fixed
 * Fixed a bug not showing thumbnail pictures when user selects the same cancer type and
 catalog type.
