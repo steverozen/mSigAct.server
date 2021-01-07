@@ -5,6 +5,8 @@ catalog type.
 
 * Fixed a bug not showing thumbnail pictures after restarting R session.
 
+* Fixed a bug in function `ReadAndCheckCatalog` for checking number of files to be read in.
+
 <br>
 
 # mSigAct.server 0.0.8

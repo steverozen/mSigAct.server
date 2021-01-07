@@ -1355,7 +1355,10 @@ ReadAndCheckCatalog <- function(input, catalog.path, input.region) {
   # "datapath": The path to a temp file that contains the data that was uploaded.
   file.info <- input$upload.spectra
   file.name <- file.info$name
-  num.of.files <- length(file.name)
+  
+  # Must use catalog.path to determine the number of files Because if we are
+  # using preloaded spectra, then input$upload.spectra will be NULL
+  num.of.files <- length(catalog.path)
   
   if (num.of.files == 1) {
     catalog <- ICAMS::ReadCatalog(file = catalog.path,
