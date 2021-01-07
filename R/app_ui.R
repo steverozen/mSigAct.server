@@ -37,9 +37,6 @@ app_ui <- function(request) {
                value = "tutorialTab"),
       position = "fixed-top",
       windowTitle = "mSigAct: Mutational Signature Activity"),
-    
-    # Add padding because navbar pinned at the top
-    tags$style(type="text/css", "body {padding-top: 75px;}"),
   )
 }
 
@@ -220,6 +217,9 @@ golem_add_external_resources <- function(){
     #tags$link(rel="stylesheet", type="text/css", href="www/custom.css")
     
     #includeCSS(path = "inst/app/www/style.css")
+    
+    # Add padding because navbar pinned at the top
+    tags$style(type="text/css", "body {padding-top: 75px;}"),
     
     tags$style(
       HTML(".shiny-notification {
