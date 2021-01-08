@@ -738,7 +738,8 @@ ProcessVCFs <- function(input, output, file, ids) {
 #' @importFrom dplyr bind_rows
 #' @keywords internal
 PrepareAttributionResults <- 
-  function (input, output, session, input.catalog.type, plotdata) {
+  function (input, output, session, input.catalog.type, plotdata, 
+            attribution.results.tab.existing) {
       cossim <- plotdata$cossim
       spect <- plotdata$spect
       best.MAP.exp <- plotdata$best.MAP.exp
@@ -903,6 +904,15 @@ PrepareAttributionResults <-
           zip::zipr(zipfile = file, files = file.names)
         }
       )
+      
+      # Check and insert tab "attributionResultsTab" on navbarPage
+      if (attribution.results.tab.existing == FALSE) {
+        insertTab(inputId = "panels",
+                  tabPanel(title = tags$b("Results"), 
+                           AttributionResultsUI(),
+                           value = "attributionResultsTab"),
+                  target = "tutorialTab")
+      }
       
       # Show the new attribution results
       shinyjs::show(selector = '#panels li a[data-value=attributionResultsTab]')
@@ -1460,4 +1470,22 @@ ReadAndCheckVCF <- function(input) {
   }
   
   return(retval)
+}
+
+#' @keywords internal
+InsertTwoTabs <- function(sig.attribution.tab.existing, show.spectra.tab.existing) {
+  if (sig.attribution.tab.existing == FALSE) {
+    insertTab(inputId = "panels",
+              tabPanel(title = tags$b("Get signature attributions"), 
+                       SignatureAttributionUI(), 
+                       value = "sigAttributionTab"),
+              target = "tutorialTab")
+    
+    if (show.spectra.tab.existing == FALSE) {
+      insertTab(inputId = "panels",
+                tabPanel(title = tags$b("Show spectra"), ShowSpectraUI(), 
+                         value = "showSpectraTab"),
+                target = "sigAttributionTab")
+    }
+  }
 }

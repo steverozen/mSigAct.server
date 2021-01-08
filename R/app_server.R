@@ -48,7 +48,13 @@ app_server <- function(input, output, session) {
     
     selected.more.sigs <- reactiveVal(NULL)
     
-    sigsForAttribution <- reactiveVal(NULL)
+    sigs.for.attribution <- reactiveVal(NULL)
+    
+    show.spectra.tab.existing <- reactiveVal(FALSE)
+    
+    sig.attribution.tab.existing <- reactiveVal(FALSE)
+    
+    attribution.results.tab.existing <- reactiveVal(FALSE)
     
     analysis.for.uploaded.spectra <- reactiveVal(FALSE)
       
@@ -345,9 +351,16 @@ app_server <- function(input, output, session) {
       shinyjs::hide(id = "spectraPlotFromCatalog")
       shinyjs::hide(id = "selectSampleFromUploadedCatalog ")
       
+      # Check and insert two tabs "sigAttributionTab" and "showSpectraTab" on
+      # navbarPage
+      InsertTwoTabs(sig.attribution.tab.existing(), show.spectra.tab.existing())
+      sig.attribution.tab.existing(TRUE)
+      show.spectra.tab.existing(TRUE)
+      
       shinyjs::show(id = "selectSampleFromUploadedVCF")
       
       shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                      selected = "showSpectraTab")
     })
@@ -360,6 +373,12 @@ app_server <- function(input, output, session) {
       # Hide the previous plot from uploaded catalog
       shinyjs::hide(id = "spectraPlotFromCatalog")
       shinyjs::hide(id = "selectSampleFromUploadedCatalog ")
+      
+      # Check and insert two tabs "sigAttributionTab" and "showSpectraTab" on
+      # navbarPage
+      InsertTwoTabs(sig.attribution.tab.existing(), show.spectra.tab.existing())
+      sig.attribution.tab.existing(TRUE)
+      show.spectra.tab.existing(TRUE)
       
       shinyjs::show(id = "selectSampleFromUploadedVCF")
       
@@ -619,6 +638,12 @@ app_server <- function(input, output, session) {
         shinyjs::hide(id = "chooseSigSubset")
         shinyjs::hide(id = "analysisButton")
         
+        # Check and insert two tabs "sigAttributionTab" and "showSpectraTab" on
+        # navbarPage
+        InsertTwoTabs(sig.attribution.tab.existing(), show.spectra.tab.existing())
+        sig.attribution.tab.existing(TRUE)
+        show.spectra.tab.existing(TRUE)
+        
         shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
         
         if (input.catalog.type() %in% c("SBS96", "SBS192", "DBS78", "ID")) {
@@ -673,6 +698,13 @@ app_server <- function(input, output, session) {
             p(tags$b(paste0("Mutation type: ", mutation.type)))
           }
         )
+        
+        # Check and insert two tabs "sigAttributionTab" and "showSpectraTab" on
+        # navbarPage
+        InsertTwoTabs(sig.attribution.tab.existing(), show.spectra.tab.existing())
+        sig.attribution.tab.existing(TRUE)
+        show.spectra.tab.existing(TRUE)
+        
         shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
         shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
         shinydashboard::updateTabItems(session = session, inputId = "panels", 
@@ -976,14 +1008,14 @@ app_server <- function(input, output, session) {
     })
     
     observeEvent(input$selectCatalogType, {
-      sigsForAttribution(NULL)
+      sigs.for.attribution(NULL)
       output$sigAetiologyTable <- NULL
       shinyjs::hide(id = "sigAetiologyTable")
     })
     
     observeEvent(sigsForAttributionChanged(), {
       shinyjs::hide(id = "sigAetiologyTable")
-      sigsForAttribution(c(preselected.sigs(), selected.more.sigs()))
+      sigs.for.attribution(c(preselected.sigs(), selected.more.sigs()))
       
       if (is.null(input.catalog.type())) {
         return()
@@ -996,16 +1028,16 @@ app_server <- function(input, output, session) {
       
       if (input.catalog.type() == "SBS96") {
         sigs.in.correct.order <- 
-          intersect(rownames(COSMIC.v3.SBS96.sig.links), sigsForAttribution())
+          intersect(rownames(COSMIC.v3.SBS96.sig.links), sigs.for.attribution())
       } else if (input.catalog.type() == "SBS192") {
         sigs.in.correct.order <- 
-          intersect(rownames(COSMIC.v3.SBS192.sig.links), sigsForAttribution())
+          intersect(rownames(COSMIC.v3.SBS192.sig.links), sigs.for.attribution())
       } else if (input.catalog.type() == "DBS78") {
         sigs.in.correct.order <- 
-          intersect(rownames(COSMIC.v3.DBS78.sig.links), sigsForAttribution())
+          intersect(rownames(COSMIC.v3.DBS78.sig.links), sigs.for.attribution())
       } else if (input.catalog.type() == "ID") {
         sigs.in.correct.order <- 
-          intersect(rownames(COSMIC.v3.ID.sig.links), sigsForAttribution())
+          intersect(rownames(COSMIC.v3.ID.sig.links), sigs.for.attribution())
       } else {
         sigs.in.correct.order <- NULL
       }
@@ -1031,12 +1063,12 @@ app_server <- function(input, output, session) {
         )
       })
       
-      if (!is.null(sigsForAttribution())) {
+      if (!is.null(sigs.for.attribution())) {
         shinyjs::show(id = "sigAetiologyTable")
       }
       
       # Don't show "Analyze" button if no signatures were selected in the beginning
-      if (!is.null(sigsForAttribution())) {
+      if (!is.null(sigs.for.attribution())) {
         output$analysisButton <- renderUI({
           actionButton(inputId = "startAnalysis", label = "Analyze",
                        style= "color: #fff; background-color: #337ab7;
@@ -1049,7 +1081,7 @@ app_server <- function(input, output, session) {
     
     # Asynchronous programming starts from here
     observeEvent(input$startAnalysis, {
-      if(length(sigsForAttribution()) == 0) {
+      if(length(sigs.for.attribution()) == 0) {
         showNotification(ui = "Error:", 
                          action = "No signatures selected for attribution analysis",
                          type = "error", duration = NULL)
@@ -1067,10 +1099,10 @@ app_server <- function(input, output, session) {
       
       if (catalog.type == "ID") {
         sig.universe <<- 
-          COSMIC.v3.hg19.genome.ID.sigs[, sigsForAttribution(), drop = FALSE]
+          COSMIC.v3.hg19.genome.ID.sigs[, sigs.for.attribution(), drop = FALSE]
       } else {
         
-        sig.universe <<- total.signatures()[, sigsForAttribution(), drop = FALSE]
+        sig.universe <<- total.signatures()[, sigs.for.attribution(), drop = FALSE]
       }
       
       # Do the first round of cut-off if there are many signatures in the beginning
@@ -1165,9 +1197,13 @@ app_server <- function(input, output, session) {
             plotdata$sig.universe <<- sig.universe
             plotdata$best.MAP.exp <<- MAP.best.exp
             
-            retval <- PrepareAttributionResults(input, output, session, 
-                                                 input.catalog.type(), 
-                                                 plotdata)
+            retval <- 
+              PrepareAttributionResults(input, output, session, 
+                                        input.catalog.type(), 
+                                        plotdata,
+                                        attribution.results.tab.existing())
+            attribution.results.tab.existing(TRUE)
+            
             attribution.results <<- retval$attribution.results
           }
         } %...>% result_val

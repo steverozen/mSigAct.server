@@ -1,4 +1,12 @@
-# mSigAct.server 0.0.9.90xx
+# mSigAct.server 0.1.0
+## Changed
+* Do not create "showSpectraTab", "sigAttributionTab" and
+"attributionResultsTab" on initialization. Use `inserTab` instead to show the
+necessary tabs upon user's action.
+
+<br>
+
+# mSigAct.server 0.0.9
 ## Added
 * Added contribution percentage of each signature to the reconstructed spectrum
 in the attribution results.

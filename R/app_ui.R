@@ -1,18 +1,9 @@
-jscode <- "
-shinyjs.init = function() {
-  $('#panels li a[data-value=showSpectraTab]').hide();
-  $('#panels li a[data-value=sigAttributionTab]').hide();
-  $('#panels li a[data-value=attributionResultsTab]').hide();
-}"
-
 #' @import shiny
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     
-    shinyjs::useShinyjs(),
-    shinyjs::extendShinyjs(text = jscode, functions = c()),
     navbarPage(title = tags$b("mSigAct"), id = "panels",
       tabPanel(title = tags$b("Home"), 
                HomeUI()),
@@ -24,19 +15,11 @@ app_ui <- function(request) {
                               "signature attribution"), 
                UploadSpectraUI(), 
                value = "uploadSpectraTab"),
-      tabPanel(title = tags$b("Show spectra"), ShowSpectraUI(), 
-               value = "showSpectraTab"),
-      tabPanel(title = tags$b("Get signature attributions"), 
-               SignatureAttributionUI(), 
-               value = "sigAttributionTab"),
-      tabPanel(title = tags$b("Results"), 
-               AttributionResultsUI(),
-               value = "attributionResultsTab"),
       tabPanel(title = tags$b("Guides (help)"), 
                TutorialUI(),
                value = "tutorialTab"),
       position = "fixed-top",
-      windowTitle = "mSigAct: Mutational Signature Activity"),
+      windowTitle = "mSigAct: Mutational Signature Activity")
   )
 }
 
