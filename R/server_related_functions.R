@@ -1270,7 +1270,7 @@ PrepareSpectraPlotFromVCF <- function(input, output, list.of.catalogs) {
   
   names.of.tabs <- NULL
   
-  heights.of.plots <- list(230, 250, 800, 250, 500, 350, 230)
+  heights.of.plots <- list(230, 300, 800, 250, 500, 350, 230)
   widths.of.plots <- list(800, 800, 800, 800, 700, 350, 800)
   names(heights.of.plots) <- names(widths.of.plots) <- tab.names
   
@@ -1320,7 +1320,7 @@ PrepareSpectraPlotFromCatalog <-
     catalog.type <- 
       c("SBS96", "SBS192", "SBS1536", "DBS78", "DBS136", "DBS144", "ID")
     
-    heights.of.plots <- list(230, 250, 800, 250, 500, 350, 230)
+    heights.of.plots <- list(230, 300, 800, 250, 500, 350, 230)
     widths.of.plots <- list(800, 800, 800, 800, 700, 350, 800)
     names(heights.of.plots) <- names(widths.of.plots) <- catalog.type
     
