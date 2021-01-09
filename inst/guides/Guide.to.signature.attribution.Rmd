@@ -135,3 +135,11 @@ knitr::include_graphics("attribution.guide/Slide13.PNG")
 knitr::include_graphics("attribution.guide/Slide14.PNG")
 knitr::include_graphics("attribution.guide/Slide15.PNG")
 ```
+
+```{r, echo=FALSE}
+# Define variable containing url for flag counter image
+url <- "https://s04.flagcounter.com/count2/S61M/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_1/flags_0/percent_0/"
+```
+
+<!-- # Insert the flag counter image -->
+![](`r url`)

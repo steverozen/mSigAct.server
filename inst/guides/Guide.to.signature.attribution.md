@@ -99,3 +99,7 @@ web server.
 Here is an analysis of insertion and deletion signature attribution.
 
 <img src="attribution.guide/Slide13.PNG" width="60%" /><img src="attribution.guide/Slide14.PNG" width="60%" /><img src="attribution.guide/Slide15.PNG" width="60%" />
+
+<!-- # Insert the flag counter image -->
+
+![](https://s04.flagcounter.com/count2/S61M/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_1/flags_0/percent_0/)
