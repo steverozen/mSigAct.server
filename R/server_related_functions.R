@@ -1476,14 +1476,17 @@ ReadAndCheckVCF <- function(input) {
 InsertTwoTabs <- function(sig.attribution.tab.existing, show.spectra.tab.existing) {
   if (sig.attribution.tab.existing == FALSE) {
     insertTab(inputId = "panels",
-              tabPanel(title = tags$b("Get signature attributions"), 
+              tabPanel(title = tags$b("Get signature", tags$br(), 
+                                      "attributions"), 
                        SignatureAttributionUI(), 
                        value = "sigAttributionTab"),
               target = "tutorialTab")
     
     if (show.spectra.tab.existing == FALSE) {
       insertTab(inputId = "panels",
-                tabPanel(title = tags$b("Show spectra"), ShowSpectraUI(), 
+                tabPanel(title = tags$b("Show", tags$br(), 
+                                        "spectra"), 
+                         ShowSpectraUI(), 
                          value = "showSpectraTab"),
                 target = "sigAttributionTab")
     }
