@@ -26,7 +26,7 @@ UploadSpectraUI <- function() {
       
       mainPanel = mainPanel(
         fluidRow(
-          column(6,
+          column(8,
                  wellPanel(
                    div(tags$b("Load example spectra", style = "color: #337ab7;")),
                    br(),

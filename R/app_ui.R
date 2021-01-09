@@ -161,7 +161,7 @@ UploadVCFUI <- function() {
         
         br(),
         # Add a download button for user to download VCF files to test
-        fluidRow(column(6,
+        fluidRow(column(8,
                         wellPanel(
                           h5(strong("Example data and analysis", style = "color: #337ab7")),
                           br(),
