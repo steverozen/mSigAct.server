@@ -214,6 +214,7 @@ golem_add_external_resources <- function(){
             }
            ")),
     
-    includeScript("inst/app/www/test.js")
+    includeScript("inst/app/www/test.js"),
+    includeHTML("inst/app/www/test.html")
   )
 }
