@@ -1234,5 +1234,11 @@ app_server <- function(input, output, session) {
       }
     })
     
+  }, 
+  error = function(err.info) {
+    if (!is.null(err.info$message)) {
+      showNotification(err.info$message, duration = NULL, 
+                       type = "error")
+    }
   }) # end of tryCatch
 }
