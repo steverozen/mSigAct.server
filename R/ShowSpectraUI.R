@@ -1,6 +1,6 @@
 #' @import shiny
 ShowSpectraUI <- function() {
-  fixedPage(
+  fluidPage(
     shinyjs::useShinyjs(),
     sidebarLayout(
       

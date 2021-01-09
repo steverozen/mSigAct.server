@@ -28,7 +28,7 @@ app_ui <- function(request) {
 TutorialUI <- function() {
   #general.guide.path <- system.file("tutorial/top.help.md", 
   #                                  package = "mSigAct.server")
-  fixedPage(
+  fluidPage(
     tabsetPanel(
       id = "helpPages", 
       tabPanel(title = tags$b("General guide"),
@@ -40,12 +40,12 @@ TutorialUI <- function() {
                includeMarkdown(
                  path = "inst/guides/Guide.to.signature.attribution.md"))
     ) # tabsetPanel
-  ) # fixedPage
+  ) # fluidPage
 }
 
 #' @import shiny
 AttributionResultsUI <- function() {
-  fixedPage(
+  fluidPage(
     br(),
     fixedRow(splitLayout(cellWidths = c("25%", "17.5%", "20%"),
                          downloadButton(outputId = "downloadExposureTable", 
@@ -63,9 +63,7 @@ AttributionResultsUI <- function() {
 #' @import shiny
 HomeUI <- function() {
   # List the first level UI elements here
-  fixedPage(
-    
-    
+  fluidPage(
     # Add a title on top the page
     titlePanel(title = p("mSigAct: Mutational Signature Activity",
                          style = "color: #337ab7"),
@@ -123,67 +121,68 @@ HomeUI <- function() {
 
 #' @import shiny
 UploadVCFUI <- function() {
-
-  sidebarLayout(
-    
-    sidebarPanel = sidebarPanel(
-      fluidRow(
-        column(6, AddReferenceGenome()),
-        
-        column(6, AddRegionForVCF())
-      ),
+  fluidPage(
+    sidebarLayout(
       
-      fluidRow(
-        column(6, AddVariantCaller()),
+      sidebarPanel = sidebarPanel(
+        fluidRow(
+          column(6, AddReferenceGenome()),
+          
+          column(6, AddRegionForVCF())
+        ),
         
-        # Hidden at first, pops up if Variant caller is "other"
-        column(6, conditionalPanel(
-          condition = "input.variantCaller == 'unknown'",
-          MergeSBSsAsDBSOption()))),
-      fluidRow(
-        column(6, UploadVCFFiles()),
-        column(
-          6, 
-          uiOutput(outputId = "clickToCreateCatalogs"),
-          br(),
-          uiOutput(outputId = "downloadZipFile"),
-          br(),
-          uiOutput(outputId = "showSpectraFromVCF"),
-          br(),
-          uiOutput(outputId = "sigAttributionFromVCF"))
-      ), width = 5), # end sidbarPanel
+        fluidRow(
+          column(6, AddVariantCaller()),
+          
+          # Hidden at first, pops up if Variant caller is "other"
+          column(6, conditionalPanel(
+            condition = "input.variantCaller == 'unknown'",
+            MergeSBSsAsDBSOption()))),
+        fluidRow(
+          column(6, UploadVCFFiles()),
+          column(
+            6, 
+            uiOutput(outputId = "clickToCreateCatalogs"),
+            br(),
+            uiOutput(outputId = "downloadZipFile"),
+            br(),
+            uiOutput(outputId = "showSpectraFromVCF"),
+            br(),
+            uiOutput(outputId = "sigAttributionFromVCF"))
+        ), width = 5), # end sidbarPanel
       
-    mainPanel = mainPanel(
-    # Add the next row of control widgets
-    fluidRow(
-      # Add text input for user to specify the sample names
-      # representing different VCF files
-      column(6, AddSampleNames()),
-     ),
-
-    br(),
-    # Add a download button for user to download VCF files to test
-    fluidRow(column(6,
-                    wellPanel(
-                      h5(strong("Example data and analysis", style = "color: #337ab7")),
-                      br(),
-                      
-                      downloadButton(outputId = "downloadsampleVCFs",
-                                     label = "Download example VCFs"),
-                      rep_br(2),
-                      
-                      actionButton(inputId = "runStrelkaVCFs", 
-                                   label = paste0("Example analysis on  ",
-                                                  "Strelka VCFs")),
-                      
-                      rep_br(2),
-                      actionButton(inputId = "runMutectVCFs",
-                                   label = paste0("Example analysis on ",
-                                            "Mutect VCFs")),
-                      rep_br(1))
-                    ) # end of column
-             ), width = 6) # end of mainPanel
-  ) # end of sidebarLayout
+      mainPanel = mainPanel(
+        # Add the next row of control widgets
+        fluidRow(
+          # Add text input for user to specify the sample names
+          # representing different VCF files
+          column(6, AddSampleNames()),
+        ),
+        
+        br(),
+        # Add a download button for user to download VCF files to test
+        fluidRow(column(6,
+                        wellPanel(
+                          h5(strong("Example data and analysis", style = "color: #337ab7")),
+                          br(),
+                          
+                          downloadButton(outputId = "downloadsampleVCFs",
+                                         label = "Download example VCFs"),
+                          rep_br(2),
+                          
+                          actionButton(inputId = "runStrelkaVCFs", 
+                                       label = paste0("Example analysis on  ",
+                                                      "Strelka VCFs")),
+                          
+                          rep_br(2),
+                          actionButton(inputId = "runMutectVCFs",
+                                       label = paste0("Example analysis on ",
+                                                      "Mutect VCFs")),
+                          rep_br(1))
+        ) # end of column
+        ), width = 6) # end of mainPanel
+    ) # end of sidebarLayout
+  )
 }
 
 #' @import shiny

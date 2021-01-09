@@ -1,6 +1,6 @@
 #' @import shiny
 SignatureAttributionUI <- function() {
-  fixedPage(
+  fluidPage(
     sidebarLayout(
       sidebarPanel(
         uiOutput(outputId = "selectSampleForAttribution"),
