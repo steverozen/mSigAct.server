@@ -212,8 +212,8 @@ golem_add_external_resources <- function(){
               top: calc(50% - 50px);;
               left: calc(50% - 400px);;
             }
-           "
-      )
-    )
+           ")),
+    
+    includeScript("inst/app/www/test.js")
   )
 }
