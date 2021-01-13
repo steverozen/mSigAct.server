@@ -1092,8 +1092,14 @@ app_server <- function(input, output, session) {
       }
       
       # Don't do anything if in the middle of a run
-      if(running())
+      if(running()) {
         return(NULL)
+      }
+      
+      # Create a Progress object
+      progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
+                                         message = "Analysis in progress",
+                                         detail = "This may take a while...")
       
       running(TRUE)
       spect <- catalog[, input$selectedSampleForAttribution, drop = FALSE]
@@ -1122,11 +1128,6 @@ app_server <- function(input, output, session) {
         cancer.type   = cancer.type,
         all.sigs      = sig.universe,
         must.include  = colnames(sig.universe))
-      
-      # Create a Progress object
-      progress <- ipc::AsyncProgress$new(session, min = 0, max = 1,
-                                         message = "Analysis in progress",
-                                         detail = "This may take a while...")
       
       result_val(NULL)
       #future.planned <<- TRUE
