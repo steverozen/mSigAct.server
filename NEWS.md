@@ -1,8 +1,12 @@
-# mSigAct.server 0.1.0
+# mSigAct.server 0.1.0.90xx
 ## Changed
 * Do not create "showSpectraTab", "sigAttributionTab" and
 "attributionResultsTab" on initialization. Use `inserTab` instead to show the
 necessary tabs upon user's action.
+
+## Fixed
+* Fixed a bug not updating signature etiology table with new R session when user
+adds more signatures.
 
 <br>
 

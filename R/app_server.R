@@ -999,7 +999,10 @@ app_server <- function(input, output, session) {
     
     observe({
       selected.more.sigs(input$selectedMoreSigs)
-    })
+      # Give more priority for this observer, otherwise when starting with
+      # new R session, the sig etiology table will not get updated after user
+      # selects more signatures
+    }, priority = 1)
     
     # Create a reactive expression to determine the signatures used for
     # attribution and then show the signatures aetiology information table
