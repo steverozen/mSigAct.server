@@ -1,4 +1,8 @@
 # mSigAct.server 0.1.0.90xx
+## Added
+* Added progress message if using bootstrapping to remove some of the signatures in 
+the beginning.
+
 ## Changed
 * Do not create "showSpectraTab", "sigAttributionTab" and
 "attributionResultsTab" on initialization. Use `inserTab` instead to show the

@@ -1116,11 +1116,15 @@ app_server <- function(input, output, session) {
       
       # Do the first round of cut-off if there are many signatures in the beginning
       if (ncol(sig.universe) > 15) {
+        progress$inc(amount = 0.05, 
+                     detail = "Trying to remove some signatures using bootstrapping")
         retval <- 
           mSigAct::OptimizeExposureQPBootstrap(spectrum = spect,
                                                signatures = sig.universe, 
                                                mc.cores = AdjustNumberOfCores(50))
         sig.universe <<- sig.universe[, names(retval$exposure), drop = FALSE]
+        progress$inc(amount = 0.05, 
+                     detail = "Removed some signatures using bootstrapping")
       }
       
       sigs.prop <- mSigAct::ExposureProportions(
