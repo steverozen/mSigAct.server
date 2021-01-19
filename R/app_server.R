@@ -1242,6 +1242,17 @@ app_server <- function(input, output, session) {
       }
     })
     
+    ########################################################################
+    # Start of functions related to AttributionResultsUI
+    ########################################################################
+    # When user clicks the actionButton "Analyze another sample", 
+    # direct user to the SignatureAttributionUI page
+    observeEvent(input$analyzeMoreSample, {
+      shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                     selected = "sigAttributionTab")
+    })
+
+    
   }, 
   error = function(err.info) {
     if (!is.null(err.info$message)) {
