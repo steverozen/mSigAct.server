@@ -1251,6 +1251,15 @@ app_server <- function(input, output, session) {
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                      selected = "sigAttributionTab")
     })
+    
+    # When user types the bookmarkded URL, show the relevant tabs and result page
+    onRestore(function(state) {
+      shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
+      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
+      shinyjs::show(selector = '#panels li a[data-value=attributionResultsTab]')
+      shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                     selected = "attributionResultsTab")
+    })
 
     
   }, 

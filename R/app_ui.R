@@ -47,10 +47,16 @@ TutorialUI <- function() {
 AttributionResultsUI <- function() {
   fluidPage(
     br(),
-    fluidRow(actionButton(inputId = "analyzeMoreSample", 
+    fluidRow(splitLayout(cellWidths = c("25%", "25%"),
+                         actionButton(inputId = "analyzeMoreSample", 
                           label = "Analyze another sample",
                           style = "color: #fff; background-color: #337ab7;
-                             border-color: #2e6da4;")),
+                             border-color: #2e6da4;"),
+                         bookmarkButton(label = "Save the session", 
+                                        title = paste0("The session will be saved ", 
+                                                       "on the server for seven days"),
+                                        style = "color: #fff; background-color: #337ab7;
+                             border-color: #2e6da4;"))),
     br(),
     fluidRow(splitLayout(cellWidths = c("25%", "17.5%", "20%"),
                          downloadButton(outputId = "downloadExposureTable", 
