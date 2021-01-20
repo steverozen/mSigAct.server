@@ -15,6 +15,9 @@ necessary tabs upon user's action.
 * Fixed a bug not updating signature etiology table with new R session when user
 adds more signatures.
 
+* Fixed a bug not showing signature etiology table when user selects another sample
+with same cancer type and catalog type.
+
 <br>
 
 # mSigAct.server 0.0.9

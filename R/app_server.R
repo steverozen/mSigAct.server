@@ -1007,7 +1007,8 @@ app_server <- function(input, output, session) {
     # Create a reactive expression to determine the signatures used for
     # attribution and then show the signatures aetiology information table
     sigsForAttributionChanged <- reactive({
-      list(input$selectCatalogType, input$preselectedSigs, input$selectedMoreSigs)
+      list(input$selectedSampleForAttribution, input$selectCatalogType, 
+           input$preselectedSigs, input$selectedMoreSigs, preselected.sigs())
     })
     
     observeEvent(input$selectCatalogType, {
@@ -1019,6 +1020,10 @@ app_server <- function(input, output, session) {
     observeEvent(sigsForAttributionChanged(), {
       shinyjs::hide(id = "sigAetiologyTable")
       sigs.for.attribution(c(preselected.sigs(), selected.more.sigs()))
+      
+      if (is.null(sigs.for.attribution())) {
+        return()
+      }
       
       if (is.null(input.catalog.type())) {
         return()
