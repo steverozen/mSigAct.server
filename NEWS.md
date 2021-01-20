@@ -3,7 +3,8 @@
 * Added progress message if using bootstrapping to remove some of the signatures in 
 the beginning.
 
-* Added another actionButton "Analyze another sample" on the attribution results page.
+* Added another actionButton "Do another signature attribution" on the
+attribution results page.
 
 ## Changed
 * Do not create "showSpectraTab", "sigAttributionTab" and
