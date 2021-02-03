@@ -112,7 +112,8 @@ COSMIC.v3.hg19.genome.ID.sigs <- PCAWG7::signature$genome$ID
 ID18.file.path <- "data-raw/sigProfiler_ID_signatures_ID18.csv"
 tmp <- ICAMS::ReadCatalog(ID18.file.path, 
                           strict = FALSE, 
-                          catalog.type = "counts.signature")
+                          catalog.type = "counts.signature",
+                          region = "genome")
 colnames(tmp) <- "ID18"
 COSMIC.v3.hg19.genome.ID.sigs <- cbind(COSMIC.v3.hg19.genome.ID.sigs, tmp)
 
