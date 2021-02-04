@@ -101,7 +101,7 @@ app_server <- function(input, output, session) {
         }
         
         if (input.catalog.type() == "ID") {
-          # The abudance information is not available for ID spectra, so 
+          # The abundance information is not available for ID spectra, so 
           # we always use the human genome signatures for attribution analysis
           total.signatures <- COSMIC.v3.hg19.genome.ID.sigs
         } else {
@@ -1256,17 +1256,6 @@ app_server <- function(input, output, session) {
       shinydashboard::updateTabItems(session = session, inputId = "panels", 
                                      selected = "sigAttributionTab")
     })
-    
-    # When user types the bookmarkded URL, show the relevant tabs and result page
-    onRestore(function(state) {
-      shinyjs::show(selector = '#panels li a[data-value=showSpectraTab]')
-      shinyjs::show(selector = '#panels li a[data-value=sigAttributionTab]')
-      shinyjs::show(selector = '#panels li a[data-value=attributionResultsTab]')
-      shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                     selected = "attributionResultsTab")
-    })
-
-    
   }, 
   error = function(err.info) {
     if (!is.null(err.info$message)) {
