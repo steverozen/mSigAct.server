@@ -36,7 +36,8 @@ Imports: BSgenome.Hsapiens.1000genomes.hs37d5,
     shinyWidgets,
     stringi,
     zip
-Remotes: github::steverozen/ICAMSxtra@master,
+Remotes: github::steverozen/ICAMS@master,
+    github::steverozen/ICAMSxtra@master,
     github::steverozen/mSigAct@master,
     github::steverozen/PCAWG7@master
 RoxygenNote: 7.1.1
