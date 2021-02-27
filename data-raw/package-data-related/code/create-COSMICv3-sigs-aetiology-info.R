@@ -3,7 +3,7 @@
 cat(getwd(), "\n")
 
 # Create COSMIC SBS signatures aetiology information
-SBS.file <- "data-raw/COSMIC-v3-SBS-proposed-aetiology.csv"
+SBS.file <- "data-raw/package-data-related/data/COSMIC-v3-SBS-proposed-aetiology.csv"
 SBS.info <- data.table::fread(SBS.file, header = TRUE)
 SBS.aetiology <- SBS.info$proposed.aetiology
 names(SBS.aetiology) <- SBS.info$name
@@ -15,7 +15,7 @@ SBS.aetiology.HTML <-
 names(SBS.aetiology.HTML) <- rownames(SBS.aetiology)
 
 # Create COSMIC DBS signatures aetiology information
-DBS.file <- "data-raw/COSMIC-v3-DBS-proposed-aetiology.csv"
+DBS.file <- "data-raw/package-data-related/data/COSMIC-v3-DBS-proposed-aetiology.csv"
 DBS.info <- data.table::fread(DBS.file, header = TRUE)
 DBS.aetiology <- DBS.info$proposed.aetiology
 names(DBS.aetiology) <- DBS.info$name
@@ -27,7 +27,7 @@ DBS.aetiology.HTML <-
 names(DBS.aetiology.HTML) <- rownames(DBS.aetiology)
 
 # Create COSMIC ID signatures aetiology information
-ID.file <- "data-raw/COSMIC-v3-ID-proposed-aetiology.csv"
+ID.file <- "data-raw/package-data-related/data/COSMIC-v3-ID-proposed-aetiology.csv"
 ID.info <- data.table::fread(ID.file, header = TRUE)
 ID.aetiology <- ID.info$proposed.aetiology
 names(ID.aetiology) <- ID.info$name

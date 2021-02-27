@@ -6,7 +6,7 @@ cat(getwd(), "\n")
 
 #################################################################################
 # Generate SBS96 signatures for human GRCh37, GRCh37 and GRCm38
-file <- "./data-raw/COSMICv3_genome_SBS96.csv"
+file <- "./data-raw/package-data-related/data/COSMICv3_genome_SBS96.csv"
 cat1 <- ICAMS::ReadCatalog(file, ref.genome = "GRCh37",
                          region = "genome",
                          catalog.type = "counts.signature")
