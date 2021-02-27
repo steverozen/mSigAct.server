@@ -745,7 +745,7 @@ PrepareAttributionResults <-
       best.MAP.exp <- plotdata$best.MAP.exp
       reconstructed.catalog <- plotdata$reconstructed.catalog
       reconstructed.catalog.rounded <- round(reconstructed.catalog)
-      
+      colnames(reconstructed.catalog.rounded) <- "Reconstructed"
       sig.universe <- plotdata$sig.universe
       
       # Sort best.MAP.exp by exposure counts
@@ -753,11 +753,24 @@ PrepareAttributionResults <-
       
       sigs.names <- best.MAP.exp$sig.id
       sigs <- sig.universe[, sigs.names, drop = FALSE]
-      colnames(sigs) <- 
-        paste0(colnames(sigs), " (exposure = ", 
-               round(best.MAP.exp$count), ")")
       
-      list.of.catalogs <- list(spect, reconstructed.catalog.rounded, sigs)
+      # Add additional information to the PDF plot
+      spect1 <- spect
+      colnames(spect1) <- paste0(colnames(spect1), " (count = ",colSums(spect1), ")")
+      
+      reconstructed.spectrum <- reconstructed.catalog.rounded
+      colnames(reconstructed.spectrum) <- 
+        paste0("Reconstructed (count = ", colSums(reconstructed.spectrum),
+               ", cosine similarity = ", cossim, ")")
+      
+      etiologies <- sigs.etiologies[[input.catalog.type]]
+      colnames(sigs) <- 
+        paste0(colnames(sigs), " (exposure = ", round(best.MAP.exp$count),
+               ", contribution = ", 
+               round(best.MAP.exp$count/sum(best.MAP.exp$count), 2), ") ",
+               etiologies[colnames(sigs), ])
+      
+      list.of.catalogs <- list(spect1, reconstructed.spectrum, sigs)
       
       # Generate a random string for resource path
       resource.path <- stringi::stri_rand_strings(n = 1, length = 5)
@@ -827,7 +840,6 @@ PrepareAttributionResults <-
                      height = height)
       ICAMS::PlotCatalog(spect)
       grDevices::dev.off()
-      
       grDevices::png(filename = png.reconstructed.file.path, width = width, 
                      height = height)
       ICAMS::PlotCatalog(reconstructed.catalog.rounded)

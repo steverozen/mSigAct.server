@@ -1,25 +1,28 @@
-require(shiny)
-library(DT)
-
-shinyUI(
-  DT::dataTableOutput('mytable')
-)
-
-# Server.R
-library(shiny)
-library(DT)
-
-
-dat <- data.frame(
-  country = c('USA', 'China'),
-  flag = c('<img src="test.png" height="52"></img>',
-           '<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/200px-Flag_of_the_People%27s_Republic_of_China.svg.png" height="52"></img>'
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      actionButton("add", "Add 'Dynamic' tab"),
+      actionButton("remove", "Remove 'Foo' tab")
+    ),
+    mainPanel(
+      tabsetPanel(id = "tabs",
+                  tabPanel("Hello", "This is the hello tab"),
+                  tabPanel("Foo", "This is the foo tab"),
+                  tabPanel("Bar", "This is the bar tab")
+      )
+    )
   )
 )
-
-shinyServer(function(input, output){
-  output$mytable <- DT::renderDataTable({
-    
-    DT::datatable(dat, escape = FALSE) # HERE
+server <- function(input, output, session) {
+  observeEvent(input$add, {
+    insertTab(inputId = "tabs",
+              tabPanel("Dynamic", "This a dynamically-added tab"),
+              target = "Bar"
+    )
   })
-})
+  observeEvent(input$remove, {
+    removeTab(inputId = "tabs", target = "Foo")
+  })
+}
+
+shinyApp(ui, server)

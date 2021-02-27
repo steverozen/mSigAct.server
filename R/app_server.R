@@ -1201,9 +1201,6 @@ app_server <- function(input, output, session) {
             
             cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
             
-            colnames(reconstructed.catalog0) <- 
-              paste0("reconstructed (cosine similarity = ", cossim, ")")
-            
             plotdata$cossim <<- cossim
             plotdata$spect <<- spect
             plotdata$reconstructed.catalog <<- reconstructed.catalog0

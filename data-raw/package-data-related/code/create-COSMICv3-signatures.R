@@ -109,9 +109,8 @@ COSMIC.v3.mm10.exome.DBS78.sigs <-
 
 ##############################################################################
 COSMIC.v3.hg19.genome.ID.sigs <- PCAWG7::signature$genome$ID
-ID18.file.path <- "data-raw/sigProfiler_ID_signatures_ID18.csv"
+ID18.file.path <- "data-raw/package-data-related/data/sigProfiler_ID_signatures_ID18.csv"
 tmp <- ICAMS::ReadCatalog(ID18.file.path, 
-                          strict = FALSE, 
                           catalog.type = "counts.signature",
                           region = "genome")
 colnames(tmp) <- "ID18"

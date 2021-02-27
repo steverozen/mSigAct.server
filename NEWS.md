@@ -1,4 +1,10 @@
-# mSigAct.server 0.1.0.90xx
+# mSigAct.server 0.1.1
+## Added
+* Added signature etiology information in the attribution PDF plot.
+
+<br>
+
+# mSigAct.server 0.1.0
 ## Added
 * Added progress message if using bootstrapping to remove some of the signatures in 
 the beginning.
