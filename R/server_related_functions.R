@@ -745,7 +745,7 @@ PrepareAttributionResults <-
       best.MAP.exp <- plotdata$best.MAP.exp
       reconstructed.catalog <- plotdata$reconstructed.catalog
       reconstructed.catalog.rounded <- round(reconstructed.catalog)
-      colnames(reconstructed.catalog.rounded) <- "Reconstructed"
+      colnames(reconstructed.catalog.rounded) <- "Reconstructed spectrum"
       sig.universe <- plotdata$sig.universe
       
       # Sort best.MAP.exp by exposure counts
@@ -760,7 +760,7 @@ PrepareAttributionResults <-
       
       reconstructed.spectrum <- reconstructed.catalog.rounded
       colnames(reconstructed.spectrum) <- 
-        paste0("Reconstructed (count = ", colSums(reconstructed.spectrum),
+        paste0("Reconstructed spectrum (count = ", colSums(reconstructed.spectrum),
                ", cosine similarity = ", cossim, ")")
       
       etiologies <- sigs.etiologies[[input.catalog.type]]
