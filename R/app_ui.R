@@ -92,13 +92,17 @@ HomeUI <- function() {
                        "mutational spectrum"))),
     )),
     
-    
     h4(a(href = "https://tinyurl.com/rdzwnxd", "*VCFs", target = "_blank"),
        " are file that contain one mutation per line, and are created ",
       "by variant callers such as ",
       a(href = "https://github.com/Illumina/strelka", "Strelka", target = "_blank"), 
       " or ",
       a(href = "https://github.com/broadgsa/gatk", "Mutect", target = "_blank")),
+    
+    hr(),
+    h4("mSigAct webserver can be freely accessed at ", 
+       a(href = "https://msigact.ai",
+         "https://msigact.ai", target = "_blank")),
     
     h4("To report issues, make suggestions, and request help, ",
        "post on ",
