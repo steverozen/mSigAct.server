@@ -1186,18 +1186,17 @@ app_server <- function(input, output, session) {
           return(retval)
         }, seed = TRUE) %...>% {
           retval <- .
-          
           plotdata$retval <<- retval
           
-          if (retval$success == FALSE || is.null(retval$success)) {
+          if (is.null(retval$proposed.assignment)) {
             showNotification(ui = "Message:", 
-                             action = retval$messages,
+                             action = retval$error.messages,
                              type = "message", duration = NULL)
             return()
           } else {
-            MAP.best.exp <- retval$MAP
+            MAP.best.exp <- retval$proposed.assignment
             
-            reconstructed.catalog0 <- retval$MAP.recon
+            reconstructed.catalog0 <- retval$proposed.reconstruction
             
             cossim <- round(mSigAct::cossim(spect, reconstructed.catalog0), 5)
             
@@ -1206,7 +1205,6 @@ app_server <- function(input, output, session) {
             plotdata$reconstructed.catalog <<- reconstructed.catalog0
             plotdata$sig.universe <<- sig.universe
             plotdata$best.MAP.exp <<- MAP.best.exp
-            
             retval <- 
               PrepareAttributionResults(input, output, session, 
                                         input.catalog.type(), 

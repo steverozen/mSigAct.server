@@ -749,9 +749,11 @@ PrepareAttributionResults <-
       sig.universe <- plotdata$sig.universe
       
       # Sort best.MAP.exp by exposure counts
-      best.MAP.exp <- dplyr::arrange(best.MAP.exp, dplyr::desc(count))
+      best.MAP.exp <-
+        best.MAP.exp[order(best.MAP.exp[, 1], decreasing = TRUE), ,
+                     drop = FALSE]
       
-      sigs.names <- best.MAP.exp$sig.id
+      sigs.names <- rownames(best.MAP.exp)
       sigs <- sig.universe[, sigs.names, drop = FALSE]
       
       # Add additional information to the PDF plot
@@ -765,9 +767,9 @@ PrepareAttributionResults <-
       
       etiologies <- sigs.etiologies[[input.catalog.type]]
       colnames(sigs) <- 
-        paste0(colnames(sigs), " (exposure = ", round(best.MAP.exp$count),
+        paste0(colnames(sigs), " (exposure = ", round(best.MAP.exp[, 1]),
                ", contribution = ", 
-               round(best.MAP.exp$count/sum(best.MAP.exp$count), 2), ") ",
+               round(best.MAP.exp[, 1]/sum(best.MAP.exp[, 1]), 2), ") ",
                etiologies[colnames(sigs), ])
       
       list.of.catalogs <- list(spect1, reconstructed.spectrum, sigs)
@@ -812,9 +814,9 @@ PrepareAttributionResults <-
                          count = c(colSums(spect), colSums(reconstructed.catalog)), 
                          contribution = c(NA, NA),
                          cosine.similarity = c(1, cossim))
-      tbl2 <- data.frame(name = best.MAP.exp$sig.id, 
-                         count = best.MAP.exp$count,
-                         contribution = best.MAP.exp$count / sum(best.MAP.exp$count))
+      tbl2 <- data.frame(name = rownames(best.MAP.exp), 
+                         count = best.MAP.exp[, 1],
+                         contribution = best.MAP.exp[, 1] / sum(best.MAP.exp[, 1]))
       
       tbl <- dplyr::bind_rows(tbl1, tbl2)
       PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
@@ -857,7 +859,7 @@ PrepareAttributionResults <-
       dt1 <- dplyr::bind_rows(tbl1, dt0)
       
       # Write the exposure counts table to CSV file
-      tbl$proposed.aetiology <- c(NA, NA, dt1[best.MAP.exp$sig.id, ]$proposed.aetiology)
+      tbl$proposed.aetiology <- c(NA, NA, dt1[rownames(best.MAP.exp), ]$proposed.aetiology)
       utils::write.csv(tbl, file = table.file.path, na = "",  row.names = FALSE)
       
       # Write all tested combination of signatures in MAP to CSV file
