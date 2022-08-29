@@ -1124,9 +1124,9 @@ app_server <- function(input, output, session) {
         progress$inc(amount = 0.05, 
                      detail = "Trying to remove some signatures using bootstrapping")
         retval <- 
-          mSigAct::OptimizeExposureQPBootstrap(spectrum = spect,
-                                               signatures = sig.universe, 
-                                               mc.cores = AdjustNumberOfCores(50))
+          mSigAct:::OptimizeExposureQPBootstrap(spectrum = spect,
+                                                signatures = sig.universe, 
+                                                mc.cores = AdjustNumberOfCores(50))
         sig.universe <<- sig.universe[, names(retval$exposure), drop = FALSE]
         progress$inc(amount = 0.05, 
                      detail = "Removed some signatures using bootstrapping")
