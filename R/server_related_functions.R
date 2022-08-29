@@ -1310,9 +1310,11 @@ PrepareSpectraPlotFromVCF <- function(input, output, list.of.catalogs) {
       if (colSums(catalog) != 0) {
         plot.name <- paste0(i, "plot")
         output[[plot.name]] <- renderPlot({
+          if (i == "SBS96") {
+            par(oma = c(0, 2, 0, 0))
+          }
           ICAMS::PlotCatalog(catalog)
         }, height = heights.of.plots[[i]], width = widths.of.plots[[i]])
-        
         names.of.tabs <<- c(names.of.tabs, i)
       }
     })
@@ -1352,7 +1354,10 @@ PrepareSpectraPlotFromCatalog <-
       {
         output$spectrum <- renderPlot(
           {
-            PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
+            if (input.catalog.type == "SBS96") {
+              par(oma = c(0, 2, 0, 0))
+            }
+            ICAMS::PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                                 drop = FALSE])
           }, height = heights.of.plots[[input.catalog.type]],
           width = widths.of.plots[[input.catalog.type]])
