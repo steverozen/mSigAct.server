@@ -109,7 +109,7 @@ HomeUI <- function() {
        a(href = "https://github.com/steverozen/mSigAct.server/issues",
          "GitHub", target = "_blank"),
        " or contact ",
-       a(href = "mailto:steverozen@gmail.com", "steverozen@gmail.com",
+       a(href = "mailto:steverozen@pm.me", "steverozen@pm.me",
          target = "_blank")),
     
     # Impressionistic collage
