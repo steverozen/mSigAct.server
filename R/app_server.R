@@ -1172,7 +1172,7 @@ app_server <- function(input, output, session) {
           # (https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mcparallel.html).
           set.seed(102119, kind = "L'Ecuyer-CMRG")
           
-          retval <- mSigAct::MAPAssignActivity1(
+          retval <- mSigAct:::MAPAssignActivity1(
             spect = spect,
             sigs = sig.universe,
             sigs.presence.prop = sigs.prop,
@@ -1180,7 +1180,9 @@ app_server <- function(input, output, session) {
             p.thresh = 0.01,
             m.opts = mSigAct::DefaultManyOpts(),
             max.mc.cores = AdjustNumberOfCores(50),
-            progress.monitor = updateProgress
+            progress.monitor = updateProgress,
+            use.sparse.assign = TRUE,
+            drop.low.mut.samples = FALSE
           )
           
           return(retval)
