@@ -1174,7 +1174,7 @@ app_server <- function(input, output, session) {
           # (https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mcparallel.html).
           set.seed(102119, kind = "L'Ecuyer-CMRG")
           
-          retval <- mSigAct::MAPAssignActivity1(
+          retval <- mSigAct:::MAPAssignActivity1(
             spect = spect,
             sigs = sig.universe,
             sigs.presence.prop = sigs.prop,
