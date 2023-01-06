@@ -12,6 +12,7 @@ GenerateZipFileFromVCFs(
   ref.genome,
   variant.caller,
   mergeSBS,
+  filter.status,
   num.of.cores,
   trans.ranges = NULL,
   region = "unknown",
@@ -40,6 +41,9 @@ and read depth will be NAs.}
 
 \item{mergeSBS}{Whether to merge adjacent SBSs as DBS. Value can be "yes" or
 "no".}
+
+\item{filter.status}{The character string in column \code{FILTER} of the VCF
+that indicates that a variant has passed all the variant caller's filters.}
 
 \item{num.of.cores}{The number of cores to use. Not available on Windows
 unless \code{num.of.cores = 1}.}

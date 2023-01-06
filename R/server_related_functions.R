@@ -14,7 +14,7 @@ GetTumorColNames <- function(tumor.col.names) {
     return (NA)
   } else {
     vector <- unlist(strsplit(tumor.col.names,
-                               ",", fixed = TRUE))
+                              ",", fixed = TRUE))
     return(trimws(vector))
   }
 }
@@ -61,7 +61,7 @@ CatchToList <- function(expr) {
     }, message = function(m) {
       message <<- append(message, conditionMessage(m))
     })
-
+  
   error.info <- list(error = error, warning = warning, message = message)
   list(error.info = error.info, retval = retval)
 }
@@ -82,7 +82,7 @@ CheckInputsForSpectra <- function(input, catalog.path) {
   catalog <- ICAMS::ReadCatalog(catalog.path, stop.on.error = FALSE)
   
   if (FALSE && !is.null(attr(catalog, "error"))) {
-          error <- append(error, attr(catalog, "error"))
+    error <- append(error, attr(catalog, "error"))
   }
   
   return(list(error = error, SBS192.check = SBS192.check))
@@ -110,8 +110,15 @@ CheckInputsForVCF <- function(input) {
   if (input$variantCaller == "unknown") {
     if (is.null(input$mergeSBS)) {
       error <- 
-        append(error, paste0("Whether to merge adjacent SBSs as DBS ", 
-                             "must be specified when variant caller is unknown"))
+        append(error, 
+               paste0("Whether to merge adjacent SBSs as DBS must be specified ", 
+                      "when variant caller is not Strelka or Mutect"))
+      return(error)
+    } else if (input$filter.status == "") {
+      error <- 
+        append(error, 
+               paste0("Filter status must be specified when variant caller ", 
+                      "is not Strelka or Mutect"))
       return(error)
     }
   }
@@ -131,7 +138,7 @@ AddErrorMessage <- function(error) {
   if (!is.null(error)) {
     for (i in 1:length(error)) {
       id.error <- showNotification(ui = "Error:", action = error[i],
-                                    type = "error", duration = NULL)
+                                   type = "error", duration = NULL)
       id <- append(id, id.error)
     }
   }
@@ -158,27 +165,27 @@ AddNotifications <- function(res) {
   # Create an empty list which can be used to store notification ids later
   id <- list("error" = character(0), "warning" = character(0),
              "message" = character(0))
-
+  
   if (!is.null(res$error)) {
     for (i in 1:length(res$error)) {
       id.error <- showNotification(ui = "Error:", action = res$error[i],
-                                    type = "error", duration = NULL)
+                                   type = "error", duration = NULL)
       id$error <- id.error
     }
   }
-
+  
   if (!is.null(res$warning)) {
     for (i in 1:length(res$warning)) {
       id.warning <- showNotification(ui = "Warning:", action = res$warning[i],
-                                      type = "warning", duration = NULL)
+                                     type = "warning", duration = NULL)
       id$warning <- c(id$warning, id.warning)
     }
   }
-
+  
   if (!is.null(res$message)) {
     for (i in 1:length(res$message)) {
       id.message <- showNotification(ui = "Message:", action = res$message[i],
-                                      type = "message", duration = NULL)
+                                     type = "message", duration = NULL)
       id$message <- id.message
     }
   }
@@ -232,10 +239,10 @@ AssignNumberOfAsterisks <- getFromNamespace("AssignNumberOfAsterisks", "ICAMS")
 AddRunInformation <-
   function(files, tmpdir, vcf.names, zipfile.name, vcftype, ref.genome,
            region, mutation.loads, strand.bias.statistics) {
-
+    
     run.info <-
       file(description = file.path(tmpdir, "run-information.txt"), open = "w")
-
+    
     # Add the header information
     time.info <- strftime(Sys.time(), usetz = TRUE) # Get time zone information
     time.info1 <-
@@ -245,7 +252,7 @@ AddRunInformation <-
     writeLines(paste(rep("-", char.length), collapse = ""), run.info)
     writeLines(header, run.info)
     writeLines(paste(rep("-", char.length), collapse = ""), run.info)
-
+    
     # Add section on purpose of ICAMS software
     writeLines("", run.info)
     writeLines("--- About ICAMS ---", run.info)
@@ -270,13 +277,13 @@ AddRunInformation <-
     writeLines("", run.info)
     writeLines(c("Shiny interface of ICAMS is available at ",
                  "https://msigact.ai"), run.info)
-
+    
     # Add ICAMS and R version used
     writeLines("", run.info)
     writeLines("--- Version of the software ---", run.info)
     writeLines(paste0("ICAMS version: ", packageVersion("ICAMS")), run.info)
     writeLines(paste0("R version:     ", getRversion()), run.info)
-
+    
     # Add input parameters specified by the user
     writeLines("", run.info)
     writeLines("--- Input parameters ---", run.info)
@@ -287,7 +294,7 @@ AddRunInformation <-
     } else if (vcftype == "unknown") {
       vcftype <- "Unknown"
     }
-
+    
     if (ref.genome == "hg19") {
       ref.genome <- "Human GRCh37/hg19"
     } else if (ref.genome == "hg38") {
@@ -298,7 +305,7 @@ AddRunInformation <-
     writeLines(paste0("Variant caller:   ", vcftype), run.info)
     writeLines(paste0("Reference genome: ", ref.genome), run.info)
     writeLines(paste0("Region:           ", region), run.info)
-
+    
     # Add input files information
     writeLines("", run.info)
     writeLines("--- Input files ---", run.info)
@@ -314,9 +321,9 @@ AddRunInformation <-
                       "# of ID", "  ",
                       "# of discarded variants", "  "),
                run.info)
-
+    
     num.of.file <- length(files)
-
+    
     for (i in 1:num.of.file) {
       writeLines(paste0(stri_pad(vcf.names[i],
                                  width = max.num.of.char,
@@ -333,9 +340,9 @@ AddRunInformation <-
                         stri_pad(mutation.loads$discarded.variants[i],
                                  width = 22, side = "right")),
                  run.info)
-
+      
     }
-
+    
     if (FALSE) {
       # Add a disclaimer about discarded variants in the analysis
       writeLines("", run.info)
@@ -343,7 +350,7 @@ AddRunInformation <-
                         "complex indels, and variants with multiple alternative ",
                         "alleles are excluded from the analysis."), run.info)
     }
-
+    
     # Add strand bias statistics for SBS12 plot
     if (!is.null(strand.bias.statistics)) {
       writeLines("", run.info)
@@ -351,24 +358,24 @@ AddRunInformation <-
       list0 <- strand.bias.statistics
       num.of.sample <- length(names(list0))
       space.mat <- CalculateNumberOfSpace(list0)
-
+      
       for (i in 1:num.of.sample) {
         transcribed.counts <- list0[[i]][, "transcribed"]
         untranscribed.counts <- list0[[i]][, "untranscribed"]
         q.values <- list0[[i]][, "q.values"]
         q.values.symbol <- lapply(q.values, FUN = AssignNumberOfAsterisks)
         q.values.sci <- formatC(q.values, format = "e", digits = 2)
-
+        
         transcribed.info <- character(0)
         untranscribed.info <- character(0)
         header1 <- header2 <- character(0)
         mutation.class <- rownames(list0[[1]])
-
+        
         for (j in 1:6) {
           header1 <- paste0(header1, stri_pad(mutation.class[j],
                                               width = space.mat[j, "space.total"],
                                               side = "both"), "|")
-
+          
           header2 <-
             paste0(header2, " ",
                    stri_pad("counts",
@@ -377,7 +384,7 @@ AddRunInformation <-
                    stri_pad("Q-value",
                             width = space.mat[j, "space.q.value"],
                             side = "right"), " ", "|")
-
+          
           transcribed.info <-
             paste0(transcribed.info, " ",
                    stri_pad(transcribed.counts[j],
@@ -386,7 +393,7 @@ AddRunInformation <-
                    stri_pad(q.values.sci[j],
                             width = space.mat[j, "space.q.value"],
                             side = "right"), " ", "|")
-
+          
           untranscribed.info <-
             paste0(untranscribed.info, " ",
                    stri_pad(untranscribed.counts[j],
@@ -397,26 +404,26 @@ AddRunInformation <-
                             width = space.mat[j, "space.q.value"],
                             side = "right"), " ", "|")
         }
-
+        
         # Add description lines of the information listed for strand bias statistics
         writeLines(paste0(stri_pad("", width = 13), " |", header1), run.info)
         writeLines(paste0(stri_pad("Strand", width = 13, side = "right"), " |",
                           header2, "Sample name"), run.info)
-
+        
         # Write the transcription strand bias statistics
         writeLines(paste0(stri_pad("transcribed", width = 13, side = "right"),
                           " |", transcribed.info, names(list0)[i]), run.info)
         writeLines(paste0(stri_pad("untranscribed", width = 13, side = "right"),
                           " |", untranscribed.info, names(list0)[i]), run.info)
-
+        
         writeLines("", run.info)
       }
-
+      
       # Add a description about the symbol denoting p-value
       writeLines(
         paste0("Legend: *Q<0.05, **Q<0.01, ***Q<0.001 (Benjamini-Hochberg ",
                "false discovery rates based on two-tailed binomial tests)"), run.info)
-
+      
       # Add a note about direction of strand bias
       writeLines(paste0("Direction of strand bias: Fewer mutations on ",
                         "transcribed strand indicates that DNA damage occurred on ",
@@ -449,6 +456,9 @@ AddRunInformation <-
 #'
 #' @param mergeSBS Whether to merge adjacent SBSs as DBS. Value can be "yes" or
 #'   "no".
+#'   
+#' @param filter.status The character string in column \code{FILTER} of the VCF
+#'   that indicates that a variant has passed all the variant caller's filters.   
 #'   
 #' @param num.of.cores The number of cores to use. Not available on Windows
 #'   unless \code{num.of.cores = 1}.
@@ -498,6 +508,7 @@ GenerateZipFileFromVCFs <- function(files,
                                     ref.genome,
                                     variant.caller,
                                     mergeSBS,
+                                    filter.status,
                                     num.of.cores,
                                     trans.ranges = NULL,
                                     region = "unknown",
@@ -517,11 +528,16 @@ GenerateZipFileFromVCFs <- function(files,
   } else {
     get.vaf.function <- NULL
   }
+  
+  if (variant.caller %in% c("strelka", "mutect")) {
+    filter.status <- "PASS"
+  }
   split.vcfs <- 
     ICAMS::ReadAndSplitVCFs(files = files,
                             variant.caller = variant.caller,
                             num.of.cores = num.of.cores,
                             names.of.VCFs = names.of.VCFs,
+                            filter.status = filter.status,
                             get.vaf.function = get.vaf.function)
   
   if (is.function(updateProgress)) {
@@ -585,7 +601,7 @@ GenerateZipFileFromVCFs <- function(files,
   tmpdir <- tempfile()
   dir.create(tmpdir)
   output.file <- paste0(tmpdir, .Platform$file.sep)
-                        
+  
   for (name in names(catalogs.to.return)) {
     WriteCatalog(catalogs.to.return[[name]],
                  file = paste0(output.file, name, ".counts.csv"))
@@ -719,6 +735,7 @@ ProcessVCFs <- function(input, output, file, ids) {
                             ref.genome = input$ref.genome,
                             variant.caller = input$variantCaller,
                             mergeSBS = input$mergeSBS,
+                            filter.status = input$filter.status,
                             num.of.cores = num.of.cores,
                             trans.ranges = NULL,
                             region = input$region,
@@ -740,201 +757,201 @@ ProcessVCFs <- function(input, output, file, ids) {
 PrepareAttributionResults <- 
   function (input, output, session, input.catalog.type, plotdata, 
             attribution.results.tab.existing) {
-      cossim <- plotdata$cossim
-      spect <- plotdata$spect
-      best.MAP.exp <- plotdata$best.MAP.exp
-      reconstructed.catalog <- plotdata$reconstructed.catalog
-      reconstructed.catalog.rounded <- round(reconstructed.catalog)
-      colnames(reconstructed.catalog.rounded) <- "Reconstructed spectrum"
-      sig.universe <- plotdata$sig.universe
-      
-      # Sort best.MAP.exp by exposure counts
-      best.MAP.exp <-
-        best.MAP.exp[order(best.MAP.exp[, 1], decreasing = TRUE), ,
-                     drop = FALSE]
-      
-      sigs.names <- rownames(best.MAP.exp)
-      sigs <- sig.universe[, sigs.names, drop = FALSE]
-      
-      # Add additional information to the PDF plot
-      spect1 <- spect
-      colnames(spect1) <- paste0(colnames(spect1), " (count = ",colSums(spect1), ")")
-      
-      reconstructed.spectrum <- reconstructed.catalog.rounded
-      colnames(reconstructed.spectrum) <- 
-        paste0("Reconstructed spectrum (count = ", colSums(reconstructed.spectrum),
-               ", cosine similarity = ", cossim, ")")
-      
-      etiologies <- sigs.etiologies[[input.catalog.type]]
-      colnames(sigs) <- 
-        paste0(colnames(sigs), " (exposure = ", round(best.MAP.exp[, 1]),
-               ", contribution = ", 
-               round(best.MAP.exp[, 1]/sum(best.MAP.exp[, 1]), 2), ") ",
-               etiologies[colnames(sigs), ])
-      
-      list.of.catalogs <- list(spect1, reconstructed.spectrum, sigs)
-      
-      # Generate a random string for resource path
-      resource.path <- stringi::stri_rand_strings(n = 1, length = 5)
-      
-      # Create a temp directory for storing png file of the thumbnail picture
-      tmpdir <- tempfile()
-      dir.create(tmpdir)
-      addResourcePath(prefix = resource.path, directoryPath = tmpdir)
-      
-      output.file.path <- resourcePaths()[resource.path]
-      
-      spect.name <- colnames(spect)
-      
-      # We cannot use "::" in the file path, otherwise zip::zipr will throw an error
-      spect.name <- gsub(pattern = "::", replacement = "-", spect.name)
-      
-      table.file.name <- paste0("mSigAct-", spect.name, "-",
-                                input.catalog.type, "-exposures.csv")
-      MAP.all.test.name <- paste0("mSigAct-", spect.name, "-",
-                                  input.catalog.type, "-all-tested.csv")
-      pdf.file.name <- paste0("mSigAct-", spect.name, "-",
-                              input.catalog.type, "-attribution-plot.pdf")
-      results.file.name <- paste0("mSigAct-", spect.name, "-",
-                                  input.catalog.type, "-attribution-results.zip")
-      png.spectrum.file.name <- paste0("mSigAct-", spect.name, "-",
-                              input.catalog.type, "-spectrum.png")
-      png.reconstructed.file.name <- 
-        paste0("mSigAct-", spect.name, "-",
-               input.catalog.type, "-reconstructed.png")
-      
-      
-      pdf.file.path <- paste0(output.file.path, "/", pdf.file.name)
-      table.file.path <- paste0(output.file.path, "/", table.file.name)
-      MAP.all.test.path <- paste0(output.file.path, "/", MAP.all.test.name)
-      png.spectrum.file.path <- paste0(output.file.path, "/", png.spectrum.file.name)
-      png.reconstructed.file.path <- paste0(output.file.path, "/", png.reconstructed.file.name)
-      
-      tbl1 <- data.frame(name = c(colnames(spect), "Reconstructed spectrum"), 
-                         count = c(colSums(spect), colSums(reconstructed.catalog)), 
-                         contribution = c(NA, NA),
-                         cosine.similarity = c(1, cossim))
-      tbl2 <- data.frame(name = rownames(best.MAP.exp), 
-                         count = best.MAP.exp[, 1],
-                         contribution = best.MAP.exp[, 1] / sum(best.MAP.exp[, 1]))
-      
-      tbl <- dplyr::bind_rows(tbl1, tbl2)
-      PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
-      src.file.path <- paste0("results", "/", pdf.file.name)
-      
-      dt <- plotdata$dat
-      dt$count <- 0
-      dt[tbl2$name, ]$count <- tbl2$count
-      
-      name1 <- setdiff(rownames(dt), tbl2$name)
-      order.name <- c(tbl2$name, name1)
-      stopifnot(setequal(order.name, rownames(dt)))
-      dt0 <- dt[order.name, ]
-      if (input.catalog.type %in% c("SBS96", "ID")) {
-        width <- 1700
-        height <- 250
-      } else {
-        width <- 2000
-        height <- 300
-      }
-      
-      grDevices::png(filename = png.spectrum.file.path, width = width, 
-                     height = height)
-      ICAMS::PlotCatalog(spect)
-      grDevices::dev.off()
-      grDevices::png(filename = png.reconstructed.file.path, width = width, 
-                     height = height)
-      ICAMS::PlotCatalog(reconstructed.catalog.rounded)
-      grDevices::dev.off()
-      
-      tbl1$spectrum <- c(paste0('<img src="', resource.path, '/', 
-                                png.spectrum.file.name, '" height="52"></img>'),
-                         paste0('<img src="', resource.path, '/', 
-                                png.reconstructed.file.name, '" height="52"></img>'))
-      
-      # Add the proportions of each signature contributing to the reconstructed
-      # spectrum
-      dt0$contribution <- dt0$count/ sum(dt0$count)
-      
-      dt1 <- dplyr::bind_rows(tbl1, dt0)
-      
-      # Write the exposure counts table to CSV file
-      tbl$proposed.aetiology <- c(NA, NA, dt1[rownames(best.MAP.exp), ]$proposed.aetiology)
-      utils::write.csv(tbl, file = table.file.path, na = "",  row.names = FALSE)
-      
-      # Write all tested combination of signatures in MAP to CSV file
-      all.tested.df <- plotdata$retval$all.tested
-      data.table::fwrite(all.tested.df, file = MAP.all.test.path)
-      
-      output$exposureTable <- DT::renderDataTable({
-        DT::datatable(dt1, 
-                      escape = FALSE, 
-                      rownames = FALSE,
-                      colnames = c("Name", "Mutations", "Contribution",
-                                   "Cosine similarity", "Spectrum", "Proposed etiology"),
-                      extensions = c("Buttons"),
-                      options = list(lengthMenu = c(25, 50, 75), 
-                                     pageLength = 25,
-                                     language = list(
-                                       search = "Search in signatures and etiologies:"
-                                     ))) %>%
-          DT::formatRound(columns = 2, digits = 1) %>%
-          DT::formatRound(columns = 3, digits = 5) %>%
-          DT::formatRound(columns = 4, digits = 5)
+    cossim <- plotdata$cossim
+    spect <- plotdata$spect
+    best.MAP.exp <- plotdata$best.MAP.exp
+    reconstructed.catalog <- plotdata$reconstructed.catalog
+    reconstructed.catalog.rounded <- round(reconstructed.catalog)
+    colnames(reconstructed.catalog.rounded) <- "Reconstructed spectrum"
+    sig.universe <- plotdata$sig.universe
+    
+    # Sort best.MAP.exp by exposure counts
+    best.MAP.exp <-
+      best.MAP.exp[order(best.MAP.exp[, 1], decreasing = TRUE), ,
+                   drop = FALSE]
+    
+    sigs.names <- rownames(best.MAP.exp)
+    sigs <- sig.universe[, sigs.names, drop = FALSE]
+    
+    # Add additional information to the PDF plot
+    spect1 <- spect
+    colnames(spect1) <- paste0(colnames(spect1), " (count = ",colSums(spect1), ")")
+    
+    reconstructed.spectrum <- reconstructed.catalog.rounded
+    colnames(reconstructed.spectrum) <- 
+      paste0("Reconstructed spectrum (count = ", colSums(reconstructed.spectrum),
+             ", cosine similarity = ", cossim, ")")
+    
+    etiologies <- sigs.etiologies[[input.catalog.type]]
+    colnames(sigs) <- 
+      paste0(colnames(sigs), " (exposure = ", round(best.MAP.exp[, 1]),
+             ", contribution = ", 
+             round(best.MAP.exp[, 1]/sum(best.MAP.exp[, 1]), 2), ") ",
+             etiologies[colnames(sigs), ])
+    
+    list.of.catalogs <- list(spect1, reconstructed.spectrum, sigs)
+    
+    # Generate a random string for resource path
+    resource.path <- stringi::stri_rand_strings(n = 1, length = 5)
+    
+    # Create a temp directory for storing png file of the thumbnail picture
+    tmpdir <- tempfile()
+    dir.create(tmpdir)
+    addResourcePath(prefix = resource.path, directoryPath = tmpdir)
+    
+    output.file.path <- resourcePaths()[resource.path]
+    
+    spect.name <- colnames(spect)
+    
+    # We cannot use "::" in the file path, otherwise zip::zipr will throw an error
+    spect.name <- gsub(pattern = "::", replacement = "-", spect.name)
+    
+    table.file.name <- paste0("mSigAct-", spect.name, "-",
+                              input.catalog.type, "-exposures.csv")
+    MAP.all.test.name <- paste0("mSigAct-", spect.name, "-",
+                                input.catalog.type, "-all-tested.csv")
+    pdf.file.name <- paste0("mSigAct-", spect.name, "-",
+                            input.catalog.type, "-attribution-plot.pdf")
+    results.file.name <- paste0("mSigAct-", spect.name, "-",
+                                input.catalog.type, "-attribution-results.zip")
+    png.spectrum.file.name <- paste0("mSigAct-", spect.name, "-",
+                                     input.catalog.type, "-spectrum.png")
+    png.reconstructed.file.name <- 
+      paste0("mSigAct-", spect.name, "-",
+             input.catalog.type, "-reconstructed.png")
+    
+    
+    pdf.file.path <- paste0(output.file.path, "/", pdf.file.name)
+    table.file.path <- paste0(output.file.path, "/", table.file.name)
+    MAP.all.test.path <- paste0(output.file.path, "/", MAP.all.test.name)
+    png.spectrum.file.path <- paste0(output.file.path, "/", png.spectrum.file.name)
+    png.reconstructed.file.path <- paste0(output.file.path, "/", png.reconstructed.file.name)
+    
+    tbl1 <- data.frame(name = c(colnames(spect), "Reconstructed spectrum"), 
+                       count = c(colSums(spect), colSums(reconstructed.catalog)), 
+                       contribution = c(NA, NA),
+                       cosine.similarity = c(1, cossim))
+    tbl2 <- data.frame(name = rownames(best.MAP.exp), 
+                       count = best.MAP.exp[, 1],
+                       contribution = best.MAP.exp[, 1] / sum(best.MAP.exp[, 1]))
+    
+    tbl <- dplyr::bind_rows(tbl1, tbl2)
+    PlotListOfCatalogsToPdf(list.of.catalogs, file = pdf.file.path)
+    src.file.path <- paste0("results", "/", pdf.file.name)
+    
+    dt <- plotdata$dat
+    dt$count <- 0
+    dt[tbl2$name, ]$count <- tbl2$count
+    
+    name1 <- setdiff(rownames(dt), tbl2$name)
+    order.name <- c(tbl2$name, name1)
+    stopifnot(setequal(order.name, rownames(dt)))
+    dt0 <- dt[order.name, ]
+    if (input.catalog.type %in% c("SBS96", "ID")) {
+      width <- 1700
+      height <- 250
+    } else {
+      width <- 2000
+      height <- 300
+    }
+    
+    grDevices::png(filename = png.spectrum.file.path, width = width, 
+                   height = height)
+    ICAMS::PlotCatalog(spect)
+    grDevices::dev.off()
+    grDevices::png(filename = png.reconstructed.file.path, width = width, 
+                   height = height)
+    ICAMS::PlotCatalog(reconstructed.catalog.rounded)
+    grDevices::dev.off()
+    
+    tbl1$spectrum <- c(paste0('<img src="', resource.path, '/', 
+                              png.spectrum.file.name, '" height="52"></img>'),
+                       paste0('<img src="', resource.path, '/', 
+                              png.reconstructed.file.name, '" height="52"></img>'))
+    
+    # Add the proportions of each signature contributing to the reconstructed
+    # spectrum
+    dt0$contribution <- dt0$count/ sum(dt0$count)
+    
+    dt1 <- dplyr::bind_rows(tbl1, dt0)
+    
+    # Write the exposure counts table to CSV file
+    tbl$proposed.aetiology <- c(NA, NA, dt1[rownames(best.MAP.exp), ]$proposed.aetiology)
+    utils::write.csv(tbl, file = table.file.path, na = "",  row.names = FALSE)
+    
+    # Write all tested combination of signatures in MAP to CSV file
+    all.tested.df <- plotdata$retval$all.tested
+    data.table::fwrite(all.tested.df, file = MAP.all.test.path)
+    
+    output$exposureTable <- DT::renderDataTable({
+      DT::datatable(dt1, 
+                    escape = FALSE, 
+                    rownames = FALSE,
+                    colnames = c("Name", "Mutations", "Contribution",
+                                 "Cosine similarity", "Spectrum", "Proposed etiology"),
+                    extensions = c("Buttons"),
+                    options = list(lengthMenu = c(25, 50, 75), 
+                                   pageLength = 25,
+                                   language = list(
+                                     search = "Search in signatures and etiologies:"
+                                   ))) %>%
+        DT::formatRound(columns = 2, digits = 1) %>%
+        DT::formatRound(columns = 3, digits = 5) %>%
+        DT::formatRound(columns = 4, digits = 5)
+    })
+    
+    # Download attribution results when user clicks the button
+    output$downloadExposureTable <- downloadHandler(
+      filename = function() {
+        table.file.name
+      },
+      content = function(file) {
+        file.copy(from = table.file.path, to = file)
       })
-      
-      # Download attribution results when user clicks the button
-      output$downloadExposureTable <- downloadHandler(
-        filename = function() {
-          table.file.name
-        },
-        content = function(file) {
-          file.copy(from = table.file.path, to = file)
-        })
-      
-      output$downloadPdf <- downloadHandler(
-        filename = function() {
-          pdf.file.name
-        },
-        content = function(file) {
-          file.copy(from = pdf.file.path, to = file)
-        })
-      
-      output$downloadMAPTable <- downloadHandler(
-        filename = function() {
-          MAP.all.test.name
-        },
-        content = function(file) {
-          file.copy(from = MAP.all.test.path, to = file)
-        })
-      
-      file.names <- c(table.file.path, pdf.file.path)
-      
-      output$downloadAttributionResults <- downloadHandler(
-        filename = function() {
-          results.file.name
-        },
-        content = function(file) {
-          zip::zipr(zipfile = file, files = file.names)
-        }
-      )
-      
-      # Check and insert tab "attributionResultsTab" on navbarPage
-      if (attribution.results.tab.existing == FALSE) {
-        insertTab(inputId = "panels",
-                  tabPanel(title = tags$b("Results"), 
-                           AttributionResultsUI(),
-                           value = "attributionResultsTab"),
-                  target = "tutorialTab")
+    
+    output$downloadPdf <- downloadHandler(
+      filename = function() {
+        pdf.file.name
+      },
+      content = function(file) {
+        file.copy(from = pdf.file.path, to = file)
+      })
+    
+    output$downloadMAPTable <- downloadHandler(
+      filename = function() {
+        MAP.all.test.name
+      },
+      content = function(file) {
+        file.copy(from = MAP.all.test.path, to = file)
+      })
+    
+    file.names <- c(table.file.path, pdf.file.path)
+    
+    output$downloadAttributionResults <- downloadHandler(
+      filename = function() {
+        results.file.name
+      },
+      content = function(file) {
+        zip::zipr(zipfile = file, files = file.names)
       }
-      
-      # Show the new attribution results
-      shinyjs::show(selector = '#panels li a[data-value=attributionResultsTab]')
-      
-      shinydashboard::updateTabItems(session = session, inputId = "panels", 
-                                     selected = "attributionResultsTab")
-      
-      return(list(attribution.results = TRUE))
+    )
+    
+    # Check and insert tab "attributionResultsTab" on navbarPage
+    if (attribution.results.tab.existing == FALSE) {
+      insertTab(inputId = "panels",
+                tabPanel(title = tags$b("Results"), 
+                         AttributionResultsUI(),
+                         value = "attributionResultsTab"),
+                target = "tutorialTab")
+    }
+    
+    # Show the new attribution results
+    shinyjs::show(selector = '#panels li a[data-value=attributionResultsTab]')
+    
+    shinydashboard::updateTabItems(session = session, inputId = "panels", 
+                                   selected = "attributionResultsTab")
+    
+    return(list(attribution.results = TRUE))
   }
 
 #' Prepare test VCFs for user to test
@@ -961,7 +978,7 @@ PrepareExampleVCFs <- function(file) {
 #' @keywords internal
 PrepareExampleSpectra <- function(file) {
   path <- system.file("extdata/mSigAct-example-spectra.zip", 
-                     package = "mSigAct.server")
+                      package = "mSigAct.server")
   file.copy(from = path, to = file)
 }
 
@@ -1033,7 +1050,7 @@ RunICAMSOnSampleMutectVCFs <- function(session, output, file, ids) {
 TransCountsCatalogToDensity <- function(list) {
   # Create an empty list for storing the density catalogs
   list1 <- vector(mode = "list")
-
+  
   for (name in names(list)) {
     name1 <- paste0(name, ".density")
     catalog <- list[[name]]
@@ -1064,40 +1081,40 @@ PlotListOfCatalogsToPdf <- function(list.of.catalogs,
                                     upper   = TRUE, 
                                     xlabels = TRUE,
                                     ylim    = NULL) {
-    old.par.tck.value <- graphics::par("tck")
-    # Setting the width and length for A4 size plotting
-    grDevices::pdf(file, width = 8.2677, height = 11.6929, onefile = TRUE)
-    graphics::par(tck = old.par.tck.value)
+  old.par.tck.value <- graphics::par("tck")
+  # Setting the width and length for A4 size plotting
+  grDevices::pdf(file, width = 8.2677, height = 11.6929, onefile = TRUE)
+  graphics::par(tck = old.par.tck.value)
+  
+  num.of.catalogs <- length(list.of.catalogs)
+  catalog.type <- attr(list.of.catalogs[[1]], "catalog.type")
+  if (nrow(list.of.catalogs[[1]]) == 96) {
+    opar <- graphics::par(mfrow = c(8, 1), mar = c(4, 5.5, 2, 1), oma = c(1, 1, 2, 1))
+  } else if (nrow(list.of.catalogs[[1]]) == 192) {
+    opar <- graphics::par(mfrow = c(8, 1), mar = c(2, 4, 2, 2), oma = c(3, 2, 1, 1))
+  } else if (nrow(list.of.catalogs[[1]]) == 78) {
+    opar <- graphics::par(mfrow = c(8, 1), mar = c(2, 4, 2, 2), oma = c(3, 3, 2, 2))
+  } else if (nrow(list.of.catalogs[[1]]) == 83) {
+    opar <- graphics::par(mfrow = c(8, 1), mar = c(3, 4, 2.5, 2), oma = c(3, 3, 2, 2))
+  } 
+  
+  on.exit(graphics::par(opar))
+  
+  for (i in 1:num.of.catalogs) {
+    catalog <- list.of.catalogs[[i]]
+    num.of.samples <- ncol(catalog)
     
-    num.of.catalogs <- length(list.of.catalogs)
-    catalog.type <- attr(list.of.catalogs[[1]], "catalog.type")
-    if (nrow(list.of.catalogs[[1]]) == 96) {
-      opar <- graphics::par(mfrow = c(8, 1), mar = c(4, 5.5, 2, 1), oma = c(1, 1, 2, 1))
-    } else if (nrow(list.of.catalogs[[1]]) == 192) {
-      opar <- graphics::par(mfrow = c(8, 1), mar = c(2, 4, 2, 2), oma = c(3, 2, 1, 1))
-    } else if (nrow(list.of.catalogs[[1]]) == 78) {
-      opar <- graphics::par(mfrow = c(8, 1), mar = c(2, 4, 2, 2), oma = c(3, 3, 2, 2))
-    } else if (nrow(list.of.catalogs[[1]]) == 83) {
-      opar <- graphics::par(mfrow = c(8, 1), mar = c(3, 4, 2.5, 2), oma = c(3, 3, 2, 2))
-    } 
-    
-    on.exit(graphics::par(opar))
-    
-    for (i in 1:num.of.catalogs) {
-      catalog <- list.of.catalogs[[i]]
-      num.of.samples <- ncol(catalog)
-      
-      for (j in 1:num.of.samples) {
-        cat <- catalog[, j, drop = FALSE]
-        PlotCatalog(cat, plot.SBS12 = plot.SBS12, cex = cex, grid = grid, 
-                    upper = upper, xlabels = xlabels, ylim = ylim)
-      }
-      
+    for (j in 1:num.of.samples) {
+      cat <- catalog[, j, drop = FALSE]
+      PlotCatalog(cat, plot.SBS12 = plot.SBS12, cex = cex, grid = grid, 
+                  upper = upper, xlabels = xlabels, ylim = ylim)
     }
     
-    grDevices::dev.off()
-    invisible(list(plot.success = TRUE))
   }
+  
+  grDevices::dev.off()
+  invisible(list(plot.success = TRUE))
+}
 
 #' @keywords internal
 CheckCatalogType <- function(catalog) {
@@ -1213,10 +1230,10 @@ PrepareThumbnailForSample <- function(input, catalog, input.catalog.type) {
   grDevices::dev.off()
   
   df <- data.frame(name = colnames(spect), 
-                    spectrum = paste0('<img src="', resource.path, '/', 
-                                      png.spectrum.file.name, 
-                                      '" height="52"></img>'),
-                    proposed.aetiology = NA)
+                   spectrum = paste0('<img src="', resource.path, '/', 
+                                     png.spectrum.file.name, 
+                                     '" height="52"></img>'),
+                   proposed.aetiology = NA)
   return(df)
 }
 
@@ -1310,11 +1327,9 @@ PrepareSpectraPlotFromVCF <- function(input, output, list.of.catalogs) {
       if (colSums(catalog) != 0) {
         plot.name <- paste0(i, "plot")
         output[[plot.name]] <- renderPlot({
-          if (i == "SBS96") {
-            par(oma = c(0, 2, 0, 0))
-          }
           ICAMS::PlotCatalog(catalog)
         }, height = heights.of.plots[[i]], width = widths.of.plots[[i]])
+        
         names.of.tabs <<- c(names.of.tabs, i)
       }
     })
@@ -1354,10 +1369,7 @@ PrepareSpectraPlotFromCatalog <-
       {
         output$spectrum <- renderPlot(
           {
-            if (input.catalog.type == "SBS96") {
-              par(oma = c(0, 2, 0, 0))
-            }
-            ICAMS::PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
+            PlotCatalog(catalog[, input$selectedSampleFromUploadedCatalog,
                                 drop = FALSE])
           }, height = heights.of.plots[[input.catalog.type]],
           width = widths.of.plots[[input.catalog.type]])
@@ -1436,23 +1448,24 @@ ReadAndCheckVCF <- function(input) {
   # "type": The MIME type reported by the browser.
   # "datapath": The path to a temp file that contains the data that was uploaded.
   vcfs.info <- input$vcf.files
-  vcfs.info <- input$vcf.files
   file.paths <- vcfs.info$datapath
   file.names <- vcfs.info$name
   num.of.files <- length(file.names)
   ReadVCFs <- utils::getFromNamespace(x = "ReadVCFs", ns = "ICAMS")
   retval <- tryCatch({
-      ReadVCFs(files = file.paths, 
-               num.of.cores = min(10, num.of.files),
-               names.of.VCFs = file.names)},
-      error = function(error.info) {
-        if(!is.null(error.info$message)) {
-          err.message <- error.info$message
-          null.list <- list()
-          attr(null.list, "error") <- err.message
-          return(null.list)
-        }
+    ReadVCFs(files = file.paths, 
+             variant.caller = input$variantCaller,
+             num.of.cores = min(10, num.of.files),
+             names.of.VCFs = file.names,
+             filter.status = input$filter.status)},
+    error = function(error.info) {
+      if(!is.null(error.info$message)) {
+        err.message <- error.info$message
+        null.list <- list()
+        attr(null.list, "error") <- err.message
+        return(null.list)
       }
+    }
   )
   
   if (.Platform$OS.type == "windows") {

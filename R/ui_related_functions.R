@@ -126,6 +126,15 @@ AddSampleNames <- function() {
 
 #' @import shiny
 #' @keywords internal
+AddFilterStatus <- function() {
+  textInput(inputId = "filter.status", 
+            label = p(strong(h5("Filter status"), style = "color: #337ab7"),
+                      h5("A character string indicating that a variant has ",
+                         "passed all filters (e.g. PASS)")))
+}
+
+#' @import shiny
+#' @keywords internal
 AddBaseFilename <- function() {
   textInput(inputId = "base.filename",
             label = 

@@ -1,3 +1,10 @@
+# mSigAct.server 0.1.2
+## Added
+* Added a new widget on the VCF uploading page for user to specify filter status
+when variant caller is not Strelka or Mutect.
+
+<br>
+
 # mSigAct.server 0.1.1
 ## Added
 * Added signature etiology information in the attribution PDF plot.

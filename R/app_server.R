@@ -57,7 +57,7 @@ app_server <- function(input, output, session) {
     attribution.results.tab.existing <- reactiveVal(FALSE)
     
     analysis.for.uploaded.spectra <- reactiveVal(FALSE)
-      
+    
     example.mutect.vcf.analyzed <- NULL  
     
     list.of.catalogs <- catalog.path <- NA
@@ -67,7 +67,7 @@ app_server <- function(input, output, session) {
     mutation.type <- NULL
     
     input.region <- reactiveVal(NULL)
-      
+    
     input.ref.genome <- reactiveVal(NULL)
     
     showSBS192Catalog <- TRUE
@@ -229,6 +229,8 @@ app_server <- function(input, output, session) {
       
       if (input$variantCaller == "unknown") {
         if (is.null(input$mergeSBS)) {
+          return()
+        } else if (input$filter.status == "") {
           return()
         }
       }
@@ -814,7 +816,7 @@ app_server <- function(input, output, session) {
       # Each time when we call ShowPreselectedSigs(), must remember to update
       # the reactive value preselected.sigs
       preselected.sigs(selected.sig.universe)
-    
+      
       # Show the actionButton for user to add more signatures
       output$addSig <- renderUI(
         actionButton(inputId = "addMoreSigs", label = "Add more signatures",
@@ -1084,7 +1086,7 @@ app_server <- function(input, output, session) {
         })
         shinyjs::show(id = "analysisButton")
       } # Need to use ignoreNULL here otherwise sigAetiologyTable will not change
-        # if user deselect all signatures
+      # if user deselect all signatures
     }, ignoreNULL = FALSE,  ignoreInit = TRUE)
     
     # Asynchronous programming starts from here
@@ -1124,9 +1126,9 @@ app_server <- function(input, output, session) {
         progress$inc(amount = 0.05, 
                      detail = "Trying to remove some signatures using bootstrapping")
         retval <- 
-          mSigAct:::OptimizeExposureQPBootstrap(spectrum = spect,
-                                                signatures = sig.universe, 
-                                                mc.cores = AdjustNumberOfCores(50))
+          mSigAct::OptimizeExposureQPBootstrap(spectrum = spect,
+                                               signatures = sig.universe, 
+                                               mc.cores = AdjustNumberOfCores(50))
         sig.universe <<- sig.universe[, names(retval$exposure), drop = FALSE]
         progress$inc(amount = 0.05, 
                      detail = "Removed some signatures using bootstrapping")
@@ -1172,7 +1174,7 @@ app_server <- function(input, output, session) {
           # (https://stat.ethz.ch/R-manual/R-devel/library/parallel/html/mcparallel.html).
           set.seed(102119, kind = "L'Ecuyer-CMRG")
           
-          retval <- mSigAct:::MAPAssignActivity1(
+          retval <- mSigAct::MAPAssignActivity1(
             spect = spect,
             sigs = sig.universe,
             sigs.presence.prop = sigs.prop,
@@ -1180,9 +1182,7 @@ app_server <- function(input, output, session) {
             p.thresh = 0.01,
             m.opts = mSigAct::DefaultManyOpts(),
             max.mc.cores = AdjustNumberOfCores(50),
-            progress.monitor = updateProgress,
-            use.sparse.assign = TRUE,
-            drop.low.mut.samples = FALSE
+            progress.monitor = updateProgress
           )
           
           return(retval)
