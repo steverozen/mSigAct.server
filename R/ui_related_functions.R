@@ -129,8 +129,9 @@ AddSampleNames <- function() {
 AddFilterStatus <- function() {
   textInput(inputId = "filter.status", 
             label = p(strong(h5("Filter status"), style = "color: #337ab7"),
-                      h5("A character string indicating that a variant has ",
-                         "passed all filters (e.g. PASS)")))
+                      h5("The character string in column FILTER of the VCF ",
+                         "that indicates that a variant has passed all the ",
+                         "variant caller's filters (e.g. PASS)")))
 }
 
 #' @import shiny
