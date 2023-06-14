@@ -1128,7 +1128,7 @@ app_server <- function(input, output, session) {
         retval <- 
           mSigAct:::OptimizeExposureQPBootstrap(spectrum = spect,
                                                 signatures = sig.universe, 
-                                                mc.cores = AdjustNumberOfCores(50))
+                                                mc.cores = AdjustNumberOfCores(30))
         sig.universe <<- sig.universe[, names(retval$exposure), drop = FALSE]
         progress$inc(amount = 0.05, 
                      detail = "Removed some signatures using bootstrapping")
@@ -1181,7 +1181,7 @@ app_server <- function(input, output, session) {
             max.level = length(sigs.prop) - 1,
             p.thresh = 0.01,
             m.opts = mSigAct::DefaultManyOpts(),
-            max.mc.cores = AdjustNumberOfCores(50),
+            max.mc.cores = AdjustNumberOfCores(30),
             progress.monitor = updateProgress
           )
           
